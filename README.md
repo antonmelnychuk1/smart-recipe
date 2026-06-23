@@ -1,100 +1,166 @@
 # SmartRecipe
 
-Aplikacja webowa, która układa przepisy z produktów dostępnych w domu. Jej
-główny cel to prostsze planowanie posiłków i ograniczenie marnowania jedzenia.
+SmartRecipe is an AI-powered web application that generates recipes from
+ingredients users already have at home. It helps simplify meal planning,
+create shopping lists, and reduce food waste.
 
-## Uruchomienie
+## Features
 
-```bash
-npm install
-npm run dev
+- generate three personalized recipes with the OpenAI API,
+- filter recipes by diet and maximum preparation time,
+- calculate how well each recipe matches the available ingredients,
+- identify missing ingredients,
+- provide step-by-step instructions and nutritional estimates,
+- create and manage a shopping list,
+- save favorite recipes,
+- access recent search history,
+- register and sign in with email and password,
+- synchronize user data with PostgreSQL,
+- store data locally for guests,
+- use a responsive Polish-language interface.
+
+## Tech Stack
+
+- Next.js 16 and React 19
+- TypeScript
+- Tailwind CSS
+- OpenAI Responses API and Structured Outputs
+- PostgreSQL
+- Prisma ORM
+- Better Auth
+- Zod
+
+## Architecture
+
+```text
+User
+  |
+  v
+Next.js interface
+  |
+  +-- /api/recipes --> OpenAI API
+  |                     |
+  |                     v
+  |                validated recipe
+  |
+  +-- /api/auth ------> Better Auth
+  |
+  +-- /api/kitchen ---> Prisma ---> PostgreSQL
 ```
 
-Aplikacja będzie dostępna pod adresem [http://localhost:3000](http://localhost:3000).
+The OpenAI API key and database credentials are used exclusively on the
+server. They are never included in the client-side bundle.
 
-## Obecny stan
+## Local Development
 
-Pierwszy interaktywny prototyp zawiera:
+### 1. Requirements
 
-- dodawanie i usuwanie składników,
-- wybór diety oraz maksymalnego czasu,
-- generowanie trzech przepisów przez OpenAI API,
-- walidowany format odpowiedzi AI,
-- informację o dopasowaniu i brakujących produktach,
-- szczegóły przepisu, kroki oraz makroskładniki,
-- zapisywanie pełnych ulubionych przepisów,
-- historię 10 ostatnich wyszukiwań,
-- wspólną listę brakujących produktów,
-- responsywny interfejs w języku polskim.
+- Node.js 20 or newer,
+- a PostgreSQL database,
+- an OpenAI API key.
 
-Przed pierwszym uruchomieniem utwórz `.env.local`:
+### 2. Installation
+
+```bash
+git clone https://github.com/YOUR_USERNAME/smart-recipe.git
+cd smart-recipe
+npm install
+```
+
+### 3. Environment variables
+
+Copy `.env.example` to `.env.local` and provide the required values:
 
 ```env
-OPENAI_API_KEY=sk-...
-# Opcjonalnie:
+OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5.4-mini
-DATABASE_URL=postgresql://...
-BETTER_AUTH_SECRET=wygenerowany-sekret-minimum-32-znaki
+DATABASE_URL=
+BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
-Klucz jest używany wyłącznie przez serwerowy endpoint `/api/recipes` i nie
-trafia do kodu przeglądarki.
-
-Bez logowania ulubione, historia i lista zakupów są zapisywane lokalnie w
-przeglądarce. Po utworzeniu konta dane są przenoszone do PostgreSQL i przypisane
-do użytkownika.
-
-Sekret Better Auth wygenerujesz poleceniem:
+Generate a Better Auth secret with:
 
 ```bash
 openssl rand -base64 32
 ```
 
-Skopiuj wynik do `BETTER_AUTH_SECRET` w `.env.local`.
+Never commit `.env.local`.
 
-## Proponowany zakres MVP
+### 4. Database setup
 
-1. Weryfikacja adresu e-mail i reset hasła.
-2. Testy endpointów i ograniczenie liczby zapytań.
-3. Deployment na Vercel.
-
-Planner tygodniowy, automatyczna lista zakupów i personalizacja na podstawie
-historii powinny wejść dopiero po domknięciu tego przepływu.
-
-## Docelowa architektura
-
-```text
-Interfejs Next.js
-       |
-Server Action / API Route
-       |
-walidacja danych -> OpenAI API
-       |
-PostgreSQL + Prisma
+```bash
+npm run db:generate
+npm run db:migrate
 ```
 
-Klucz API nigdy nie powinien trafiać do kodu klienta. Wywołanie modelu wykonuje
-serwer, a odpowiedź przed wyświetleniem jest walidowana.
+The migration creates tables for users, sessions, favorite recipes, search
+history, and shopping-list items.
 
-## Pomysły na wyróżnienie projektu
-
-- **Tryb „uratować najpierw”** — produkty otrzymują datę ważności, a generator
-  priorytetyzuje te, które trzeba szybko zużyć.
-- **Poziom elastyczności** — użytkownik wybiera: tylko posiadane produkty,
-  maksymalnie 2 brakujące albo dowolne uzupełnienia.
-- **Zamienniki** — przepis od razu proponuje zamianę brakującego składnika.
-- **Porcje i skalowanie** — automatyczne przeliczenie ilości dla 1–8 osób.
-- **Ocena realnego wykorzystania** — wskaźnik pokazujący, jak dużo zapasów
-  zużywa konkretny przepis.
-- **Budżet posiłku** — opcjonalny limit kosztu brakujących produktów.
-
-## Skrypty
+### 5. Start the application
 
 ```bash
 npm run dev
-npm run lint
-npm run build
-npm run db:migrate
-npm run db:studio
 ```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Available Scripts
+
+```bash
+npm run dev          # start the development server
+npm run build        # create a production build
+npm run start        # start the production build
+npm run lint         # check code quality
+npm run db:generate  # generate the Prisma client
+npm run db:migrate   # create and apply a local migration
+npm run db:studio    # open the database browser
+```
+
+## Deployment
+
+The project can be deployed to Vercel or any other hosting provider that
+supports Next.js applications.
+
+Configure the following environment variables in production:
+
+```text
+OPENAI_API_KEY
+OPENAI_MODEL
+DATABASE_URL
+BETTER_AUTH_SECRET
+BETTER_AUTH_URL
+```
+
+`BETTER_AUTH_URL` must point to the public application URL, for example:
+
+```env
+BETTER_AUTH_URL=https://smart-recipe.vercel.app
+```
+
+Apply Prisma migrations whenever the production database schema changes.
+
+## Security
+
+- secrets are stored exclusively in environment variables,
+- AI responses are validated before they reach the interface,
+- user data is protected by session-based authorization,
+- passwords and sessions are handled by Better Auth,
+- `.env.local` is excluded from Git.
+
+## Roadmap
+
+- email verification and password recovery,
+- API rate limiting,
+- weekly meal planning,
+- ingredient scaling based on serving size,
+- substitutions for missing ingredients,
+- prioritization of ingredients nearing their expiration date,
+- automated tests,
+- iOS and Android applications built with React Native and Expo,
+- App Store and Google Play releases.
+
+## Project Status
+
+SmartRecipe is under active development. The current version includes a
+working AI recipe generator, authentication, and persistent user data.
