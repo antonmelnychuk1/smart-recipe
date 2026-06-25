@@ -139,6 +139,9 @@ export default function Home() {
     remaining: number;
     resetAt: string;
   } | null>(null);
+  const dailyGenerationLimit = session?.user ? 20 : 3;
+  const currentGenerationUsage =
+    generationUsage?.limit === dailyGenerationLimit ? generationUsage : null;
 
   useEffect(() => {
     const initialization = window.setTimeout(() => {
@@ -544,19 +547,61 @@ export default function Home() {
               {isLoading ? "AI gotuje..." : "Generuj przepisy"}
             </button>
           </div>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#f3f6f2] px-4 py-3 text-xs text-[#617068]">
+            <span>
+              {session?.user ? (
+                <>
+                  Twoje konto obejmuje{" "}
+                  <strong className="text-[#365a46]">
+                    20 generowań dziennie
+                  </strong>
+                  .
+                </>
+              ) : (
+                <>
+                  Bez konta otrzymujesz{" "}
+                  <strong className="text-[#365a46]">
+                    3 generowania dziennie
+                  </strong>
+                  .
+                </>
+              )}
+            </span>
+            {!session?.user && (
+              <button
+                type="button"
+                onClick={() => setAuthOpen(true)}
+                className="font-semibold text-[#2f684f] hover:underline"
+              >
+                Załóż konto — zwiększ limit do 20
+              </button>
+            )}
+          </div>
           {error && (
             <p
               role="alert"
               className="mt-4 rounded-xl bg-[#fff0eb] px-4 py-3 text-sm text-[#a44436]"
             >
               {error}
+              {generationUsage?.remaining === 0 && (
+                <span className="mt-1 block text-xs">
+                  Limit odnowi się{" "}
+                  {new Intl.DateTimeFormat("pl-PL", {
+                    weekday: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }).format(new Date(generationUsage.resetAt))}
+                  .
+                </span>
+              )}
             </p>
           )}
-          {generationUsage && !error && (
+          {currentGenerationUsage && !error && (
             <p className="mt-4 text-center text-xs text-[#7a857e]">
               Pozostało dziś:{" "}
               <strong className="text-[#466453]">
-                {generationUsage.remaining}/{generationUsage.limit}
+                {currentGenerationUsage.remaining}/
+                {currentGenerationUsage.limit}
               </strong>{" "}
               generowań
             </p>
