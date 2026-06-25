@@ -17,6 +17,7 @@ create shopping lists, and reduce food waste.
 - save favorite recipes,
 - access recent search history,
 - register and sign in with email and password,
+- access a protected administrator dashboard with user and usage statistics,
 - synchronize user data with PostgreSQL,
 - protect OpenAI usage with persistent daily generation limits,
 - store data locally for guests,
@@ -118,6 +119,7 @@ npm run lint         # check code quality
 npm run db:generate  # generate the Prisma client
 npm run db:migrate   # create and apply a local migration
 npm run db:studio    # open the database browser
+npm run admin:promote -- user@example.com # grant administrator access
 ```
 
 ## Deployment
@@ -142,6 +144,20 @@ BETTER_AUTH_URL=https://smart-recipe.vercel.app
 ```
 
 Apply Prisma migrations whenever the production database schema changes.
+
+## Administrator Access
+
+The protected dashboard is available at `/admin`. Access is checked on the
+server against the user's role stored in PostgreSQL.
+
+Grant administrator access to an existing account with:
+
+```bash
+npm run admin:promote -- user@example.com
+```
+
+Run this command only from a trusted environment with access to
+`DATABASE_URL`.
 
 ## Security
 

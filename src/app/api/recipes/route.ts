@@ -57,6 +57,7 @@ export async function POST(request: Request) {
   const usage = await consumeGenerationLimit();
 
   if (!usage.allowed) {
+    await refundGenerationLimit(usage.identifier);
     return Response.json(
       {
         error:

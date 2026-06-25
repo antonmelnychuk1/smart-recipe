@@ -135,6 +135,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [generationUsage, setGenerationUsage] = useState<{
     limit: number;
     remaining: number;
@@ -231,6 +232,24 @@ export default function Home() {
     // Dane lokalne są używane tylko podczas pierwszej synchronizacji po logowaniu.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user.id, storageLoaded]);
+
+  useEffect(() => {
+    if (!session?.user) return;
+
+    let cancelled = false;
+    fetch("/api/admin/status")
+      .then((response) => response.json())
+      .then((data: { isAdmin?: boolean }) => {
+        if (!cancelled) setIsAdmin(Boolean(data.isAdmin));
+      })
+      .catch(() => {
+        if (!cancelled) setIsAdmin(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.user]);
 
   const visibleRecipes = useMemo(
     () =>
@@ -419,6 +438,14 @@ export default function Home() {
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
           ) : session?.user ? (
             <div className="flex items-center gap-3">
+              {isAdmin && (
+                <a
+                  href="/admin"
+                  className="rounded-full bg-[#253d31] px-4 py-2 text-white"
+                >
+                  Admin
+                </a>
+              )}
               <a
                 href="#my-kitchen"
                 className="rounded-full border border-[#d9d7cd] bg-white px-4 py-2 text-[#33433a] shadow-sm"
@@ -426,7 +453,10 @@ export default function Home() {
                 {session.user.name}
               </a>
               <button
-                onClick={() => authClient.signOut()}
+                onClick={() => {
+                  setIsAdmin(false);
+                  void authClient.signOut();
+                }}
                 className="text-xs text-[#7a857e] hover:text-[#2f684f]"
               >
                 Wyloguj
