@@ -1,6 +1,10 @@
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
+import {
+  consumeGenerationLimit,
+  refundGenerationLimit,
+} from "@/lib/generation-limit";
 
 const requestSchema = z.object({
   ingredients: z.array(z.string().trim().min(1).max(60)).min(1).max(30),
@@ -50,6 +54,37 @@ export async function POST(request: Request) {
 
   const { ingredients, diet, maxTime } = parsedRequest.data;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const usage = await consumeGenerationLimit();
+
+  if (!usage.allowed) {
+    return Response.json(
+      {
+        error:
+          "Dzisiejszy limit generowania został wykorzystany. Spróbuj ponownie jutro.",
+        usage: {
+          limit: usage.limit,
+          remaining: usage.remaining,
+          resetAt: usage.resetAt,
+        },
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(
+            Math.max(
+              1,
+              Math.ceil(
+                (new Date(usage.resetAt).getTime() - Date.now()) / 1000,
+              ),
+            ),
+          ),
+          "X-RateLimit-Limit": String(usage.limit),
+          "X-RateLimit-Remaining": String(usage.remaining),
+          "X-RateLimit-Reset": usage.resetAt,
+        },
+      },
+    );
+  }
 
   try {
     const response = await openai.responses.parse({
@@ -78,14 +113,25 @@ Każdy przepis musi mieścić się w limicie czasu, być zgodny z dietą, wykorz
     });
 
     if (!response.output_parsed) {
+      await refundGenerationLimit(usage.identifier);
       return Response.json(
         { error: "Model nie zwrócił gotowych przepisów. Spróbuj ponownie." },
         { status: 502 },
       );
     }
 
-    return Response.json(response.output_parsed);
+    return Response.json({
+      ...response.output_parsed,
+      usage: {
+        limit: usage.limit,
+        remaining: usage.remaining,
+        resetAt: usage.resetAt,
+      },
+    });
   } catch (error) {
+    await refundGenerationLimit(usage.identifier).catch((refundError) => {
+      console.error("Generation limit refund failed", refundError);
+    });
     console.error("Recipe generation failed", error);
 
     if (error instanceof OpenAI.APIError) {

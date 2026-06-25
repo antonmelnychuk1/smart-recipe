@@ -76,3 +76,8 @@ export type SearchHistory = Prisma.SearchHistoryModel
  * 
  */
 export type ShoppingItem = Prisma.ShoppingItemModel
+/**
+ * Model GenerationUsage
+ * 
+ */
+export type GenerationUsage = Prisma.GenerationUsageModel

@@ -16,6 +16,7 @@ create shopping lists, and reduce food waste.
 - access recent search history,
 - register and sign in with email and password,
 - synchronize user data with PostgreSQL,
+- protect OpenAI usage with persistent daily generation limits,
 - store data locally for guests,
 - use a responsive Polish-language interface.
 
@@ -151,7 +152,7 @@ Apply Prisma migrations whenever the production database schema changes.
 ## Roadmap
 
 - email verification and password recovery,
-- API rate limiting,
+- configurable usage plans and higher limits for selected users,
 - weekly meal planning,
 - ingredient scaling based on serving size,
 - substitutions for missing ingredients,

@@ -390,7 +390,8 @@ export const ModelName = {
   Verification: 'Verification',
   Favorite: 'Favorite',
   SearchHistory: 'SearchHistory',
-  ShoppingItem: 'ShoppingItem'
+  ShoppingItem: 'ShoppingItem',
+  GenerationUsage: 'GenerationUsage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -406,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "favorite" | "searchHistory" | "shoppingItem"
+    modelProps: "user" | "session" | "account" | "verification" | "favorite" | "searchHistory" | "shoppingItem" | "generationUsage"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -928,6 +929,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    GenerationUsage: {
+      payload: Prisma.$GenerationUsagePayload<ExtArgs>
+      fields: Prisma.GenerationUsageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GenerationUsageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GenerationUsageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>
+        }
+        findFirst: {
+          args: Prisma.GenerationUsageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GenerationUsageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>
+        }
+        findMany: {
+          args: Prisma.GenerationUsageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>[]
+        }
+        create: {
+          args: Prisma.GenerationUsageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>
+        }
+        createMany: {
+          args: Prisma.GenerationUsageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GenerationUsageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>[]
+        }
+        delete: {
+          args: Prisma.GenerationUsageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>
+        }
+        update: {
+          args: Prisma.GenerationUsageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>
+        }
+        deleteMany: {
+          args: Prisma.GenerationUsageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GenerationUsageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GenerationUsageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>[]
+        }
+        upsert: {
+          args: Prisma.GenerationUsageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationUsagePayload>
+        }
+        aggregate: {
+          args: Prisma.GenerationUsageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGenerationUsage>
+        }
+        groupBy: {
+          args: Prisma.GenerationUsageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GenerationUsageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GenerationUsageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GenerationUsageCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1057,6 +1132,18 @@ export const ShoppingItemScalarFieldEnum = {
 } as const
 
 export type ShoppingItemScalarFieldEnum = (typeof ShoppingItemScalarFieldEnum)[keyof typeof ShoppingItemScalarFieldEnum]
+
+
+export const GenerationUsageScalarFieldEnum = {
+  id: 'id',
+  identifier: 'identifier',
+  windowStart: 'windowStart',
+  count: 'count',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GenerationUsageScalarFieldEnum = (typeof GenerationUsageScalarFieldEnum)[keyof typeof GenerationUsageScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1298,6 +1385,7 @@ export type GlobalOmitConfig = {
   favorite?: Prisma.FavoriteOmit
   searchHistory?: Prisma.SearchHistoryOmit
   shoppingItem?: Prisma.ShoppingItemOmit
+  generationUsage?: Prisma.GenerationUsageOmit
 }
 
 /* Types for Logging */

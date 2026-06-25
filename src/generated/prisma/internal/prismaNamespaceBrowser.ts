@@ -57,7 +57,8 @@ export const ModelName = {
   Verification: 'Verification',
   Favorite: 'Favorite',
   SearchHistory: 'SearchHistory',
-  ShoppingItem: 'ShoppingItem'
+  ShoppingItem: 'ShoppingItem',
+  GenerationUsage: 'GenerationUsage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -166,6 +167,18 @@ export const ShoppingItemScalarFieldEnum = {
 } as const
 
 export type ShoppingItemScalarFieldEnum = (typeof ShoppingItemScalarFieldEnum)[keyof typeof ShoppingItemScalarFieldEnum]
+
+
+export const GenerationUsageScalarFieldEnum = {
+  id: 'id',
+  identifier: 'identifier',
+  windowStart: 'windowStart',
+  count: 'count',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GenerationUsageScalarFieldEnum = (typeof GenerationUsageScalarFieldEnum)[keyof typeof GenerationUsageScalarFieldEnum]
 
 
 export const SortOrder = {

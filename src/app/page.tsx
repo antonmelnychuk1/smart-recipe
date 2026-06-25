@@ -134,6 +134,11 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
+  const [generationUsage, setGenerationUsage] = useState<{
+    limit: number;
+    remaining: number;
+    resetAt: string;
+  } | null>(null);
 
   useEffect(() => {
     const initialization = window.setTimeout(() => {
@@ -330,7 +335,16 @@ export default function Home() {
       const data = (await response.json()) as {
         recipes?: Recipe[];
         error?: string;
+        usage?: {
+          limit: number;
+          remaining: number;
+          resetAt: string;
+        };
       };
+
+      if (data.usage) {
+        setGenerationUsage(data.usage);
+      }
 
       if (!response.ok || !data.recipes) {
         throw new Error(data.error ?? "Nie udało się wygenerować przepisów.");
@@ -536,6 +550,15 @@ export default function Home() {
               className="mt-4 rounded-xl bg-[#fff0eb] px-4 py-3 text-sm text-[#a44436]"
             >
               {error}
+            </p>
+          )}
+          {generationUsage && !error && (
+            <p className="mt-4 text-center text-xs text-[#7a857e]">
+              Pozostało dziś:{" "}
+              <strong className="text-[#466453]">
+                {generationUsage.remaining}/{generationUsage.limit}
+              </strong>{" "}
+              generowań
             </p>
           )}
         </form>
