@@ -81,6 +81,8 @@ OPENAI_MODEL=gpt-5.4-mini
 DATABASE_URL=
 BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:3000
+RESEND_API_KEY=
+EMAIL_FROM="SmartRecipe <onboarding@resend.dev>"
 ```
 
 Generate a Better Auth secret with:
@@ -144,6 +146,15 @@ BETTER_AUTH_URL=https://smart-recipe.vercel.app
 ```
 
 Apply Prisma migrations whenever the production database schema changes.
+
+`RESEND_API_KEY` enables verification emails. During development,
+`onboarding@resend.dev` can send only to the email address associated with the
+Resend account. For public delivery, verify your own domain in Resend and set
+`EMAIL_FROM`, for example:
+
+```env
+EMAIL_FROM="SmartRecipe <hello@your-domain.com>"
+```
 
 ## Administrator Access
 

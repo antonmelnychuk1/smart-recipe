@@ -136,6 +136,8 @@ export default function Home() {
   const [error, setError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [verificationPending, setVerificationPending] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState("");
   const [generationUsage, setGenerationUsage] = useState<{
     limit: number;
     remaining: number;
@@ -415,6 +417,23 @@ export default function Home() {
     }
   }
 
+  async function resendVerification() {
+    if (!session?.user.email) return;
+
+    setVerificationPending(true);
+    setVerificationMessage("");
+    const result = await authClient.sendVerificationEmail({
+      email: session.user.email,
+      callbackURL: "/",
+    });
+    setVerificationPending(false);
+    setVerificationMessage(
+      result.error
+        ? "Nie udało się wysłać wiadomości. Spróbuj ponownie."
+        : "Wiadomość została wysłana. Sprawdź również folder spam.",
+    );
+  }
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f4ed] text-[#25322b]">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8">
@@ -472,6 +491,29 @@ export default function Home() {
           )}
         </div>
       </nav>
+
+      {session?.user && !session.user.emailVerified && (
+        <div className="border-y border-[#efd4a8] bg-[#fff5df] px-5 py-3 sm:px-8">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 text-sm text-[#795d2f]">
+            <p>
+              Potwierdź adres <strong>{session.user.email}</strong>, aby
+              zabezpieczyć konto.
+              {verificationMessage && (
+                <span className="ml-2 text-xs">{verificationMessage}</span>
+              )}
+            </p>
+            <button
+              onClick={resendVerification}
+              disabled={verificationPending}
+              className="rounded-lg bg-[#795d2f] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+            >
+              {verificationPending
+                ? "Wysyłam..."
+                : "Wyślij link weryfikacyjny"}
+            </button>
+          </div>
+        </div>
+      )}
 
       <section className="relative mx-auto max-w-7xl px-5 pb-20 pt-10 sm:px-8 lg:pt-20">
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />

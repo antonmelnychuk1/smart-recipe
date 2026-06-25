@@ -11,11 +11,13 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsPending(true);
     setError("");
+    setMessage("");
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email"));
@@ -42,6 +44,13 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
           : mode === "login"
             ? "Nieprawidłowy e-mail lub hasło."
             : result.error.message || "Nie udało się utworzyć konta.",
+      );
+      return;
+    }
+
+    if (mode === "register") {
+      setMessage(
+        "Konto zostało utworzone. Sprawdź skrzynkę i potwierdź adres e-mail.",
       );
       return;
     }
@@ -119,6 +128,14 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
               {error}
             </p>
           )}
+          {message && (
+            <p
+              role="status"
+              className="rounded-xl bg-[#e9f2eb] p-3 text-sm text-[#356248]"
+            >
+              {message}
+            </p>
+          )}
 
           <button
             disabled={isPending}
@@ -136,6 +153,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
           onClick={() => {
             setMode((current) => (current === "login" ? "register" : "login"));
             setError("");
+            setMessage("");
           }}
           className="mt-5 w-full text-sm text-[#667168] hover:text-[#2f684f]"
         >
