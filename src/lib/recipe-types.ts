@@ -22,3 +22,12 @@ export type SearchHistoryEntry = {
   maxTime: number;
   recipes: Recipe[];
 };
+
+export type MealType = "breakfast" | "lunch" | "dinner";
+
+export type MealPlanEntry = {
+  id: string;
+  day: number;
+  mealType: MealType;
+  recipe: Recipe;
+};

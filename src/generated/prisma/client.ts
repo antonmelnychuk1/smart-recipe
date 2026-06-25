@@ -81,3 +81,8 @@ export type ShoppingItem = Prisma.ShoppingItemModel
  * 
  */
 export type GenerationUsage = Prisma.GenerationUsageModel
+/**
+ * Model MealPlan
+ * 
+ */
+export type MealPlan = Prisma.MealPlanModel

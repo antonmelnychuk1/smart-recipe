@@ -12,6 +12,8 @@ create shopping lists, and reduce food waste.
 - identify missing ingredients,
 - provide step-by-step instructions and nutritional estimates,
 - create and manage a shopping list,
+- plan breakfast, lunch, and dinner for each day of the week,
+- add missing ingredients from the weekly plan to the shopping list,
 - save favorite recipes,
 - access recent search history,
 - register and sign in with email and password,
@@ -153,7 +155,6 @@ Apply Prisma migrations whenever the production database schema changes.
 
 - email verification and password recovery,
 - configurable usage plans and higher limits for selected users,
-- weekly meal planning,
 - ingredient scaling based on serving size,
 - substitutions for missing ingredients,
 - prioritization of ingredients nearing their expiration date,

@@ -203,6 +203,7 @@ export type UserWhereInput = {
   favorites?: Prisma.FavoriteListRelationFilter
   searches?: Prisma.SearchHistoryListRelationFilter
   shoppingItems?: Prisma.ShoppingItemListRelationFilter
+  mealPlans?: Prisma.MealPlanListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -218,6 +219,7 @@ export type UserOrderByWithRelationInput = {
   favorites?: Prisma.FavoriteOrderByRelationAggregateInput
   searches?: Prisma.SearchHistoryOrderByRelationAggregateInput
   shoppingItems?: Prisma.ShoppingItemOrderByRelationAggregateInput
+  mealPlans?: Prisma.MealPlanOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -236,6 +238,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   favorites?: Prisma.FavoriteListRelationFilter
   searches?: Prisma.SearchHistoryListRelationFilter
   shoppingItems?: Prisma.ShoppingItemListRelationFilter
+  mealPlans?: Prisma.MealPlanListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -277,6 +280,7 @@ export type UserCreateInput = {
   favorites?: Prisma.FavoriteCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -292,6 +296,7 @@ export type UserUncheckedCreateInput = {
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryUncheckedCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemUncheckedCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -307,6 +312,7 @@ export type UserUpdateInput = {
   favorites?: Prisma.FavoriteUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -322,6 +328,7 @@ export type UserUncheckedUpdateInput = {
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUncheckedUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUncheckedUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -475,6 +482,20 @@ export type UserUpdateOneRequiredWithoutShoppingItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutShoppingItemsInput, Prisma.UserUpdateWithoutShoppingItemsInput>, Prisma.UserUncheckedUpdateWithoutShoppingItemsInput>
 }
 
+export type UserCreateNestedOneWithoutMealPlansInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMealPlansInput, Prisma.UserUncheckedCreateWithoutMealPlansInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMealPlansInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMealPlansNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMealPlansInput, Prisma.UserUncheckedCreateWithoutMealPlansInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMealPlansInput
+  upsert?: Prisma.UserUpsertWithoutMealPlansInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMealPlansInput, Prisma.UserUpdateWithoutMealPlansInput>, Prisma.UserUncheckedUpdateWithoutMealPlansInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id: string
   name: string
@@ -487,6 +508,7 @@ export type UserCreateWithoutSessionsInput = {
   favorites?: Prisma.FavoriteCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -501,6 +523,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryUncheckedCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemUncheckedCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -531,6 +554,7 @@ export type UserUpdateWithoutSessionsInput = {
   favorites?: Prisma.FavoriteUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -545,6 +569,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUncheckedUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUncheckedUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -559,6 +584,7 @@ export type UserCreateWithoutAccountsInput = {
   favorites?: Prisma.FavoriteCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -573,6 +599,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryUncheckedCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemUncheckedCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -603,6 +630,7 @@ export type UserUpdateWithoutAccountsInput = {
   favorites?: Prisma.FavoriteUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -617,6 +645,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUncheckedUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUncheckedUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutFavoritesInput = {
@@ -631,6 +660,7 @@ export type UserCreateWithoutFavoritesInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFavoritesInput = {
@@ -645,6 +675,7 @@ export type UserUncheckedCreateWithoutFavoritesInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryUncheckedCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemUncheckedCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFavoritesInput = {
@@ -675,6 +706,7 @@ export type UserUpdateWithoutFavoritesInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFavoritesInput = {
@@ -689,6 +721,7 @@ export type UserUncheckedUpdateWithoutFavoritesInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUncheckedUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUncheckedUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSearchesInput = {
@@ -703,6 +736,7 @@ export type UserCreateWithoutSearchesInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   favorites?: Prisma.FavoriteCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSearchesInput = {
@@ -717,6 +751,7 @@ export type UserUncheckedCreateWithoutSearchesInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutUserInput
   shoppingItems?: Prisma.ShoppingItemUncheckedCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSearchesInput = {
@@ -747,6 +782,7 @@ export type UserUpdateWithoutSearchesInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   favorites?: Prisma.FavoriteUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSearchesInput = {
@@ -761,6 +797,7 @@ export type UserUncheckedUpdateWithoutSearchesInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutUserNestedInput
   shoppingItems?: Prisma.ShoppingItemUncheckedUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutShoppingItemsInput = {
@@ -775,6 +812,7 @@ export type UserCreateWithoutShoppingItemsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   favorites?: Prisma.FavoriteCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutShoppingItemsInput = {
@@ -789,6 +827,7 @@ export type UserUncheckedCreateWithoutShoppingItemsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutUserInput
   searches?: Prisma.SearchHistoryUncheckedCreateNestedManyWithoutUserInput
+  mealPlans?: Prisma.MealPlanUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutShoppingItemsInput = {
@@ -819,6 +858,7 @@ export type UserUpdateWithoutShoppingItemsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   favorites?: Prisma.FavoriteUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShoppingItemsInput = {
@@ -833,6 +873,83 @@ export type UserUncheckedUpdateWithoutShoppingItemsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutUserNestedInput
   searches?: Prisma.SearchHistoryUncheckedUpdateManyWithoutUserNestedInput
+  mealPlans?: Prisma.MealPlanUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutMealPlansInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutUserInput
+  searches?: Prisma.SearchHistoryCreateNestedManyWithoutUserInput
+  shoppingItems?: Prisma.ShoppingItemCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutMealPlansInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutUserInput
+  searches?: Prisma.SearchHistoryUncheckedCreateNestedManyWithoutUserInput
+  shoppingItems?: Prisma.ShoppingItemUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutMealPlansInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMealPlansInput, Prisma.UserUncheckedCreateWithoutMealPlansInput>
+}
+
+export type UserUpsertWithoutMealPlansInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMealPlansInput, Prisma.UserUncheckedUpdateWithoutMealPlansInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMealPlansInput, Prisma.UserUncheckedCreateWithoutMealPlansInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMealPlansInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMealPlansInput, Prisma.UserUncheckedUpdateWithoutMealPlansInput>
+}
+
+export type UserUpdateWithoutMealPlansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutUserNestedInput
+  searches?: Prisma.SearchHistoryUpdateManyWithoutUserNestedInput
+  shoppingItems?: Prisma.ShoppingItemUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMealPlansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutUserNestedInput
+  searches?: Prisma.SearchHistoryUncheckedUpdateManyWithoutUserNestedInput
+  shoppingItems?: Prisma.ShoppingItemUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -846,6 +963,7 @@ export type UserCountOutputType = {
   favorites: number
   searches: number
   shoppingItems: number
+  mealPlans: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -854,6 +972,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   favorites?: boolean | UserCountOutputTypeCountFavoritesArgs
   searches?: boolean | UserCountOutputTypeCountSearchesArgs
   shoppingItems?: boolean | UserCountOutputTypeCountShoppingItemsArgs
+  mealPlans?: boolean | UserCountOutputTypeCountMealPlansArgs
 }
 
 /**
@@ -901,6 +1020,13 @@ export type UserCountOutputTypeCountShoppingItemsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.ShoppingItemWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMealPlansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MealPlanWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -915,6 +1041,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   favorites?: boolean | Prisma.User$favoritesArgs<ExtArgs>
   searches?: boolean | Prisma.User$searchesArgs<ExtArgs>
   shoppingItems?: boolean | Prisma.User$shoppingItemsArgs<ExtArgs>
+  mealPlans?: boolean | Prisma.User$mealPlansArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -955,6 +1082,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   favorites?: boolean | Prisma.User$favoritesArgs<ExtArgs>
   searches?: boolean | Prisma.User$searchesArgs<ExtArgs>
   shoppingItems?: boolean | Prisma.User$shoppingItemsArgs<ExtArgs>
+  mealPlans?: boolean | Prisma.User$mealPlansArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -968,6 +1096,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     favorites: Prisma.$FavoritePayload<ExtArgs>[]
     searches: Prisma.$SearchHistoryPayload<ExtArgs>[]
     shoppingItems: Prisma.$ShoppingItemPayload<ExtArgs>[]
+    mealPlans: Prisma.$MealPlanPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1376,6 +1505,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   favorites<T extends Prisma.User$favoritesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$favoritesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   searches<T extends Prisma.User$searchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$searchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SearchHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   shoppingItems<T extends Prisma.User$shoppingItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$shoppingItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShoppingItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  mealPlans<T extends Prisma.User$mealPlansArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$mealPlansArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MealPlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1922,6 +2052,30 @@ export type User$shoppingItemsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ShoppingItemScalarFieldEnum | Prisma.ShoppingItemScalarFieldEnum[]
+}
+
+/**
+ * User.mealPlans
+ */
+export type User$mealPlansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MealPlan
+   */
+  select?: Prisma.MealPlanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MealPlan
+   */
+  omit?: Prisma.MealPlanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MealPlanInclude<ExtArgs> | null
+  where?: Prisma.MealPlanWhereInput
+  orderBy?: Prisma.MealPlanOrderByWithRelationInput | Prisma.MealPlanOrderByWithRelationInput[]
+  cursor?: Prisma.MealPlanWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MealPlanScalarFieldEnum | Prisma.MealPlanScalarFieldEnum[]
 }
 
 /**

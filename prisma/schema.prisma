@@ -20,6 +20,7 @@ model User {
   favorites     Favorite[]
   searches      SearchHistory[]
   shoppingItems ShoppingItem[]
+  mealPlans     MealPlan[]
 
   @@map("user")
 }
@@ -117,4 +118,19 @@ model GenerationUsage {
 
   @@unique([identifier, windowStart])
   @@index([windowStart])
+}
+
+model MealPlan {
+  id        String   @id @default(cuid())
+  weekStart DateTime
+  day       Int
+  mealType  String
+  recipe    Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart, day, mealType])
+  @@index([userId, weekStart])
 }

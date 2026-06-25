@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AuthDialog } from "@/components/auth-dialog";
+import { MealPlanner } from "@/components/meal-planner";
 import { authClient } from "@/lib/auth-client";
 import type { Recipe, SearchHistoryEntry } from "@/lib/recipe-types";
 
@@ -411,6 +412,9 @@ export default function Home() {
           <a className="transition hover:text-[#25322b]" href="#results">
             Przepisy
           </a>
+          <a className="transition hover:text-[#25322b]" href="#meal-planner">
+            Planer
+          </a>
           {sessionPending ? (
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
           ) : session?.user ? (
@@ -726,6 +730,14 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <MealPlanner
+        recipes={generated ? generatedRecipes : sampleRecipes}
+        favorites={favorites}
+        isSignedIn={Boolean(session?.user)}
+        onOpenRecipe={setSelectedRecipe}
+        onAddToShoppingList={addToShoppingList}
+      />
 
       <section
         id="my-kitchen"
