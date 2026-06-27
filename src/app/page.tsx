@@ -105,7 +105,7 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/sample-recipes")
+    fetch("/api/sample-recipes?v=2")
       .then((response) => {
         if (!response.ok) throw new Error("Sample photos request failed");
         return response.json() as Promise<{ recipes: Recipe[] }>;
