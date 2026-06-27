@@ -6,6 +6,9 @@ import { MealPlanner } from "@/components/meal-planner";
 import { authClient } from "@/lib/auth-client";
 import type { Recipe, SearchHistoryEntry } from "@/lib/recipe-types";
 
+const emailVerificationEnabled =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
+
 const suggestions = ["jajka", "ryż", "kurczak", "pomidor", "szpinak"];
 
 const sampleRecipes: Recipe[] = [
@@ -513,7 +516,9 @@ export default function Home() {
         </div>
       </nav>
 
-      {session?.user && !session.user.emailVerified && (
+      {emailVerificationEnabled &&
+        session?.user &&
+        !session.user.emailVerified && (
         <div className="border-y border-[#efd4a8] bg-[#fff5df] px-5 py-3 sm:px-8">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 text-sm text-[#795d2f]">
             <p>
@@ -534,7 +539,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-      )}
+        )}
 
       <section className="relative mx-auto max-w-7xl px-5 pb-20 pt-10 sm:px-8 lg:pt-20">
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />

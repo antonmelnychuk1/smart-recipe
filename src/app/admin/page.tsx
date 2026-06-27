@@ -5,6 +5,9 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+const emailVerificationEnabled =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
+
 function startOfUtcDay() {
   const now = new Date();
   return new Date(
@@ -211,7 +214,7 @@ export default async function AdminPage() {
                         <p className="mt-1 text-xs text-[#7a857e]">
                           {user.email}
                         </p>
-                        {!user.emailVerified && (
+                        {emailVerificationEnabled && !user.emailVerified && (
                           <span className="mt-2 inline-block rounded-full bg-[#fff0e8] px-2 py-0.5 text-[10px] font-bold text-[#a45c45]">
                             e-mail niezweryfikowany
                           </span>

@@ -81,6 +81,7 @@ OPENAI_MODEL=gpt-5.4-mini
 DATABASE_URL=
 BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED=false
 RESEND_API_KEY=
 EMAIL_FROM="SmartRecipe <onboarding@resend.dev>"
 ```
@@ -154,6 +155,13 @@ Resend account. For public delivery, verify your own domain in Resend and set
 
 ```env
 EMAIL_FROM="SmartRecipe <hello@your-domain.com>"
+```
+
+Email verification is disabled by default. After configuring Resend and a
+verified sending domain, enable it locally and in the hosting environment:
+
+```env
+NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED=true
 ```
 
 ## Administrator Access

@@ -3,6 +3,9 @@
 import { FormEvent, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
+const emailVerificationEnabled =
+  process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
+
 type AuthDialogProps = {
   onClose: () => void;
 };
@@ -49,7 +52,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       return;
     }
 
-    if (mode === "register") {
+    if (mode === "register" && emailVerificationEnabled) {
       setMessage(
         "Konto zostało utworzone. Sprawdź skrzynkę i potwierdź adres e-mail.",
       );
