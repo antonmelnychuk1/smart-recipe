@@ -898,6 +898,24 @@ export default function Home() {
         </form>
       </section>
 
+      <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
+        <div className="mx-auto grid max-w-5xl gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
+          {[
+            ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
+            ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie."],
+            ["03", "Gotuj bez resztek", "Wybierz pomysł i wykorzystaj produkty do końca."],
+          ].map(([number, title, text]) => (
+            <div key={number} className="flex items-start gap-4 text-left">
+              <span className="font-serif text-3xl italic text-[#d46c4c]">{number}</span>
+              <div>
+                <h2 className="font-semibold">{title}</h2>
+                <p className="mt-1 text-sm leading-6 text-[#748078]">{text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-10 sm:px-8 sm:py-14">
         <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
@@ -982,24 +1000,6 @@ export default function Home() {
               </p>
             )}
           </form>
-        </div>
-      </section>
-
-      <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
-        <div className="mx-auto grid max-w-5xl gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
-          {[
-            ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
-            ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie."],
-            ["03", "Gotuj bez resztek", "Wybierz pomysł i wykorzystaj produkty do końca."],
-          ].map(([number, title, text]) => (
-            <div key={number} className="flex items-start gap-4 text-left">
-              <span className="font-serif text-3xl italic text-[#d46c4c]">{number}</span>
-              <div>
-                <h2 className="font-semibold">{title}</h2>
-                <p className="mt-1 text-sm leading-6 text-[#748078]">{text}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
