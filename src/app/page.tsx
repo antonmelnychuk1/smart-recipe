@@ -1191,7 +1191,7 @@ export default function Home() {
             className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-9"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="relative flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">
                 {selectedRecipe.image ? (
                   <div className="relative mb-6 h-56 w-full overflow-hidden rounded-2xl sm:h-72">
@@ -1225,7 +1225,7 @@ export default function Home() {
               <button
                 onClick={() => setSelectedRecipe(null)}
                 aria-label="Zamknij"
-                className="grid size-10 shrink-0 place-items-center rounded-full bg-[#eeeae2] text-xl"
+                className="absolute right-5 top-5 grid size-10 shrink-0 place-items-center rounded-full bg-[#eeeae2] text-xl"
               >
                 ×
               </button>
