@@ -4,6 +4,8 @@ import { sendVerificationEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
 export const auth = betterAuth({
+  appName: "SmartRecipe",
+  baseURL: process.env.BETTER_AUTH_URL,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),

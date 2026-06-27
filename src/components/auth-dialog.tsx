@@ -29,6 +29,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
             name: String(formData.get("name")),
             email,
             password,
+            callbackURL: "/email-verified",
           })
         : await authClient.signIn.email({
             email,
