@@ -19,6 +19,7 @@ create shopping lists, and reduce food waste.
 - register and sign in with email and password,
 - access a protected administrator dashboard with user and usage statistics,
 - manage user roles, bans, individual limits, usage resets, and account deletion,
+- change passwords, review active sessions, and delete an account,
 - synchronize user data with PostgreSQL,
 - protect OpenAI usage with persistent daily generation limits,
 - store data locally for guests,

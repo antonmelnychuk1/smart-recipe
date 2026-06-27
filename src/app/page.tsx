@@ -503,7 +503,7 @@ export default function Home() {
                 </a>
               )}
               <a
-                href="#my-kitchen"
+                href="/settings"
                 className="rounded-full border border-[#d9d7cd] bg-white px-4 py-2 text-[#33433a] shadow-sm"
               >
                 {session.user.name}

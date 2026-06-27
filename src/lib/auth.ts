@@ -17,6 +17,16 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
   },
+  user: {
+    deleteUser: {
+      enabled: true,
+      beforeDelete: async (user) => {
+        await prisma.generationUsage.deleteMany({
+          where: { identifier: `user:${user.id}` },
+        });
+      },
+    },
+  },
   emailVerification: emailVerificationEnabled
     ? {
         sendOnSignUp: true,
