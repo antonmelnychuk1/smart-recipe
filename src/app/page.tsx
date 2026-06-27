@@ -138,6 +138,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [accountDailyLimit, setAccountDailyLimit] = useState(20);
   const [verificationPending, setVerificationPending] = useState(false);
@@ -473,7 +474,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f4ed] text-[#25322b]">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8">
+      <nav className="relative z-40 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 sm:py-6">
         <a href="#" className="flex items-center gap-2 text-lg font-bold">
           <span className="grid size-9 place-items-center rounded-xl bg-[#2f684f] text-white">
             <Icon name="leaf" />
@@ -527,7 +528,109 @@ export default function Home() {
             </button>
           )}
         </div>
+        <button
+          type="button"
+          aria-label={mobileMenuOpen ? "Zamknij menu" : "Otwórz menu"}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-navigation"
+          onClick={() => setMobileMenuOpen((current) => !current)}
+          className="grid size-11 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm sm:hidden"
+        >
+          <span className="relative block h-4 w-5">
+            <span
+              className={`absolute left-0 top-0 h-0.5 w-5 rounded bg-current transition ${
+                mobileMenuOpen ? "translate-y-[7px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`absolute left-0 top-[7px] h-0.5 w-5 rounded bg-current transition ${
+                mobileMenuOpen ? "opacity-0" : ""
+              }`}
+            />
+            <span
+              className={`absolute left-0 top-[14px] h-0.5 w-5 rounded bg-current transition ${
+                mobileMenuOpen ? "-translate-y-[7px] -rotate-45" : ""
+              }`}
+            />
+          </span>
+        </button>
       </nav>
+
+      {mobileMenuOpen && (
+        <div
+          id="mobile-navigation"
+          className="relative z-30 mx-4 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl sm:hidden"
+        >
+          <div className="grid gap-1 text-sm font-semibold text-[#536159]">
+            {[
+              ["Jak to działa?", "#how"],
+              ["Przepisy", "#results"],
+              ["Planer posiłków", "#meal-planner"],
+              ["Moja kuchnia", "#my-kitchen"],
+            ].map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-xl px-4 py-3 transition hover:bg-[#f3f6f2] hover:text-[#2f684f]"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+
+          <div className="mt-2 border-t border-[#ebe8e0] pt-3">
+            {sessionPending ? (
+              <div className="h-11 animate-pulse rounded-xl bg-[#eeeae2]" />
+            ) : session?.user ? (
+              <div className="grid gap-2">
+                <div className="px-4 py-2">
+                  <p className="text-sm font-semibold text-[#25322b]">
+                    {session.user.name}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs text-[#7a857e]">
+                    {session.user.email}
+                  </p>
+                </div>
+                <a
+                  href="/settings"
+                  className="rounded-xl bg-[#f3f6f2] px-4 py-3 text-sm font-semibold text-[#356248]"
+                >
+                  Ustawienia konta
+                </a>
+                {isAdmin && (
+                  <a
+                    href="/admin"
+                    className="rounded-xl bg-[#253d31] px-4 py-3 text-sm font-semibold text-white"
+                  >
+                    Panel administratora
+                  </a>
+                )}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsAdmin(false);
+                    void authClient.signOut();
+                  }}
+                  className="rounded-xl px-4 py-3 text-left text-sm font-semibold text-[#a45c45]"
+                >
+                  Wyloguj się
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setAuthOpen(true);
+                }}
+                className="h-11 w-full rounded-xl bg-[#2f684f] text-sm font-semibold text-white"
+              >
+                Zaloguj się lub utwórz konto
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {emailVerificationEnabled &&
         session?.user &&
