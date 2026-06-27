@@ -72,6 +72,8 @@ export default function Home() {
     "ingredients" | "dish" | null
   >(null);
   const [desiredDish, setDesiredDish] = useState("");
+  const [desiredDishDiet, setDesiredDishDiet] = useState("Bez ograniczeń");
+  const [desiredDishMaxTime, setDesiredDishMaxTime] = useState("30");
   const [desiredDishLoading, setDesiredDishLoading] = useState(false);
   const [desiredDishError, setDesiredDishError] = useState("");
   const [favorites, setFavorites] = useState<Recipe[]>([]);
@@ -451,8 +453,8 @@ export default function Home() {
         body: JSON.stringify({
           mode: "dish",
           dish,
-          diet,
-          maxTime: Number(maxTime),
+          diet: desiredDishDiet,
+          maxTime: Number(desiredDishMaxTime),
         }),
       });
       const data = (await response.json()) as {
@@ -930,16 +932,45 @@ export default function Home() {
                 className="h-12 min-w-0 flex-1 rounded-xl border border-[#dedfd9] bg-[#fbfaf6] px-4 outline-none transition focus:border-[#71927e] focus:ring-4 focus:ring-[#71927e]/10"
                 placeholder="np. puszyste pancakes z owocami"
               />
+            </div>
+            <div className="mt-3 grid gap-3 border-t border-[#eeece5] pt-3 sm:grid-cols-[1fr_1fr_auto]">
+              <label className="text-sm font-semibold text-[#35483e]">
+                Dieta
+                <select
+                  value={desiredDishDiet}
+                  onChange={(event) => setDesiredDishDiet(event.target.value)}
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                >
+                  <option>Bez ograniczeń</option>
+                  <option>Wegetariańska</option>
+                  <option>Wegańska</option>
+                  <option>Bezglutenowa</option>
+                </select>
+              </label>
+              <label className="text-sm font-semibold text-[#35483e]">
+                Maksymalny czas
+                <select
+                  value={desiredDishMaxTime}
+                  onChange={(event) =>
+                    setDesiredDishMaxTime(event.target.value)
+                  }
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                >
+                  <option value="20">do 20 minut</option>
+                  <option value="30">do 30 minut</option>
+                  <option value="60">do 60 minut</option>
+                </select>
+              </label>
               <button
                 disabled={desiredDish.trim().length < 2 || desiredDishLoading}
-                className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#d66a49] px-5 font-semibold text-white shadow-lg shadow-[#d66a49]/20 transition hover:-translate-y-0.5 hover:bg-[#c35d3e] disabled:cursor-not-allowed disabled:opacity-40"
+                className="mt-auto flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#d66a49] px-5 font-semibold text-white shadow-lg shadow-[#d66a49]/20 transition hover:-translate-y-0.5 hover:bg-[#c35d3e] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon name="spark" />
                 {desiredDishLoading ? "AI gotuje..." : "Stwórz przepis"}
               </button>
             </div>
             <p className="mt-3 text-xs text-[#7a857e]">
-              Obowiązują wybrana wyżej dieta, czas przygotowania i dzienny
+              Ten generator ma własne ustawienia. Obowiązuje wspólny dzienny
               limit generowania.
             </p>
             {desiredDishError && (
