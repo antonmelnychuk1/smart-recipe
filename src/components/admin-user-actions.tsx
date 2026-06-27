@@ -67,7 +67,7 @@ export function AdminUserActions({
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-[1.7rem] border border-[#dedbd2] bg-white p-6 shadow-2xl"
+            className="w-full max-w-md rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-2xl sm:p-6"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">

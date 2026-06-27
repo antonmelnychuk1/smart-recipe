@@ -134,8 +134,8 @@ export function AccountSettings() {
   }
 
   return (
-    <div className="mt-10 space-y-6">
-      <section className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-6 shadow-sm sm:p-8">
+    <div className="mt-6 space-y-4 sm:mt-10 sm:space-y-6">
+      <section className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-sm sm:p-8">
         <h2 className="font-serif text-2xl font-semibold">Zmiana hasła</h2>
         <p className="mt-2 text-sm leading-6 text-[#748078]">
           Po zmianie hasła wszystkie pozostałe urządzenia zostaną wylogowane.
@@ -187,7 +187,7 @@ export function AccountSettings() {
         </form>
       </section>
 
-      <section className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-6 shadow-sm sm:p-8">
+      <section className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-sm sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="font-serif text-2xl font-semibold">Aktywne sesje</h2>
@@ -252,7 +252,7 @@ export function AccountSettings() {
         </div>
       </section>
 
-      <section className="rounded-[1.7rem] border border-[#e4bdb5] bg-[#fff9f6] p-6 shadow-sm sm:p-8">
+      <section className="rounded-[1.7rem] border border-[#e4bdb5] bg-[#fff9f6] p-4 shadow-sm sm:p-8">
         <h2 className="font-serif text-2xl font-semibold text-[#913f32]">
           Usuń konto
         </h2>

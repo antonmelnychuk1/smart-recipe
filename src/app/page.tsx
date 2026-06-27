@@ -507,7 +507,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f4ed] text-[#25322b]">
-      <nav className="relative z-40 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 sm:py-6">
+      <nav className="relative z-40 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8 sm:py-6">
         <a href="#" className="flex items-center gap-2 text-lg font-bold">
           <span className="grid size-9 place-items-center rounded-xl bg-[#2f684f] text-white">
             <Icon name="leaf" />
@@ -690,17 +690,17 @@ export default function Home() {
         </div>
         )}
 
-      <section className="relative mx-auto max-w-7xl px-5 pb-20 pt-10 sm:px-8 lg:pt-20">
+      <section className="relative mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20">
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#d8dfd7] bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#48705c]">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#d8dfd7] bg-white/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#48705c] sm:mb-5 sm:px-4">
             <Icon name="spark" /> Mniej marnowania, więcej smaku
           </div>
           <h1 className="font-serif text-5xl font-semibold leading-[1.02] tracking-[-0.04em] text-[#203128] sm:text-7xl">
             Co dziś ugotujemy
             <span className="block italic text-[#d66a49]">z tego, co masz?</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-[#68736b] sm:text-lg">
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[#68736b] sm:mt-6 sm:text-lg">
             Wpisz produkty ze swojej kuchni. Znajdziemy dla nich pyszne
             zastosowanie i podpowiemy, czego ewentualnie brakuje.
           </p>
@@ -708,7 +708,7 @@ export default function Home() {
 
         <form
           onSubmit={submit}
-          className="mx-auto mt-10 max-w-4xl rounded-[2rem] border border-white bg-white/90 p-4 shadow-[0_24px_80px_rgba(53,68,58,0.13)] sm:p-7"
+          className="mx-auto mt-7 max-w-4xl rounded-3xl border border-white bg-white/90 p-3 shadow-[0_24px_80px_rgba(53,68,58,0.13)] sm:mt-10 sm:rounded-[2rem] sm:p-7"
         >
           <label className="mb-2 block text-sm font-semibold text-[#35483e]">
             Twoje składniki
@@ -764,7 +764,7 @@ export default function Home() {
               ))}
           </div>
 
-          <div className="mt-6 grid gap-4 border-t border-[#eeece5] pt-6 sm:grid-cols-[1fr_1fr_auto]">
+          <div className="mt-4 grid gap-3 border-t border-[#eeece5] pt-4 sm:mt-6 sm:grid-cols-[1fr_1fr_auto] sm:gap-4 sm:pt-6">
             <label className="text-sm font-semibold text-[#35483e]">
               Dieta
               <select
@@ -871,7 +871,7 @@ export default function Home() {
       </section>
 
       <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
-        <div className="mx-auto grid max-w-5xl gap-8 px-5 py-8 text-center sm:grid-cols-3 sm:px-8">
+        <div className="mx-auto grid max-w-5xl gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
           {[
             ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
             ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie."],
@@ -888,7 +888,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="results" className="mx-auto max-w-7xl scroll-mt-8 px-5 py-20 sm:px-8">
+      <section id="results" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-12 sm:px-8 sm:py-20">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
@@ -906,7 +906,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-3">
           {visibleRecipes.map((recipe, index) => (
             <article
               key={recipe.title}
@@ -954,7 +954,7 @@ export default function Home() {
                   <Icon name="heart" />
                 </button>
               </div>
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex gap-4 text-xs font-medium text-[#78837c]">
                   <span className="flex items-center gap-1.5">
                     <Icon name="clock" /> {recipe.time} min
@@ -1031,7 +1031,7 @@ export default function Home() {
 
       <section
         id="my-kitchen"
-        className="scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] px-5 py-20 sm:px-8"
+        className="scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] px-4 py-12 sm:px-8 sm:py-20"
       >
         <div className="mx-auto max-w-7xl">
           <div className="max-w-2xl">
@@ -1056,8 +1056,8 @@ export default function Home() {
             )}
           </div>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
-            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-6">
+          <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-3">
+            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-2xl font-semibold">Ulubione</h3>
                 <span className="rounded-full bg-[#f7eee8] px-3 py-1 text-xs font-bold text-[#a45c45]">
@@ -1112,7 +1112,7 @@ export default function Home() {
               </div>
             </article>
 
-            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-6">
+            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-2xl font-semibold">Historia</h3>
                 {history.length > 0 && (
@@ -1160,7 +1160,7 @@ export default function Home() {
               </div>
             </article>
 
-            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-6">
+            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-2xl font-semibold">
                   Lista zakupów
@@ -1228,7 +1228,7 @@ export default function Home() {
           onClick={() => setSelectedRecipe(null)}
         >
           <article
-            className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] bg-[#fffdf8] p-6 shadow-2xl sm:p-9"
+            className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-9"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
@@ -1306,7 +1306,7 @@ export default function Home() {
               </div>
             )}
 
-            <div className="mt-8 grid gap-8 md:grid-cols-2">
+            <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-2 md:gap-8">
               <div>
                 <h3 className="font-serif text-2xl font-semibold">Składniki</h3>
                 <ul className="mt-4 space-y-2 text-sm leading-6 text-[#59675f]">
@@ -1352,7 +1352,7 @@ export default function Home() {
         </div>
       )}
 
-      <footer className="bg-[#23362c] px-5 py-8 text-center text-sm text-[#b8c3bc]">
+      <footer className="bg-[#23362c] px-4 py-6 text-center text-sm text-[#b8c3bc] sm:px-5 sm:py-8">
         SmartRecipe · Gotuj sprytniej, marnuj mniej.{" "}
         <a
           href="https://www.pexels.com"

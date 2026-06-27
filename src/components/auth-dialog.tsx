@@ -71,7 +71,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-[2rem] bg-[#fffdf8] p-7 shadow-2xl"
+        className="w-full max-w-md rounded-3xl bg-[#fffdf8] p-5 shadow-2xl sm:rounded-[2rem] sm:p-7"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between">

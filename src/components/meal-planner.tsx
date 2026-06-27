@@ -192,7 +192,7 @@ export function MealPlanner({
   return (
     <section
       id="meal-planner"
-      className="scroll-mt-8 border-t border-[#e5e0d7] bg-[#faf8f3] px-5 py-20 sm:px-8"
+      className="scroll-mt-8 border-t border-[#e5e0d7] bg-[#faf8f3] px-4 py-12 sm:px-8 sm:py-20"
     >
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap items-end justify-between gap-5">
@@ -244,7 +244,7 @@ export function MealPlanner({
           </div>
         </div>
 
-        <div className="mt-10 overflow-x-auto pb-3">
+        <div className="mt-7 overflow-x-auto pb-3 sm:mt-10">
           <div className="grid min-w-[1050px] grid-cols-7 gap-3">
             {days.map((day, dayIndex) => (
               <div key={day} className="space-y-3">
@@ -369,7 +369,7 @@ export function MealPlanner({
           onClick={() => setSelection(null)}
         >
           <div
-            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] bg-[#fffdf8] p-6 shadow-2xl sm:p-8"
+            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-8"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">

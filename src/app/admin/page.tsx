@@ -107,7 +107,7 @@ export default async function AdminPage() {
   ).length;
 
   return (
-    <main className="min-h-screen bg-[#f7f4ed] px-5 py-8 text-[#25322b] sm:px-8">
+    <main className="min-h-screen bg-[#f7f4ed] px-4 py-5 text-[#25322b] sm:px-8 sm:py-8">
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -129,7 +129,7 @@ export default async function AdminPage() {
           </Link>
         </header>
 
-        <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <section className="mt-6 grid gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-5">
           {[
             ["Użytkownicy", users.length],
             ["Generowania łącznie", totalGenerations],
@@ -170,7 +170,7 @@ export default async function AdminPage() {
           ))}
         </section>
 
-        <section className="mt-10 overflow-hidden rounded-[1.7rem] border border-[#dedbd2] bg-white shadow-sm">
+        <section className="mt-6 overflow-hidden rounded-[1.7rem] border border-[#dedbd2] bg-white shadow-sm sm:mt-10">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ebe8e0] px-6 py-5">
             <div>
               <h2 className="font-serif text-2xl font-semibold">
