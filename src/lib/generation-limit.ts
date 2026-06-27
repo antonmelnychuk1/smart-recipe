@@ -36,6 +36,7 @@ export type GenerationLimit = {
   limit: number;
   remaining: number;
   resetAt: string;
+  unlimited: boolean;
 };
 
 export async function consumeGenerationLimit(): Promise<GenerationLimit> {
@@ -46,11 +47,30 @@ export async function consumeGenerationLimit(): Promise<GenerationLimit> {
     forwardedFor?.split(",")[0]?.trim() ||
     requestHeaders.get("x-real-ip") ||
     "unknown";
+  const account = session?.user.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { role: true, dailyLimit: true },
+      })
+    : null;
   const identifier = session?.user.id
     ? `user:${session.user.id}`
     : `guest:${hashIp(ip)}`;
-  const limit = session?.user.id ? USER_DAILY_LIMIT : GUEST_DAILY_LIMIT;
+  const limit = session?.user.id
+    ? (account?.dailyLimit ?? USER_DAILY_LIMIT)
+    : GUEST_DAILY_LIMIT;
   const windowStart = startOfUtcDay();
+
+  if (account?.role === "admin") {
+    return {
+      allowed: true,
+      identifier,
+      limit: 0,
+      remaining: 0,
+      resetAt: startOfNextUtcDay().toISOString(),
+      unlimited: true,
+    };
+  }
 
   const usage = await prisma.generationUsage.upsert({
     where: {
@@ -74,6 +94,7 @@ export async function consumeGenerationLimit(): Promise<GenerationLimit> {
     limit,
     remaining: Math.max(0, limit - usage.count),
     resetAt: startOfNextUtcDay().toISOString(),
+    unlimited: false,
   };
 }
 

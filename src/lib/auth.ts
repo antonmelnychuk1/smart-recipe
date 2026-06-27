@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { admin } from "better-auth/plugins";
 import { sendVerificationEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
@@ -29,4 +30,12 @@ export const auth = betterAuth({
         },
       }
     : undefined,
+  plugins: [
+    admin({
+      defaultRole: "user",
+      adminRoles: ["admin"],
+      bannedUserMessage:
+        "To konto zostało zablokowane. Skontaktuj się z administratorem.",
+    }),
+  ],
 });

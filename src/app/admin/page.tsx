@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AdminUserActions } from "@/components/admin-user-actions";
 import { getCurrentAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 
@@ -40,6 +41,9 @@ export default async function AdminPage() {
         name: true,
         email: true,
         role: true,
+        banned: true,
+        banReason: true,
+        dailyLimit: true,
         emailVerified: true,
         createdAt: true,
         _count: {
@@ -173,7 +177,8 @@ export default async function AdminPage() {
                 Wszyscy użytkownicy
               </h2>
               <p className="mt-1 text-sm text-[#7a857e]">
-                Dzisiejszy limit zalogowanego użytkownika: 20 generowań.
+                Limity można ustawiać indywidualnie. Administratorzy generują
+                bez limitu.
               </p>
             </div>
             <span className="rounded-full bg-[#e8efe9] px-3 py-1.5 text-xs font-bold text-[#356248]">
@@ -182,11 +187,12 @@ export default async function AdminPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1050px] border-collapse text-left text-sm">
+            <table className="w-full min-w-[1320px] border-collapse text-left text-sm">
               <thead className="bg-[#faf8f3] text-xs uppercase tracking-wider text-[#7b857f]">
                 <tr>
                   <th className="px-6 py-4">Użytkownik</th>
                   <th className="px-4 py-4">Rola</th>
+                  <th className="px-4 py-4">Status</th>
                   <th className="px-4 py-4">Dzisiaj</th>
                   <th className="px-4 py-4">Łącznie</th>
                   <th className="px-4 py-4">Ulubione</th>
@@ -194,6 +200,7 @@ export default async function AdminPage() {
                   <th className="px-4 py-4">Plan</th>
                   <th className="px-4 py-4">Ostatnia aktywność</th>
                   <th className="px-6 py-4">Rejestracja</th>
+                  <th className="px-6 py-4 text-right">Akcje</th>
                 </tr>
               </thead>
               <tbody>
@@ -233,13 +240,28 @@ export default async function AdminPage() {
                       </td>
                       <td className="px-4 py-4">
                         <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                            user.banned
+                              ? "bg-[#fff0e8] text-[#a45c45]"
+                              : "bg-[#e8efe9] text-[#356248]"
+                          }`}
+                          title={user.banReason ?? undefined}
+                        >
+                          {user.banned ? "zablokowany" : "aktywny"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span
                           className={
-                            usage.today >= 20
+                            user.role !== "admin" &&
+                            usage.today >= user.dailyLimit
                               ? "font-bold text-[#b04f3a]"
                               : "font-semibold text-[#365a46]"
                           }
                         >
-                          {usage.today}/20
+                          {user.role === "admin"
+                            ? "bez limitu"
+                            : `${usage.today}/${user.dailyLimit}`}
                         </span>
                       </td>
                       <td className="px-4 py-4 font-semibold">{usage.total}</td>
@@ -251,6 +273,16 @@ export default async function AdminPage() {
                       </td>
                       <td className="px-6 py-4 text-xs text-[#68736b]">
                         {formatDate(user.createdAt)}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <AdminUserActions
+                          userId={user.id}
+                          userName={user.name}
+                          role={user.role}
+                          banned={user.banned}
+                          dailyLimit={user.dailyLimit}
+                          isCurrentAdmin={user.id === admin.id}
+                        />
                       </td>
                     </tr>
                   );

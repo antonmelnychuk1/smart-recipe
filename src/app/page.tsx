@@ -139,16 +139,25 @@ export default function Home() {
   const [error, setError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [accountDailyLimit, setAccountDailyLimit] = useState(20);
   const [verificationPending, setVerificationPending] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState("");
   const [generationUsage, setGenerationUsage] = useState<{
     limit: number;
     remaining: number;
     resetAt: string;
+    unlimited?: boolean;
   } | null>(null);
-  const dailyGenerationLimit = session?.user ? 20 : 3;
+  const dailyGenerationLimit = isAdmin
+    ? 0
+    : session?.user
+      ? accountDailyLimit
+      : 3;
   const currentGenerationUsage =
-    generationUsage?.limit === dailyGenerationLimit ? generationUsage : null;
+    generationUsage?.unlimited ||
+    generationUsage?.limit === dailyGenerationLimit
+      ? generationUsage
+      : null;
 
   useEffect(() => {
     const initialization = window.setTimeout(() => {
@@ -244,8 +253,11 @@ export default function Home() {
     let cancelled = false;
     fetch("/api/admin/status")
       .then((response) => response.json())
-      .then((data: { isAdmin?: boolean }) => {
-        if (!cancelled) setIsAdmin(Boolean(data.isAdmin));
+      .then((data: { isAdmin?: boolean; dailyLimit?: number }) => {
+        if (!cancelled) {
+          setIsAdmin(Boolean(data.isAdmin));
+          setAccountDailyLimit(data.dailyLimit ?? 20);
+        }
       })
       .catch(() => {
         if (!cancelled) setIsAdmin(false);
@@ -367,6 +379,7 @@ export default function Home() {
           limit: number;
           remaining: number;
           resetAt: string;
+          unlimited?: boolean;
         };
       };
 
@@ -653,11 +666,19 @@ export default function Home() {
             <span>
               {session?.user ? (
                 <>
-                  Twoje konto obejmuje{" "}
-                  <strong className="text-[#365a46]">
-                    20 generowań dziennie
-                  </strong>
-                  .
+                  {isAdmin ? (
+                    <strong className="text-[#365a46]">
+                      Konto administratora — generowanie bez limitu.
+                    </strong>
+                  ) : (
+                    <>
+                      Twoje konto obejmuje{" "}
+                      <strong className="text-[#365a46]">
+                        {accountDailyLimit} generowań dziennie
+                      </strong>
+                      .
+                    </>
+                  )}
                 </>
               ) : (
                 <>
@@ -698,7 +719,9 @@ export default function Home() {
               )}
             </p>
           )}
-          {currentGenerationUsage && !error && (
+          {currentGenerationUsage &&
+            !currentGenerationUsage.unlimited &&
+            !error && (
             <p className="mt-4 text-center text-xs text-[#7a857e]">
               Pozostało dziś:{" "}
               <strong className="text-[#466453]">

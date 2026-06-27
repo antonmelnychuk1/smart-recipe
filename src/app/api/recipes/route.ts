@@ -66,6 +66,7 @@ export async function POST(request: Request) {
           limit: usage.limit,
           remaining: usage.remaining,
           resetAt: usage.resetAt,
+          unlimited: usage.unlimited,
         },
       },
       {
@@ -127,6 +128,7 @@ Każdy przepis musi mieścić się w limicie czasu, być zgodny z dietą, wykorz
         limit: usage.limit,
         remaining: usage.remaining,
         resetAt: usage.resetAt,
+        unlimited: usage.unlimited,
       },
     });
   } catch (error) {

@@ -83,6 +83,10 @@ export const UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   role: 'role',
+  banned: 'banned',
+  banReason: 'banReason',
+  banExpires: 'banExpires',
+  dailyLimit: 'dailyLimit',
   emailVerified: 'emailVerified',
   image: 'image',
   createdAt: 'createdAt',
@@ -100,6 +104,7 @@ export const SessionScalarFieldEnum = {
   updatedAt: 'updatedAt',
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
+  impersonatedBy: 'impersonatedBy',
   userId: 'userId'
 } as const
 

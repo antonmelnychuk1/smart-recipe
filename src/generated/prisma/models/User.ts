@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  dailyLimit: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  dailyLimit: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -29,6 +39,10 @@ export type UserMinAggregateOutputType = {
   name: string | null
   email: string | null
   role: string | null
+  banned: boolean | null
+  banReason: string | null
+  banExpires: Date | null
+  dailyLimit: number | null
   emailVerified: boolean | null
   image: string | null
   createdAt: Date | null
@@ -40,6 +54,10 @@ export type UserMaxAggregateOutputType = {
   name: string | null
   email: string | null
   role: string | null
+  banned: boolean | null
+  banReason: string | null
+  banExpires: Date | null
+  dailyLimit: number | null
   emailVerified: boolean | null
   image: string | null
   createdAt: Date | null
@@ -51,6 +69,10 @@ export type UserCountAggregateOutputType = {
   name: number
   email: number
   role: number
+  banned: number
+  banReason: number
+  banExpires: number
+  dailyLimit: number
   emailVerified: number
   image: number
   createdAt: number
@@ -59,11 +81,23 @@ export type UserCountAggregateOutputType = {
 }
 
 
+export type UserAvgAggregateInputType = {
+  dailyLimit?: true
+}
+
+export type UserSumAggregateInputType = {
+  dailyLimit?: true
+}
+
 export type UserMinAggregateInputType = {
   id?: true
   name?: true
   email?: true
   role?: true
+  banned?: true
+  banReason?: true
+  banExpires?: true
+  dailyLimit?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -75,6 +109,10 @@ export type UserMaxAggregateInputType = {
   name?: true
   email?: true
   role?: true
+  banned?: true
+  banReason?: true
+  banExpires?: true
+  dailyLimit?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -86,6 +124,10 @@ export type UserCountAggregateInputType = {
   name?: true
   email?: true
   role?: true
+  banned?: true
+  banReason?: true
+  banExpires?: true
+  dailyLimit?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -131,6 +173,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -161,6 +215,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -170,11 +226,17 @@ export type UserGroupByOutputType = {
   name: string
   email: string
   role: string
+  banned: boolean
+  banReason: string | null
+  banExpires: Date | null
+  dailyLimit: number
   emailVerified: boolean
   image: string | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -202,6 +264,10 @@ export type UserWhereInput = {
   name?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
   role?: Prisma.StringFilter<"User"> | string
+  banned?: Prisma.BoolFilter<"User"> | boolean
+  banReason?: Prisma.StringNullableFilter<"User"> | string | null
+  banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  dailyLimit?: Prisma.IntFilter<"User"> | number
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -219,6 +285,10 @@ export type UserOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
+  banReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  banExpires?: Prisma.SortOrderInput | Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -239,6 +309,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   name?: Prisma.StringFilter<"User"> | string
   role?: Prisma.StringFilter<"User"> | string
+  banned?: Prisma.BoolFilter<"User"> | boolean
+  banReason?: Prisma.StringNullableFilter<"User"> | string | null
+  banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  dailyLimit?: Prisma.IntFilter<"User"> | number
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -256,13 +330,19 @@ export type UserOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
+  banReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  banExpires?: Prisma.SortOrderInput | Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -273,6 +353,10 @@ export type UserScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   role?: Prisma.StringWithAggregatesFilter<"User"> | string
+  banned?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  banReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  banExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  dailyLimit?: Prisma.IntWithAggregatesFilter<"User"> | number
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -284,6 +368,10 @@ export type UserCreateInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -301,6 +389,10 @@ export type UserUncheckedCreateInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -318,6 +410,10 @@ export type UserUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -335,6 +431,10 @@ export type UserUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -352,6 +452,10 @@ export type UserCreateManyInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -363,6 +467,10 @@ export type UserUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -374,6 +482,10 @@ export type UserUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -385,10 +497,18 @@ export type UserCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
+  banReason?: Prisma.SortOrder
+  banExpires?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  dailyLimit?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -396,6 +516,10 @@ export type UserMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
+  banReason?: Prisma.SortOrder
+  banExpires?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -407,10 +531,18 @@ export type UserMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  banned?: Prisma.SortOrder
+  banReason?: Prisma.SortOrder
+  banExpires?: Prisma.SortOrder
+  dailyLimit?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  dailyLimit?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -428,6 +560,18 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -523,6 +667,10 @@ export type UserCreateWithoutSessionsInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -539,6 +687,10 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -571,6 +723,10 @@ export type UserUpdateWithoutSessionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -587,6 +743,10 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -603,6 +763,10 @@ export type UserCreateWithoutAccountsInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -619,6 +783,10 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -651,6 +819,10 @@ export type UserUpdateWithoutAccountsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -667,6 +839,10 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -683,6 +859,10 @@ export type UserCreateWithoutFavoritesInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -699,6 +879,10 @@ export type UserUncheckedCreateWithoutFavoritesInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -731,6 +915,10 @@ export type UserUpdateWithoutFavoritesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -747,6 +935,10 @@ export type UserUncheckedUpdateWithoutFavoritesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -763,6 +955,10 @@ export type UserCreateWithoutSearchesInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -779,6 +975,10 @@ export type UserUncheckedCreateWithoutSearchesInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -811,6 +1011,10 @@ export type UserUpdateWithoutSearchesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -827,6 +1031,10 @@ export type UserUncheckedUpdateWithoutSearchesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -843,6 +1051,10 @@ export type UserCreateWithoutShoppingItemsInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -859,6 +1071,10 @@ export type UserUncheckedCreateWithoutShoppingItemsInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -891,6 +1107,10 @@ export type UserUpdateWithoutShoppingItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -907,6 +1127,10 @@ export type UserUncheckedUpdateWithoutShoppingItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -923,6 +1147,10 @@ export type UserCreateWithoutMealPlansInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -939,6 +1167,10 @@ export type UserUncheckedCreateWithoutMealPlansInput = {
   name: string
   email: string
   role?: string
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  dailyLimit?: number
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -971,6 +1203,10 @@ export type UserUpdateWithoutMealPlansInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -987,6 +1223,10 @@ export type UserUncheckedUpdateWithoutMealPlansInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1079,6 +1319,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   name?: boolean
   email?: boolean
   role?: boolean
+  banned?: boolean
+  banReason?: boolean
+  banExpires?: boolean
+  dailyLimit?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1097,6 +1341,10 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   email?: boolean
   role?: boolean
+  banned?: boolean
+  banReason?: boolean
+  banExpires?: boolean
+  dailyLimit?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1108,6 +1356,10 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   email?: boolean
   role?: boolean
+  banned?: boolean
+  banReason?: boolean
+  banExpires?: boolean
+  dailyLimit?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1119,13 +1371,17 @@ export type UserSelectScalar = {
   name?: boolean
   email?: boolean
   role?: boolean
+  banned?: boolean
+  banReason?: boolean
+  banExpires?: boolean
+  dailyLimit?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "role" | "emailVerified" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "role" | "banned" | "banReason" | "banExpires" | "dailyLimit" | "emailVerified" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
@@ -1153,6 +1409,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     name: string
     email: string
     role: string
+    banned: boolean
+    banReason: string | null
+    banExpires: Date | null
+    dailyLimit: number
     emailVerified: boolean
     image: string | null
     createdAt: Date
@@ -1590,6 +1850,10 @@ export interface UserFieldRefs {
   readonly name: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'String'>
+  readonly banned: Prisma.FieldRef<"User", 'Boolean'>
+  readonly banReason: Prisma.FieldRef<"User", 'String'>
+  readonly banExpires: Prisma.FieldRef<"User", 'DateTime'>
+  readonly dailyLimit: Prisma.FieldRef<"User", 'Int'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
