@@ -427,10 +427,31 @@ export default function Home() {
       callbackURL: "/email-verified",
     });
     setVerificationPending(false);
+
+    if (!result.error) {
+      setVerificationMessage(
+        "Wiadomość została wysłana. Sprawdź również folder spam.",
+      );
+      return;
+    }
+
+    if (result.error.code === "EMAIL_ALREADY_VERIFIED") {
+      setVerificationMessage(
+        "Ten adres jest już zweryfikowany. Odśwież stronę.",
+      );
+      return;
+    }
+
+    if (result.error.status === 429) {
+      setVerificationMessage(
+        "Wysłano zbyt wiele prób. Poczekaj chwilę i spróbuj ponownie.",
+      );
+      return;
+    }
+
+    const errorCode = result.error.code ?? `HTTP_${result.error.status}`;
     setVerificationMessage(
-      result.error
-        ? "Nie udało się wysłać wiadomości. Spróbuj ponownie."
-        : "Wiadomość została wysłana. Sprawdź również folder spam.",
+      `Nie udało się wysłać wiadomości. Kod: ${errorCode}.`,
     );
   }
 
