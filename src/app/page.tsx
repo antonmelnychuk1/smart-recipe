@@ -68,6 +68,12 @@ export default function Home() {
   const [diet, setDiet] = useState("Bez ograniczeń");
   const [maxTime, setMaxTime] = useState("30");
   const [generated, setGenerated] = useState(false);
+  const [generationMode, setGenerationMode] = useState<
+    "ingredients" | "dish" | null
+  >(null);
+  const [desiredDish, setDesiredDish] = useState("");
+  const [desiredDishLoading, setDesiredDishLoading] = useState(false);
+  const [desiredDishError, setDesiredDishError] = useState("");
   const [favorites, setFavorites] = useState<Recipe[]>([]);
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [shoppingList, setShoppingList] = useState<string[]>([]);
@@ -331,6 +337,7 @@ export default function Home() {
     setMaxTime(String(entry.maxTime));
     setGeneratedRecipes(entry.recipes);
     setGenerated(true);
+    setGenerationMode("ingredients");
     window.setTimeout(
       () =>
         document
@@ -387,6 +394,7 @@ export default function Home() {
 
       setGeneratedRecipes(data.recipes);
       setGenerated(true);
+      setGenerationMode("ingredients");
       setHistory((current) =>
         [
           {
@@ -424,6 +432,64 @@ export default function Home() {
       );
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function submitDesiredDish(event: FormEvent) {
+    event.preventDefault();
+
+    const dish = desiredDish.trim();
+    if (dish.length < 2) return;
+
+    setDesiredDishError("");
+    setDesiredDishLoading(true);
+
+    try {
+      const response = await fetch("/api/recipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "dish",
+          dish,
+          diet,
+          maxTime: Number(maxTime),
+        }),
+      });
+      const data = (await response.json()) as {
+        recipes?: Recipe[];
+        error?: string;
+        usage?: {
+          limit: number;
+          remaining: number;
+          resetAt: string;
+          unlimited?: boolean;
+        };
+      };
+
+      if (data.usage) setGenerationUsage(data.usage);
+
+      if (!response.ok || !data.recipes) {
+        throw new Error(data.error ?? "Nie udało się przygotować przepisu.");
+      }
+
+      setGeneratedRecipes(data.recipes);
+      setGenerated(true);
+      setGenerationMode("dish");
+      window.setTimeout(
+        () =>
+          document
+            .getElementById("results")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        50,
+      );
+    } catch (caughtError) {
+      setDesiredDishError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Nie udało się przygotować przepisu.",
+      );
+    } finally {
+      setDesiredDishLoading(false);
     }
   }
 
@@ -830,6 +896,64 @@ export default function Home() {
         </form>
       </section>
 
+      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-10 sm:px-8 sm:py-14">
+        <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+              Masz ochotę na konkretne danie?
+            </p>
+            <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+              Wpisz, co chcesz ugotować
+            </h2>
+            <p className="mt-3 max-w-lg text-sm leading-6 text-[#68736b] sm:text-base">
+              Napisz „pancakes”, „gulasz” albo dokładniej: „wegańskie curry z
+              ciecierzycą”. Otrzymasz pełny przepis dla dwóch osób.
+            </p>
+          </div>
+
+          <form
+            onSubmit={submitDesiredDish}
+            className="rounded-3xl border border-white bg-white/90 p-3 shadow-[0_18px_60px_rgba(53,68,58,0.10)] sm:p-5"
+          >
+            <label
+              htmlFor="desired-dish"
+              className="text-sm font-semibold text-[#35483e]"
+            >
+              Nazwa lub opis dania
+            </label>
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+              <input
+                id="desired-dish"
+                value={desiredDish}
+                onChange={(event) => setDesiredDish(event.target.value)}
+                maxLength={120}
+                className="h-12 min-w-0 flex-1 rounded-xl border border-[#dedfd9] bg-[#fbfaf6] px-4 outline-none transition focus:border-[#71927e] focus:ring-4 focus:ring-[#71927e]/10"
+                placeholder="np. puszyste pancakes z owocami"
+              />
+              <button
+                disabled={desiredDish.trim().length < 2 || desiredDishLoading}
+                className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#d66a49] px-5 font-semibold text-white shadow-lg shadow-[#d66a49]/20 transition hover:-translate-y-0.5 hover:bg-[#c35d3e] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <Icon name="spark" />
+                {desiredDishLoading ? "AI gotuje..." : "Stwórz przepis"}
+              </button>
+            </div>
+            <p className="mt-3 text-xs text-[#7a857e]">
+              Obowiązują wybrana wyżej dieta, czas przygotowania i dzienny
+              limit generowania.
+            </p>
+            {desiredDishError && (
+              <p
+                role="alert"
+                className="mt-3 rounded-xl bg-[#fff0eb] px-4 py-3 text-sm text-[#a44436]"
+              >
+                {desiredDishError}
+              </p>
+            )}
+          </form>
+        </div>
+      </section>
+
       <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
         <div className="mx-auto grid max-w-5xl gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
           {[
@@ -852,17 +976,24 @@ export default function Home() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-              {generated ? "Dopasowane dla Ciebie" : "Przykładowe inspiracje"}
+              {generationMode === "dish"
+                ? "Przepis na Twoje życzenie"
+                : generated
+                  ? "Dopasowane dla Ciebie"
+                  : "Przykładowe inspiracje"}
             </p>
             <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-              {generated
+              {generationMode === "dish"
+                ? generatedRecipes[0]?.title
+                : generated
                 ? `${visibleRecipes.length} pomysły na dzisiaj`
                 : "Tak mogą wyglądać wyniki"}
             </h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-[#748078]">
-            Procent dopasowania pokazuje, ile potrzebnych produktów już masz.
-            Brakujące składniki łatwo przeniesiesz później na listę zakupów.
+            {generationMode === "dish"
+              ? "Pełna lista produktów, instrukcja przygotowania i wartości odżywcze — wszystko w jednym miejscu."
+              : "Procent dopasowania pokazuje, ile potrzebnych produktów już masz. Brakujące składniki łatwo przeniesiesz później na listę zakupów."}
           </p>
         </div>
 
@@ -900,7 +1031,9 @@ export default function Home() {
                   </span>
                 )}
                 <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#356248] backdrop-blur">
-                  {recipe.match}% dopasowania
+                  {generationMode === "dish"
+                    ? "Pełny przepis"
+                    : `${recipe.match}% dopasowania`}
                 </span>
                 <button
                   onClick={() => toggleFavorite(recipe)}
