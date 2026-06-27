@@ -108,7 +108,14 @@ Dostępne składniki: ${ingredients.join(", ")}
 Dieta: ${diet}
 Maksymalny czas przygotowania: ${maxTime} minut
 
-Każdy przepis musi mieścić się w limicie czasu, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada. Pole imageQuery ma być krótką, konkretną angielską frazą opisującą wygląd gotowego dania do wyszukania fotografii kulinarnej, bez słów photo, image ani photography.`,
+Każdy przepis musi mieścić się w limicie czasu, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.
+
+Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęcia w Pexels. Użyj 6–10 konkretnych słów opisujących nazwę dania, najważniejsze widoczne składniki, sposób podania oraz opcjonalnie ujęcie lub styl. Nie używaj słów photo, image ani photography. Nie tłumacz frazy i nie dodawaj znaków interpunkcyjnych.
+
+Przykładowy format imageQuery:
+- chicken rice egg bowl top view asian style plated food
+- creamy chicken spinach risotto
+- chicken rice omelette golden brown on pan close up`,
         },
       ],
       text: {

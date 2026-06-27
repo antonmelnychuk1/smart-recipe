@@ -20,8 +20,7 @@ export const sampleRecipes: Recipe[] = [
       "Pod koniec wmieszaj szpinak i parmezan.",
     ],
     emoji: "🍲",
-    imageQuery:
-      "Italian creamy chicken spinach parmesan risotto served in ceramic bowl",
+    imageQuery: "creamy chicken spinach risotto",
   },
   {
     title: "Szybki bowl z ryżem, kurczakiem i jajkiem",
@@ -43,8 +42,7 @@ export const sampleRecipes: Recipe[] = [
       "Podaj wszystko razem w misce i dopraw.",
     ],
     emoji: "🍚",
-    imageQuery:
-      "Asian rice bowl grilled chicken fried egg fresh vegetables spring onion top view",
+    imageQuery: "chicken rice egg bowl top view asian style plated food",
   },
   {
     title: "Omlet ryżowy z kurczakiem",
@@ -66,7 +64,6 @@ export const sampleRecipes: Recipe[] = [
       "Smaż jak omlet, aż się zetnie i lekko zarumieni.",
     ],
     emoji: "🍳",
-    imageQuery:
-      "Japanese chicken rice omelette omurice golden egg served on plate close up",
-  },
+    imageQuery: "chicken rice omelette golden brown on pan close up",
+  }
 ];
