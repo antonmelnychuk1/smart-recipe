@@ -962,7 +962,7 @@ export default function Home() {
                   <span>{recipe.difficulty}</span>
                   <span>{recipe.calories} kcal</span>
                 </div>
-                <h3 className="mt-4 font-serif text-2xl font-semibold">
+                <h3 className="break-anywhere mt-4 font-serif text-2xl font-semibold">
                   {recipe.title}
                 </h3>
                 <p className="mt-2 min-h-12 text-sm leading-6 text-[#748078]">
@@ -981,7 +981,7 @@ export default function Home() {
                           key={item}
                           onClick={() => addToShoppingList([item])}
                           disabled={added}
-                          className={`max-w-full whitespace-normal rounded-full px-2.5 py-1 text-left text-xs font-medium transition-all duration-200 ${
+                          className={`break-anywhere max-w-full whitespace-normal rounded-full px-2.5 py-1 text-left text-xs font-medium transition-all duration-200 ${
                             added
                               ? "bg-[#e3eee5] text-[#356248]"
                               : "bg-[#f7eee8] text-[#a45c45] hover:-translate-y-0.5 hover:bg-[#f2ded3] hover:shadow-sm"
@@ -1088,7 +1088,7 @@ export default function Home() {
                         onClick={() => setSelectedRecipe(recipe)}
                         className="min-w-0 flex-1 text-left"
                       >
-                        <span className="block text-sm font-semibold">
+                        <span className="break-anywhere block text-sm font-semibold">
                           {recipe.title}
                         </span>
                         <span className="text-xs text-[#7a857e]">
@@ -1137,7 +1137,7 @@ export default function Home() {
                       onClick={() => restoreHistory(entry)}
                       className="block w-full rounded-xl bg-[#faf8f3] p-3 text-left transition hover:bg-[#f1eee6]"
                     >
-                      <span className="block text-sm font-semibold">
+                      <span className="break-anywhere block text-sm font-semibold">
                         {entry.ingredients.join(", ")}
                       </span>
                       <span className="mt-1 block text-xs text-[#7a857e]">
@@ -1255,7 +1255,7 @@ export default function Home() {
                 ) : (
                   <span className="text-5xl">{selectedRecipe.emoji}</span>
                 )}
-                <h2 className="mt-4 font-serif text-3xl font-semibold sm:text-4xl">
+                <h2 className="break-anywhere mt-4 font-serif text-3xl font-semibold sm:text-4xl">
                   {selectedRecipe.title}
                 </h2>
                 <p className="mt-2 text-[#748078]">
@@ -1292,7 +1292,7 @@ export default function Home() {
                         key={item}
                         onClick={() => addToShoppingList([item])}
                         disabled={added}
-                        className={`max-w-full whitespace-normal rounded-full px-3 py-1.5 text-left text-xs font-semibold transition-all ${
+                        className={`break-anywhere max-w-full whitespace-normal rounded-full px-3 py-1.5 text-left text-xs font-semibold transition-all ${
                           added
                             ? "bg-[#e3eee5] text-[#356248]"
                             : "bg-white text-[#a45c45] shadow-sm hover:-translate-y-0.5 hover:shadow-md"

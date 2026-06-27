@@ -229,7 +229,7 @@ export default async function AdminPage() {
                       </td>
                       <td className="px-4 py-4">
                         <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                          className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold ${
                             user.role === "admin"
                               ? "bg-[#253d31] text-white"
                               : "bg-[#edf1ec] text-[#536159]"
@@ -240,7 +240,7 @@ export default async function AdminPage() {
                       </td>
                       <td className="px-4 py-4">
                         <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                          className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold ${
                             user.banned
                               ? "bg-[#fff0e8] text-[#a45c45]"
                               : "bg-[#e8efe9] text-[#356248]"
@@ -252,12 +252,12 @@ export default async function AdminPage() {
                       </td>
                       <td className="px-4 py-4">
                         <span
-                          className={
+                          className={`whitespace-nowrap ${
                             user.role !== "admin" &&
                             usage.today >= user.dailyLimit
                               ? "font-bold text-[#b04f3a]"
                               : "font-semibold text-[#365a46]"
-                          }
+                          }`}
                         >
                           {user.role === "admin"
                             ? "bez limitu"

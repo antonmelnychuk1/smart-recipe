@@ -293,7 +293,7 @@ export function MealPlanner({
                                 {entry.recipe.emoji}
                               </span>
                             )}
-                            <span className="mt-2 block text-sm font-semibold leading-5">
+                            <span className="break-anywhere mt-2 block text-sm font-semibold leading-5">
                               {entry.recipe.title}
                             </span>
                             <span className="mt-1 block text-xs text-[#7a857e]">
@@ -412,7 +412,7 @@ export function MealPlanner({
                       <span className="text-3xl">{recipe.emoji}</span>
                     )}
                     <span className="min-w-0">
-                      <span className="block text-sm font-semibold">
+                      <span className="break-anywhere block text-sm font-semibold">
                         {recipe.title}
                       </span>
                       <span className="mt-1 block text-xs text-[#7a857e]">

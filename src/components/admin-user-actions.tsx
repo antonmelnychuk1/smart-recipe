@@ -54,7 +54,7 @@ export function AdminUserActions({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold"
+        className="whitespace-nowrap rounded-lg border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold"
       >
         Zarządzaj
       </button>
