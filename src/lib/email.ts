@@ -11,14 +11,17 @@ export async function sendVerificationEmail({
   name,
   verificationUrl,
 }: VerificationEmail) {
-  if (!process.env.RESEND_API_KEY) {
+  const apiKey = normalizeEnvironmentValue(process.env.RESEND_API_KEY);
+
+  if (!apiKey) {
     console.error("RESEND_API_KEY is missing. Verification email was not sent.");
     return;
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const resend = new Resend(apiKey);
   const from =
-    process.env.EMAIL_FROM ?? "SmartRecipe <onboarding@resend.dev>";
+    normalizeEnvironmentValue(process.env.EMAIL_FROM) ??
+    "SmartRecipe <onboarding@resend.dev>";
 
   const { error } = await resend.emails.send({
     from,
@@ -45,8 +48,24 @@ export async function sendVerificationEmail({
   });
 
   if (error) {
+    console.error("Resend verification email failed", {
+      name: error.name,
+      message: error.message,
+      statusCode: error.statusCode,
+    });
     throw new Error(`Resend failed: ${error.message}`);
   }
+}
+
+function normalizeEnvironmentValue(value: string | undefined) {
+  if (!value) return undefined;
+
+  const trimmed = value.trim();
+  const hasMatchingQuotes =
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"));
+
+  return hasMatchingQuotes ? trimmed.slice(1, -1).trim() : trimmed;
 }
 
 function escapeHtml(value: string) {
