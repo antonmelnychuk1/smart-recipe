@@ -143,6 +143,7 @@ export default function Home() {
   const [accountDailyLimit, setAccountDailyLimit] = useState(20);
   const [verificationPending, setVerificationPending] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
   const [generationUsage, setGenerationUsage] = useState<{
     limit: number;
     remaining: number;
@@ -183,6 +184,13 @@ export default function Home() {
       JSON.stringify(shoppingList),
     );
   }, [favorites, history, shoppingList, storageLoaded]);
+
+  useEffect(() => {
+    if (!toast) return;
+
+    const timeout = window.setTimeout(() => setToast(null), 2600);
+    return () => window.clearTimeout(timeout);
+  }, [toast]);
 
   useEffect(() => {
     if (!session?.user || !storageLoaded) return;
@@ -307,9 +315,18 @@ export default function Home() {
   }
 
   function addToShoppingList(items: string[]) {
+    const newItems = items.filter(
+      (item) =>
+        !shoppingList.some(
+          (savedItem) =>
+            savedItem.toLocaleLowerCase("pl") ===
+            item.toLocaleLowerCase("pl"),
+        ),
+    );
+
     setShoppingList((current) => [
       ...current,
-      ...items.filter(
+      ...newItems.filter(
         (item) =>
           !current.some(
             (savedItem) =>
@@ -319,9 +336,24 @@ export default function Home() {
       ),
     ]);
 
-    if (session?.user && items.length > 0) {
-      void saveKitchenAction({ action: "shopping.add", items });
+    setToast(
+      newItems.length === 0
+        ? "Te produkty są już na liście zakupów."
+        : newItems.length === 1
+          ? `Dodano: ${newItems[0]}`
+          : `Dodano ${newItems.length} produktów do listy zakupów.`,
+    );
+
+    if (session?.user && newItems.length > 0) {
+      void saveKitchenAction({ action: "shopping.add", items: newItems });
     }
+  }
+
+  function isOnShoppingList(item: string) {
+    return shoppingList.some(
+      (savedItem) =>
+        savedItem.toLocaleLowerCase("pl") === item.toLocaleLowerCase("pl"),
+    );
   }
 
   async function saveKitchenAction(action: Record<string, unknown>) {
@@ -920,14 +952,23 @@ export default function Home() {
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {recipe.missing.length > 0 ? (
-                      recipe.missing.map((item) => (
-                        <span
+                      recipe.missing.map((item) => {
+                        const added = isOnShoppingList(item);
+                        return (
+                        <button
                           key={item}
-                          className="rounded-full bg-[#f7eee8] px-2.5 py-1 text-xs text-[#a45c45]"
+                          onClick={() => addToShoppingList([item])}
+                          disabled={added}
+                          className={`rounded-full px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
+                            added
+                              ? "bg-[#e3eee5] text-[#356248]"
+                              : "bg-[#f7eee8] text-[#a45c45] hover:-translate-y-0.5 hover:bg-[#f2ded3] hover:shadow-sm"
+                          }`}
                         >
-                          + {item}
-                        </span>
-                      ))
+                          {added ? "✓" : "+"} {item}
+                        </button>
+                        );
+                      })
                     ) : (
                       <span className="text-sm text-[#4f765e]">
                         Masz wszystko!
@@ -937,9 +978,12 @@ export default function Home() {
                   {recipe.missing.length > 0 && (
                     <button
                       onClick={() => addToShoppingList(recipe.missing)}
-                      className="mt-3 text-xs font-semibold text-[#a45c45] hover:underline"
+                      disabled={recipe.missing.every(isOnShoppingList)}
+                      className="mt-3 rounded-lg px-2 py-1 text-xs font-semibold text-[#a45c45] transition hover:bg-[#fff0e8] disabled:text-[#6e8376]"
                     >
-                      Dodaj brakujące do zakupów
+                      {recipe.missing.every(isOnShoppingList)
+                        ? "✓ Wszystkie są na liście"
+                        : "Dodaj wszystkie brakujące"}
                     </button>
                   )}
                 </div>
@@ -1180,6 +1224,33 @@ export default function Home() {
               <span>T: {selectedRecipe.fat} g</span>
             </div>
 
+            {selectedRecipe.missing.length > 0 && (
+              <div className="mt-5 rounded-2xl border border-[#eee1d8] bg-[#fff8f3] p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#9a6251]">
+                  Brakujące — kliknij, aby dodać
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {selectedRecipe.missing.map((item) => {
+                    const added = isOnShoppingList(item);
+                    return (
+                      <button
+                        key={item}
+                        onClick={() => addToShoppingList([item])}
+                        disabled={added}
+                        className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
+                          added
+                            ? "bg-[#e3eee5] text-[#356248]"
+                            : "bg-white text-[#a45c45] shadow-sm hover:-translate-y-0.5 hover:shadow-md"
+                        }`}
+                      >
+                        {added ? "✓" : "+"} {item}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="mt-8 grid gap-8 md:grid-cols-2">
               <div>
                 <h3 className="font-serif text-2xl font-semibold">Składniki</h3>
@@ -1212,6 +1283,19 @@ export default function Home() {
       )}
 
       {authOpen && <AuthDialog onClose={() => setAuthOpen(false)} />}
+
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="toast-enter fixed bottom-5 left-1/2 z-[80] flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 items-center gap-3 rounded-2xl bg-[#253d31] px-4 py-3 text-sm font-semibold text-white shadow-2xl"
+        >
+          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white/15">
+            ✓
+          </span>
+          {toast}
+        </div>
+      )}
 
       <footer className="bg-[#23362c] px-5 py-8 text-center text-sm text-[#b8c3bc]">
         SmartRecipe · Gotuj sprytniej, marnuj mniej.
