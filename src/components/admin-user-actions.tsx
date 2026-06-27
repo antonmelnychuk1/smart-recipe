@@ -75,7 +75,7 @@ export function AdminUserActions({
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
                   Zarządzanie kontem
                 </p>
-                <h3 className="mt-1 truncate font-serif text-2xl font-semibold">
+                <h3 className="mt-1 font-serif text-2xl font-semibold">
                   {userName}
                 </h3>
               </div>

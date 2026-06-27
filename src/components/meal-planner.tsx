@@ -412,7 +412,7 @@ export function MealPlanner({
                       <span className="text-3xl">{recipe.emoji}</span>
                     )}
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold">
+                      <span className="block text-sm font-semibold">
                         {recipe.title}
                       </span>
                       <span className="mt-1 block text-xs text-[#7a857e]">

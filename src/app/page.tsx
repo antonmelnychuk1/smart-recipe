@@ -910,7 +910,7 @@ export default function Home() {
           {visibleRecipes.map((recipe, index) => (
             <article
               key={recipe.title}
-              className="group overflow-hidden rounded-[1.7rem] border border-[#e2dfd6] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+              className="group min-w-0 overflow-hidden rounded-[1.7rem] border border-[#e2dfd6] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div
                 className={`relative grid h-48 place-items-center bg-gradient-to-br ${accents[index % accents.length]}`}
@@ -981,7 +981,7 @@ export default function Home() {
                           key={item}
                           onClick={() => addToShoppingList([item])}
                           disabled={added}
-                          className={`rounded-full px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
+                          className={`max-w-full whitespace-normal rounded-full px-2.5 py-1 text-left text-xs font-medium transition-all duration-200 ${
                             added
                               ? "bg-[#e3eee5] text-[#356248]"
                               : "bg-[#f7eee8] text-[#a45c45] hover:-translate-y-0.5 hover:bg-[#f2ded3] hover:shadow-sm"
@@ -1088,7 +1088,7 @@ export default function Home() {
                         onClick={() => setSelectedRecipe(recipe)}
                         className="min-w-0 flex-1 text-left"
                       >
-                        <span className="block truncate text-sm font-semibold">
+                        <span className="block text-sm font-semibold">
                           {recipe.title}
                         </span>
                         <span className="text-xs text-[#7a857e]">
@@ -1137,7 +1137,7 @@ export default function Home() {
                       onClick={() => restoreHistory(entry)}
                       className="block w-full rounded-xl bg-[#faf8f3] p-3 text-left transition hover:bg-[#f1eee6]"
                     >
-                      <span className="block truncate text-sm font-semibold">
+                      <span className="block text-sm font-semibold">
                         {entry.ingredients.join(", ")}
                       </span>
                       <span className="mt-1 block text-xs text-[#7a857e]">
@@ -1292,7 +1292,7 @@ export default function Home() {
                         key={item}
                         onClick={() => addToShoppingList([item])}
                         disabled={added}
-                        className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
+                        className={`max-w-full whitespace-normal rounded-full px-3 py-1.5 text-left text-xs font-semibold transition-all ${
                           added
                             ? "bg-[#e3eee5] text-[#356248]"
                             : "bg-white text-[#a45c45] shadow-sm hover:-translate-y-0.5 hover:shadow-md"
