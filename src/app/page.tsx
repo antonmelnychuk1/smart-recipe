@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AuthDialog } from "@/components/auth-dialog";
 import { MealPlanner } from "@/components/meal-planner";
@@ -914,9 +915,30 @@ export default function Home() {
               <div
                 className={`relative grid h-48 place-items-center bg-gradient-to-br ${accents[index % accents.length]}`}
               >
-                <span className="text-7xl drop-shadow-lg transition duration-300 group-hover:scale-110">
-                  {recipe.emoji}
-                </span>
+                {recipe.image ? (
+                  <>
+                    <Image
+                      src={recipe.image.url}
+                      alt={recipe.image.alt}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 33vw"
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/5" />
+                    <a
+                      href={recipe.image.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="absolute bottom-3 left-4 max-w-[75%] truncate text-[10px] font-medium text-white/90 hover:text-white hover:underline"
+                    >
+                      Fot. {recipe.image.photographer} · Pexels
+                    </a>
+                  </>
+                ) : (
+                  <span className="text-7xl drop-shadow-lg transition duration-300 group-hover:scale-110">
+                    {recipe.emoji}
+                  </span>
+                )}
                 <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#356248] backdrop-blur">
                   {recipe.match}% dopasowania
                 </span>
@@ -1049,7 +1071,19 @@ export default function Home() {
                       key={recipe.title}
                       className="flex items-center gap-3 rounded-xl bg-[#faf8f3] p-3"
                     >
-                      <span className="text-2xl">{recipe.emoji}</span>
+                      {recipe.image ? (
+                        <span className="relative size-11 shrink-0 overflow-hidden rounded-xl">
+                          <Image
+                            src={recipe.image.url}
+                            alt={recipe.image.alt}
+                            fill
+                            sizes="44px"
+                            className="object-cover"
+                          />
+                        </span>
+                      ) : (
+                        <span className="text-2xl">{recipe.emoji}</span>
+                      )}
                       <button
                         onClick={() => setSelectedRecipe(recipe)}
                         className="min-w-0 flex-1 text-left"
@@ -1198,8 +1232,29 @@ export default function Home() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <span className="text-5xl">{selectedRecipe.emoji}</span>
+              <div className="min-w-0 flex-1">
+                {selectedRecipe.image ? (
+                  <div className="relative mb-6 h-56 w-full overflow-hidden rounded-2xl sm:h-72">
+                    <Image
+                      src={selectedRecipe.image.url}
+                      alt={selectedRecipe.image.alt}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 768px"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                    <a
+                      href={selectedRecipe.image.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="absolute bottom-3 left-4 text-xs font-medium text-white hover:underline"
+                    >
+                      Zdjęcie: {selectedRecipe.image.photographer} · Pexels
+                    </a>
+                  </div>
+                ) : (
+                  <span className="text-5xl">{selectedRecipe.emoji}</span>
+                )}
                 <h2 className="mt-4 font-serif text-3xl font-semibold sm:text-4xl">
                   {selectedRecipe.title}
                 </h2>
@@ -1298,7 +1353,15 @@ export default function Home() {
       )}
 
       <footer className="bg-[#23362c] px-5 py-8 text-center text-sm text-[#b8c3bc]">
-        SmartRecipe · Gotuj sprytniej, marnuj mniej.
+        SmartRecipe · Gotuj sprytniej, marnuj mniej.{" "}
+        <a
+          href="https://www.pexels.com"
+          target="_blank"
+          rel="noreferrer"
+          className="underline decoration-white/30 underline-offset-4 hover:text-white"
+        >
+          Photos provided by Pexels
+        </a>
       </footer>
     </main>
   );

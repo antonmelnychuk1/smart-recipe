@@ -12,6 +12,14 @@ export type Recipe = {
   missing: string[];
   steps: string[];
   emoji: string;
+  imageQuery?: string;
+  image?: {
+    url: string;
+    alt: string;
+    photographer: string;
+    photographerUrl: string;
+    sourceUrl: string;
+  };
 };
 
 export type SearchHistoryEntry = {

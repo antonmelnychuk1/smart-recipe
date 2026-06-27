@@ -7,6 +7,7 @@ create shopping lists, and reduce food waste.
 ## Features
 
 - generate three personalized recipes with the OpenAI API,
+- display matching food photography from Pexels with photographer attribution,
 - filter recipes by diet and maximum preparation time,
 - calculate how well each recipe matches the available ingredients,
 - identify missing ingredients,
@@ -57,6 +58,9 @@ Next.js interface
 The OpenAI API key and database credentials are used exclusively on the
 server. They are never included in the client-side bundle.
 
+Pexels searches are performed on the server and cached. Photo metadata remains
+attached to saved recipes, favorites, search history, and meal plans.
+
 ## Local Development
 
 ### 1. Requirements
@@ -64,6 +68,7 @@ server. They are never included in the client-side bundle.
 - Node.js 20 or newer,
 - a PostgreSQL database,
 - an OpenAI API key.
+- a Pexels API key for food photography (optional).
 
 ### 2. Installation
 
@@ -80,6 +85,7 @@ Copy `.env.example` to `.env.local` and provide the required values:
 ```env
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-5.4-mini
+PEXELS_API_KEY=
 DATABASE_URL=
 BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:3000

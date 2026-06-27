@@ -18,6 +18,16 @@ const recipeSchema = z.object({
   missing: z.array(z.string()),
   steps: z.array(z.string()),
   emoji: z.string(),
+  imageQuery: z.string().optional(),
+  image: z
+    .object({
+      url: z.string().url(),
+      alt: z.string(),
+      photographer: z.string(),
+      photographerUrl: z.string().url(),
+      sourceUrl: z.string().url(),
+    })
+    .optional(),
 });
 
 const actionSchema = z.discriminatedUnion("action", [

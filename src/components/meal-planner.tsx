@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import type {
   MealPlanEntry,
@@ -277,9 +278,21 @@ export function MealPlanner({
                             onClick={() => onOpenRecipe(entry.recipe)}
                             className="block w-full text-left"
                           >
-                            <span className="text-2xl">
-                              {entry.recipe.emoji}
-                            </span>
+                            {entry.recipe.image ? (
+                              <span className="relative block h-16 overflow-hidden rounded-lg">
+                                <Image
+                                  src={entry.recipe.image.url}
+                                  alt={entry.recipe.image.alt}
+                                  fill
+                                  sizes="150px"
+                                  className="object-cover"
+                                />
+                              </span>
+                            ) : (
+                              <span className="text-2xl">
+                                {entry.recipe.emoji}
+                              </span>
+                            )}
                             <span className="mt-2 block text-sm font-semibold leading-5">
                               {entry.recipe.title}
                             </span>
@@ -385,7 +398,19 @@ export function MealPlanner({
                     onClick={() => assignRecipe(recipe)}
                     className="flex items-center gap-4 rounded-2xl border border-[#e1ddd4] bg-white p-4 text-left transition hover:border-[#7e9d89] hover:bg-[#f4f7f3]"
                   >
-                    <span className="text-3xl">{recipe.emoji}</span>
+                    {recipe.image ? (
+                      <span className="relative size-12 shrink-0 overflow-hidden rounded-xl">
+                        <Image
+                          src={recipe.image.url}
+                          alt={recipe.image.alt}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </span>
+                    ) : (
+                      <span className="text-3xl">{recipe.emoji}</span>
+                    )}
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold">
                         {recipe.title}

@@ -5,6 +5,7 @@ import {
   consumeGenerationLimit,
   refundGenerationLimit,
 } from "@/lib/generation-limit";
+import { attachRecipePhotos } from "@/lib/pexels";
 
 const requestSchema = z.object({
   ingredients: z.array(z.string().trim().min(1).max(60)).min(1).max(30),
@@ -29,6 +30,7 @@ const responseSchema = z.object({
         missing: z.array(z.string()),
         steps: z.array(z.string()),
         emoji: z.string(),
+        imageQuery: z.string(),
       }),
     )
     .length(3),
@@ -106,7 +108,7 @@ Dostępne składniki: ${ingredients.join(", ")}
 Dieta: ${diet}
 Maksymalny czas przygotowania: ${maxTime} minut
 
-Każdy przepis musi mieścić się w limicie czasu, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`,
+Każdy przepis musi mieścić się w limicie czasu, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada. Pole imageQuery ma być krótką, konkretną angielską frazą opisującą wygląd gotowego dania do wyszukania fotografii kulinarnej, bez słów photo, image ani photography.`,
         },
       ],
       text: {
@@ -122,8 +124,12 @@ Każdy przepis musi mieścić się w limicie czasu, być zgodny z dietą, wykorz
       );
     }
 
+    const recipesWithPhotos = await attachRecipePhotos(
+      response.output_parsed.recipes,
+    );
+
     return Response.json({
-      ...response.output_parsed,
+      recipes: recipesWithPhotos,
       usage: {
         limit: usage.limit,
         remaining: usage.remaining,
