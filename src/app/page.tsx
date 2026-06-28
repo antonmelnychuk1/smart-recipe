@@ -1028,7 +1028,13 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-3">
+        <div
+          className={`mt-7 grid gap-4 sm:mt-10 sm:gap-6 ${
+            generationMode === "dish"
+              ? "mx-auto max-w-2xl"
+              : "lg:grid-cols-3"
+          }`}
+        >
           {visibleRecipes.map((recipe, index) => (
             <article
               key={recipe.title}
