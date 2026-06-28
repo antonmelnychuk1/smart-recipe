@@ -186,7 +186,91 @@ export default async function AdminPage() {
             </span>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="divide-y divide-[#efede7] xl:hidden">
+            {users.map((user) => {
+              const usage = usageByUser.get(user.id) ?? {
+                total: 0,
+                today: 0,
+                lastActivity: null,
+              };
+
+              return (
+                <article key={user.id} className="p-4 sm:p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold">{user.name}</p>
+                      <p className="mt-1 truncate text-xs text-[#7a857e]">
+                        {user.email}
+                      </p>
+                    </div>
+                    <AdminUserActions
+                      userId={user.id}
+                      userName={user.name}
+                      role={user.role}
+                      banned={user.banned}
+                      dailyLimit={user.dailyLimit}
+                      isCurrentAdmin={user.id === admin.id}
+                    />
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                        user.role === "admin"
+                          ? "bg-[#253d31] text-white"
+                          : "bg-[#edf1ec] text-[#536159]"
+                      }`}
+                    >
+                      {user.role}
+                    </span>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                        user.banned
+                          ? "bg-[#fff0e8] text-[#a45c45]"
+                          : "bg-[#e8efe9] text-[#356248]"
+                      }`}
+                      title={user.banReason ?? undefined}
+                    >
+                      {user.banned ? "zablokowany" : "aktywny"}
+                    </span>
+                    {emailVerificationEnabled && !user.emailVerified && (
+                      <span className="rounded-full bg-[#fff0e8] px-2.5 py-1 text-xs font-bold text-[#a45c45]">
+                        e-mail niezweryfikowany
+                      </span>
+                    )}
+                  </div>
+
+                  <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">
+                    {[
+                      [
+                        "Dzisiaj",
+                        user.role === "admin"
+                          ? "bez limitu"
+                          : `${usage.today}/${user.dailyLimit}`,
+                      ],
+                      ["Łącznie", usage.total],
+                      ["Ulubione", user._count.favorites],
+                      ["Historia", user._count.searches],
+                      ["Plan", user._count.mealPlans],
+                      ["Aktywność", formatDate(usage.lastActivity)],
+                      ["Rejestracja", formatDate(user.createdAt)],
+                    ].map(([label, value]) => (
+                      <div key={label} className="min-w-0">
+                        <dt className="text-[10px] font-bold uppercase tracking-wider text-[#929a94]">
+                          {label}
+                        </dt>
+                        <dd className="mt-1 text-xs font-semibold text-[#4f5e56]">
+                          {value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="hidden overflow-x-auto xl:block">
             <table className="w-full min-w-[1320px] border-collapse text-left text-sm">
               <thead className="bg-[#faf8f3] text-xs uppercase tracking-wider text-[#7b857f]">
                 <tr>
@@ -200,7 +284,9 @@ export default async function AdminPage() {
                   <th className="px-4 py-4">Plan</th>
                   <th className="px-4 py-4">Ostatnia aktywność</th>
                   <th className="px-6 py-4">Rejestracja</th>
-                  <th className="px-6 py-4 text-right">Akcje</th>
+                  <th className="sticky right-0 z-10 bg-[#faf8f3] px-6 py-4 text-right shadow-[-8px_0_12px_-12px_rgba(37,50,43,0.45)]">
+                    Akcje
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -214,7 +300,7 @@ export default async function AdminPage() {
                   return (
                     <tr
                       key={user.id}
-                      className="border-t border-[#efede7] align-top hover:bg-[#fcfbf8]"
+                      className="group border-t border-[#efede7] align-top hover:bg-[#fcfbf8]"
                     >
                       <td className="px-6 py-4">
                         <p className="font-semibold">{user.name}</p>
@@ -274,7 +360,7 @@ export default async function AdminPage() {
                       <td className="px-6 py-4 text-xs text-[#68736b]">
                         {formatDate(user.createdAt)}
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="sticky right-0 z-10 bg-white px-6 py-4 text-right shadow-[-8px_0_12px_-12px_rgba(37,50,43,0.45)] group-hover:bg-[#fcfbf8]">
                         <AdminUserActions
                           userId={user.id}
                           userName={user.name}
