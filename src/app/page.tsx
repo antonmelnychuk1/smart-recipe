@@ -4,8 +4,13 @@ import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AuthDialog } from "@/components/auth-dialog";
 import { MealPlanner } from "@/components/meal-planner";
+import { Pantry } from "@/components/pantry";
 import { authClient } from "@/lib/auth-client";
-import type { Recipe, SearchHistoryEntry } from "@/lib/recipe-types";
+import type {
+  PantryItem,
+  Recipe,
+  SearchHistoryEntry,
+} from "@/lib/recipe-types";
 import { sampleRecipes as initialSampleRecipes } from "@/lib/sample-recipes";
 
 const emailVerificationEnabled =
@@ -47,6 +52,7 @@ const storageKeys = {
   favorites: "smart-recipe:favorites",
   history: "smart-recipe:history",
   shopping: "smart-recipe:shopping",
+  pantry: "smart-recipe:pantry",
 };
 
 function readStoredValue<T>(key: string, fallback: T): T {
@@ -103,6 +109,7 @@ export default function Home() {
   const [favorites, setFavorites] = useState<Recipe[]>([]);
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [shoppingList, setShoppingList] = useState<string[]>([]);
+  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [sampleRecipes, setSampleRecipes] =
     useState<Recipe[]>(initialSampleRecipes);
@@ -159,6 +166,7 @@ export default function Home() {
       setFavorites(readStoredValue(storageKeys.favorites, []));
       setHistory(readStoredValue(storageKeys.history, []));
       setShoppingList(readStoredValue(storageKeys.shopping, []));
+      setPantryItems(readStoredValue(storageKeys.pantry, []));
       setStorageLoaded(true);
     }, 0);
 
@@ -176,7 +184,11 @@ export default function Home() {
       storageKeys.shopping,
       JSON.stringify(shoppingList),
     );
-  }, [favorites, history, shoppingList, storageLoaded]);
+    window.localStorage.setItem(
+      storageKeys.pantry,
+      JSON.stringify(pantryItems),
+    );
+  }, [favorites, history, pantryItems, shoppingList, storageLoaded]);
 
   useEffect(() => {
     if (!toast) return;
@@ -198,14 +210,19 @@ export default function Home() {
         favorites: Recipe[];
         history: SearchHistoryEntry[];
         shoppingList: string[];
+        pantryItems: PantryItem[];
       };
 
       const remoteIsEmpty =
         remote.favorites.length === 0 &&
         remote.history.length === 0 &&
-        remote.shoppingList.length === 0;
+        remote.shoppingList.length === 0 &&
+        remote.pantryItems.length === 0;
       const localHasData =
-        favorites.length > 0 || history.length > 0 || shoppingList.length > 0;
+        favorites.length > 0 ||
+        history.length > 0 ||
+        shoppingList.length > 0 ||
+        pantryItems.length > 0;
 
       if (remoteIsEmpty && localHasData) {
         await Promise.all([
@@ -229,6 +246,14 @@ export default function Home() {
                 }),
               ]
             : []),
+          ...pantryItems.map((item) =>
+            saveKitchenAction({
+              action: "pantry.upsert",
+              label: item.label,
+              quantity: item.quantity,
+              expiresAt: item.expiresAt,
+            }),
+          ),
         ]);
         return;
       }
@@ -237,6 +262,7 @@ export default function Home() {
         setFavorites(remote.favorites);
         setHistory(remote.history);
         setShoppingList(remote.shoppingList);
+        setPantryItems(remote.pantryItems);
       }
     }
 
@@ -349,6 +375,65 @@ export default function Home() {
     );
   }
 
+  function savePantryItem(item: Omit<PantryItem, "id">) {
+    setPantryItems((current) => {
+      const existing = current.find(
+        (savedItem) =>
+          savedItem.label.toLocaleLowerCase("pl") ===
+          item.label.toLocaleLowerCase("pl"),
+      );
+
+      if (existing) {
+        return current.map((savedItem) =>
+          savedItem.id === existing.id ? { ...savedItem, ...item } : savedItem,
+        );
+      }
+
+      return [{ ...item, id: crypto.randomUUID() }, ...current];
+    });
+    setToast(`Dodano do spiżarni: ${item.label}`);
+
+    if (session?.user) {
+      void saveKitchenAction({ action: "pantry.upsert", ...item });
+    }
+  }
+
+  function removePantryItem(item: PantryItem) {
+    setPantryItems((current) =>
+      current.filter((savedItem) => savedItem.id !== item.id),
+    );
+
+    if (session?.user) {
+      void saveKitchenAction({
+        action: "pantry.remove",
+        label: item.label,
+      });
+    }
+  }
+
+  function usePantryIngredients(labels: string[]) {
+    setIngredients((current) => [
+      ...current,
+      ...labels.filter(
+        (label) =>
+          !current.some(
+            (ingredient) =>
+              ingredient.toLocaleLowerCase("pl") ===
+              label.toLocaleLowerCase("pl"),
+          ),
+      ),
+    ]);
+    setToast(
+      labels.length === 1
+        ? `Dodano do generatora: ${labels[0]}`
+        : `Dodano ${labels.length} produktów do generatora.`,
+    );
+    window.setTimeout(
+      () => window.scrollTo({ top: 0, behavior: "smooth" }),
+      50,
+    );
+  }
+
   async function saveKitchenAction(action: Record<string, unknown>) {
     await fetch("/api/kitchen", {
       method: "POST",
@@ -395,6 +480,16 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ingredients: submittedIngredients,
+          priorityIngredients: pantryItems
+            .filter(
+              (item) =>
+                item.expiresAt &&
+                new Date(`${item.expiresAt}T23:59:59`).getTime() >= Date.now() &&
+                new Date(`${item.expiresAt}T23:59:59`).getTime() <=
+                  Date.now() + 4 * 86_400_000 &&
+                submittedIngredients.includes(item.label),
+            )
+            .map((item) => item.label),
           diet,
           maxTime: Number(maxTime),
         }),
@@ -924,7 +1019,7 @@ export default function Home() {
       </section>
 
       <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
-        <div className="mx-auto grid max-w-5xl gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
+        <div className="mx-auto grid gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
           {[
             ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
             ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie."],
@@ -942,7 +1037,7 @@ export default function Home() {
       </section>
 
       <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-10 sm:px-8 sm:py-14">
-        <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+        <div className="mx-auto grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
               Masz ochotę na konkretne danie?
@@ -1212,7 +1307,17 @@ export default function Home() {
             )}
           </div>
 
-          <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-3">
+          <div className="mt-7 sm:mt-10">
+            <Pantry
+              items={pantryItems}
+              isSignedIn={Boolean(session?.user)}
+              onSave={savePantryItem}
+              onRemove={removePantryItem}
+              onUseIngredients={usePantryIngredients}
+            />
+          </div>
+
+          <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-3">
             <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-2xl font-semibold">Ulubione</h3>

@@ -10,6 +10,10 @@ import { attachRecipePhotos } from "@/lib/pexels";
 const ingredientsRequestSchema = z.object({
   mode: z.literal("ingredients").optional(),
   ingredients: z.array(z.string().trim().min(1).max(60)).min(1).max(30),
+  priorityIngredients: z
+    .array(z.string().trim().min(1).max(60))
+    .max(30)
+    .optional(),
   diet: z.string().trim().min(1).max(60),
   maxTime: z.number().int().min(0).max(240),
 });
@@ -91,10 +95,13 @@ Zachowaj charakter wskazanego dania, ale dopasuj je do diety i podanych wymagań
     requestPrompt = `Wygeneruj dokładnie 3 różne przepisy.
 
 Dostępne składniki: ${requestData.ingredients.join(", ")}
+Produkty z krótką datą ważności, które należy wykorzystać w pierwszej kolejności: ${
+      requestData.priorityIngredients?.join(", ") || "brak"
+    }
 Dieta: ${diet}
 Czas przygotowania: ${timeRequirement}
 
-Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
+Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Jeśli podano produkty z krótką datą ważności, wykorzystaj je w możliwie wielu propozycjach. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
   }
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const usage = await consumeGenerationLimit();

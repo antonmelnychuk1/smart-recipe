@@ -58,6 +58,7 @@ export const ModelName = {
   Favorite: 'Favorite',
   SearchHistory: 'SearchHistory',
   ShoppingItem: 'ShoppingItem',
+  PantryItem: 'PantryItem',
   GenerationUsage: 'GenerationUsage',
   MealPlan: 'MealPlan'
 } as const
@@ -174,6 +175,19 @@ export const ShoppingItemScalarFieldEnum = {
 } as const
 
 export type ShoppingItemScalarFieldEnum = (typeof ShoppingItemScalarFieldEnum)[keyof typeof ShoppingItemScalarFieldEnum]
+
+
+export const PantryItemScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  quantity: 'quantity',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type PantryItemScalarFieldEnum = (typeof PantryItemScalarFieldEnum)[keyof typeof PantryItemScalarFieldEnum]
 
 
 export const GenerationUsageScalarFieldEnum = {

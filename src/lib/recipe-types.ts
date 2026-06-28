@@ -31,6 +31,13 @@ export type SearchHistoryEntry = {
   recipes: Recipe[];
 };
 
+export type PantryItem = {
+  id: string;
+  label: string;
+  quantity: string;
+  expiresAt: string | null;
+};
+
 export type MealType = "breakfast" | "lunch" | "dinner";
 
 export type MealPlanEntry = {

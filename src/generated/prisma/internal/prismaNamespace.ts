@@ -391,6 +391,7 @@ export const ModelName = {
   Favorite: 'Favorite',
   SearchHistory: 'SearchHistory',
   ShoppingItem: 'ShoppingItem',
+  PantryItem: 'PantryItem',
   GenerationUsage: 'GenerationUsage',
   MealPlan: 'MealPlan'
 } as const
@@ -408,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "favorite" | "searchHistory" | "shoppingItem" | "generationUsage" | "mealPlan"
+    modelProps: "user" | "session" | "account" | "verification" | "favorite" | "searchHistory" | "shoppingItem" | "pantryItem" | "generationUsage" | "mealPlan"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -930,6 +931,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PantryItem: {
+      payload: Prisma.$PantryItemPayload<ExtArgs>
+      fields: Prisma.PantryItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PantryItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PantryItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>
+        }
+        findFirst: {
+          args: Prisma.PantryItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PantryItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>
+        }
+        findMany: {
+          args: Prisma.PantryItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>[]
+        }
+        create: {
+          args: Prisma.PantryItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>
+        }
+        createMany: {
+          args: Prisma.PantryItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PantryItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>[]
+        }
+        delete: {
+          args: Prisma.PantryItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>
+        }
+        update: {
+          args: Prisma.PantryItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.PantryItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PantryItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PantryItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.PantryItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PantryItemPayload>
+        }
+        aggregate: {
+          args: Prisma.PantryItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePantryItem>
+        }
+        groupBy: {
+          args: Prisma.PantryItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PantryItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PantryItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PantryItemCountAggregateOutputType> | number
+        }
+      }
+    }
     GenerationUsage: {
       payload: Prisma.$GenerationUsagePayload<ExtArgs>
       fields: Prisma.GenerationUsageFieldRefs
@@ -1215,6 +1290,19 @@ export const ShoppingItemScalarFieldEnum = {
 export type ShoppingItemScalarFieldEnum = (typeof ShoppingItemScalarFieldEnum)[keyof typeof ShoppingItemScalarFieldEnum]
 
 
+export const PantryItemScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  quantity: 'quantity',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type PantryItemScalarFieldEnum = (typeof PantryItemScalarFieldEnum)[keyof typeof PantryItemScalarFieldEnum]
+
+
 export const GenerationUsageScalarFieldEnum = {
   id: 'id',
   identifier: 'identifier',
@@ -1480,6 +1568,7 @@ export type GlobalOmitConfig = {
   favorite?: Prisma.FavoriteOmit
   searchHistory?: Prisma.SearchHistoryOmit
   shoppingItem?: Prisma.ShoppingItemOmit
+  pantryItem?: Prisma.PantryItemOmit
   generationUsage?: Prisma.GenerationUsageOmit
   mealPlan?: Prisma.MealPlanOmit
 }

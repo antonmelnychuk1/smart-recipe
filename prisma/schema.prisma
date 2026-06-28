@@ -25,6 +25,7 @@ model User {
   favorites     Favorite[]
   searches      SearchHistory[]
   shoppingItems ShoppingItem[]
+  pantryItems   PantryItem[]
   mealPlans     MealPlan[]
 
   @@map("user")
@@ -112,6 +113,20 @@ model ShoppingItem {
 
   @@unique([userId, label])
   @@index([userId])
+}
+
+model PantryItem {
+  id        String    @id @default(cuid())
+  label     String
+  quantity  String
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, label])
+  @@index([userId, expiresAt])
 }
 
 model GenerationUsage {

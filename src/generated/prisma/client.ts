@@ -24,7 +24,7 @@ export * as $Enums from './enums'
 export * from "./enums"
 /**
  * ## Prisma Client
- * 
+ *
  * Type-safe database client for TypeScript
  * @example
  * ```
@@ -76,6 +76,11 @@ export type SearchHistory = Prisma.SearchHistoryModel
  * 
  */
 export type ShoppingItem = Prisma.ShoppingItemModel
+/**
+ * Model PantryItem
+ *
+ */
+export type PantryItem = Prisma.PantryItemModel
 /**
  * Model GenerationUsage
  * 

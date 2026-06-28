@@ -60,6 +60,19 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("shopping.clear"),
   }),
+  z.object({
+    action: z.literal("pantry.upsert"),
+    label: z.string().trim().min(1).max(80),
+    quantity: z.string().trim().min(1).max(60),
+    expiresAt: z.string().date().nullable(),
+  }),
+  z.object({
+    action: z.literal("pantry.remove"),
+    label: z.string().trim().min(1).max(80),
+  }),
+  z.object({
+    action: z.literal("pantry.clear"),
+  }),
 ]);
 
 async function getUserId() {
@@ -77,7 +90,7 @@ export async function GET() {
     return Response.json({ error: "Zaloguj się, aby pobrać dane." }, { status: 401 });
   }
 
-  const [favorites, history, shoppingItems] = await Promise.all([
+  const [favorites, history, shoppingItems, pantryItems] = await Promise.all([
     prisma.favorite.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -90,6 +103,10 @@ export async function GET() {
     prisma.shoppingItem.findMany({
       where: { userId },
       orderBy: { createdAt: "asc" },
+    }),
+    prisma.pantryItem.findMany({
+      where: { userId },
+      orderBy: [{ expiresAt: "asc" }, { createdAt: "asc" }],
     }),
   ]);
 
@@ -104,6 +121,12 @@ export async function GET() {
       recipes: entry.recipes as Recipe[],
     })),
     shoppingList: shoppingItems.map((item) => item.label),
+    pantryItems: pantryItems.map((item) => ({
+      id: item.id,
+      label: item.label,
+      quantity: item.quantity,
+      expiresAt: item.expiresAt?.toISOString().slice(0, 10) ?? null,
+    })),
   });
 }
 
@@ -186,6 +209,33 @@ export async function POST(request: Request) {
       break;
     case "shopping.clear":
       await prisma.shoppingItem.deleteMany({ where: { userId } });
+      break;
+    case "pantry.upsert":
+      await prisma.pantryItem.upsert({
+        where: { userId_label: { userId, label: data.label } },
+        create: {
+          userId,
+          label: data.label,
+          quantity: data.quantity,
+          expiresAt: data.expiresAt
+            ? new Date(`${data.expiresAt}T12:00:00.000Z`)
+            : null,
+        },
+        update: {
+          quantity: data.quantity,
+          expiresAt: data.expiresAt
+            ? new Date(`${data.expiresAt}T12:00:00.000Z`)
+            : null,
+        },
+      });
+      break;
+    case "pantry.remove":
+      await prisma.pantryItem.deleteMany({
+        where: { userId, label: data.label },
+      });
+      break;
+    case "pantry.clear":
+      await prisma.pantryItem.deleteMany({ where: { userId } });
       break;
   }
 
