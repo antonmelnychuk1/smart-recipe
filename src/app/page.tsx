@@ -13,6 +13,30 @@ const emailVerificationEnabled =
 
 const suggestions = ["jajka", "ryż", "kurczak", "pomidor", "szpinak"];
 
+const dietOptions = [
+  "Bez ograniczeń",
+  "Wegetariańska",
+  "Wegańska",
+  "Pescetariańska",
+  "Bezglutenowa",
+  "Bez laktozy",
+  "Ketogeniczna",
+  "Niskowęglowodanowa",
+  "Śródziemnomorska",
+  "Wysokobiałkowa",
+];
+
+const timeOptions = [
+  ["0", "Bez ograniczeń"],
+  ["15", "do 15 minut"],
+  ["20", "do 20 minut"],
+  ["30", "do 30 minut"],
+  ["45", "do 45 minut"],
+  ["60", "do 60 minut"],
+  ["90", "do 90 minut"],
+  ["120", "do 120 minut"],
+];
+
 const accents = [
   "from-[#f7c56c] to-[#e78a43]",
   "from-[#8fbb72] to-[#4f8457]",
@@ -66,14 +90,14 @@ export default function Home() {
   const [ingredients, setIngredients] = useState(["jajka", "ryż", "kurczak"]);
   const [input, setInput] = useState("");
   const [diet, setDiet] = useState("Bez ograniczeń");
-  const [maxTime, setMaxTime] = useState("30");
+  const [maxTime, setMaxTime] = useState("0");
   const [generated, setGenerated] = useState(false);
   const [generationMode, setGenerationMode] = useState<
     "ingredients" | "dish" | null
   >(null);
   const [desiredDish, setDesiredDish] = useState("");
   const [desiredDishDiet, setDesiredDishDiet] = useState("Bez ograniczeń");
-  const [desiredDishMaxTime, setDesiredDishMaxTime] = useState("30");
+  const [desiredDishMaxTime, setDesiredDishMaxTime] = useState("0");
   const [desiredDishLoading, setDesiredDishLoading] = useState(false);
   const [desiredDishError, setDesiredDishError] = useState("");
   const [favorites, setFavorites] = useState<Recipe[]>([]);
@@ -249,7 +273,7 @@ export default function Home() {
   const visibleRecipes = useMemo(
     () =>
       (generated ? generatedRecipes : sampleRecipes).filter(
-        (recipe) => recipe.time <= Number(maxTime),
+        (recipe) => maxTime === "0" || recipe.time <= Number(maxTime),
       ),
     [generated, generatedRecipes, maxTime, sampleRecipes],
   );
@@ -800,10 +824,9 @@ export default function Home() {
                 onChange={(event) => setDiet(event.target.value)}
                 className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
               >
-                <option>Bez ograniczeń</option>
-                <option>Wegetariańska</option>
-                <option>Wegańska</option>
-                <option>Bezglutenowa</option>
+                {dietOptions.map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
               </select>
             </label>
             <label className="text-sm font-semibold text-[#35483e]">
@@ -813,9 +836,11 @@ export default function Home() {
                 onChange={(event) => setMaxTime(event.target.value)}
                 className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
               >
-                <option value="20">do 20 minut</option>
-                <option value="30">do 30 minut</option>
-                <option value="60">do 60 minut</option>
+                {timeOptions.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </label>
             <button
@@ -959,10 +984,9 @@ export default function Home() {
                   onChange={(event) => setDesiredDishDiet(event.target.value)}
                   className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
                 >
-                  <option>Bez ograniczeń</option>
-                  <option>Wegetariańska</option>
-                  <option>Wegańska</option>
-                  <option>Bezglutenowa</option>
+                  {dietOptions.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
                 </select>
               </label>
               <label className="text-sm font-semibold text-[#35483e]">
@@ -974,9 +998,11 @@ export default function Home() {
                   }
                   className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
                 >
-                  <option value="20">do 20 minut</option>
-                  <option value="30">do 30 minut</option>
-                  <option value="60">do 60 minut</option>
+                  {timeOptions.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
                 </select>
               </label>
               <button

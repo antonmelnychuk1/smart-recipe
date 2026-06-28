@@ -11,14 +11,14 @@ const ingredientsRequestSchema = z.object({
   mode: z.literal("ingredients").optional(),
   ingredients: z.array(z.string().trim().min(1).max(60)).min(1).max(30),
   diet: z.string().trim().min(1).max(60),
-  maxTime: z.number().int().min(5).max(240),
+  maxTime: z.number().int().min(0).max(240),
 });
 
 const dishRequestSchema = z.object({
   mode: z.literal("dish"),
   dish: z.string().trim().min(2).max(120),
   diet: z.string().trim().min(1).max(60),
-  maxTime: z.number().int().min(5).max(240),
+  maxTime: z.number().int().min(0).max(240),
 });
 
 const requestSchema = z.union([ingredientsRequestSchema, dishRequestSchema]);
@@ -71,6 +71,10 @@ export async function POST(request: Request) {
   const requestData = parsedRequest.data;
   const isDishMode = requestData.mode === "dish";
   const { diet, maxTime } = requestData;
+  const timeRequirement =
+    maxTime === 0
+      ? "Bez ograniczeń czasowych"
+      : `Maksymalnie ${maxTime} minut`;
   let responseSchema;
   let requestPrompt;
 
@@ -79,18 +83,18 @@ export async function POST(request: Request) {
     requestPrompt = `Przygotuj dokładnie jeden kompletny przepis na danie opisane przez użytkownika: ${requestData.dish}.
 
 Dieta: ${diet}
-Maksymalny czas przygotowania: ${maxTime} minut
+Czas przygotowania: ${timeRequirement}
 
-Zachowaj charakter wskazanego dania, ale dopasuj je do diety i limitu czasu. Podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tę samą kompletną listę produktów potrzebnych do zakupów, a pole match ustaw na 0.`;
+Zachowaj charakter wskazanego dania, ale dopasuj je do diety i podanych wymagań czasowych. Podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tę samą kompletną listę produktów potrzebnych do zakupów, a pole match ustaw na 0.`;
   } else {
     responseSchema = ingredientsResponseSchema;
     requestPrompt = `Wygeneruj dokładnie 3 różne przepisy.
 
 Dostępne składniki: ${requestData.ingredients.join(", ")}
 Dieta: ${diet}
-Maksymalny czas przygotowania: ${maxTime} minut
+Czas przygotowania: ${timeRequirement}
 
-Każdy przepis musi mieścić się w limicie czasu, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
+Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
   }
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const usage = await consumeGenerationLimit();
