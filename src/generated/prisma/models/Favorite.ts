@@ -27,6 +27,7 @@ export type AggregateFavorite = {
 export type FavoriteMinAggregateOutputType = {
   id: string | null
   title: string | null
+  isPublic: boolean | null
   createdAt: Date | null
   userId: string | null
 }
@@ -34,6 +35,7 @@ export type FavoriteMinAggregateOutputType = {
 export type FavoriteMaxAggregateOutputType = {
   id: string | null
   title: string | null
+  isPublic: boolean | null
   createdAt: Date | null
   userId: string | null
 }
@@ -42,6 +44,7 @@ export type FavoriteCountAggregateOutputType = {
   id: number
   title: number
   recipe: number
+  isPublic: number
   createdAt: number
   userId: number
   _all: number
@@ -51,6 +54,7 @@ export type FavoriteCountAggregateOutputType = {
 export type FavoriteMinAggregateInputType = {
   id?: true
   title?: true
+  isPublic?: true
   createdAt?: true
   userId?: true
 }
@@ -58,6 +62,7 @@ export type FavoriteMinAggregateInputType = {
 export type FavoriteMaxAggregateInputType = {
   id?: true
   title?: true
+  isPublic?: true
   createdAt?: true
   userId?: true
 }
@@ -66,6 +71,7 @@ export type FavoriteCountAggregateInputType = {
   id?: true
   title?: true
   recipe?: true
+  isPublic?: true
   createdAt?: true
   userId?: true
   _all?: true
@@ -147,6 +153,7 @@ export type FavoriteGroupByOutputType = {
   id: string
   title: string
   recipe: runtime.JsonValue
+  isPublic: boolean
   createdAt: Date
   userId: string
   _count: FavoriteCountAggregateOutputType | null
@@ -176,6 +183,7 @@ export type FavoriteWhereInput = {
   id?: Prisma.StringFilter<"Favorite"> | string
   title?: Prisma.StringFilter<"Favorite"> | string
   recipe?: Prisma.JsonFilter<"Favorite">
+  isPublic?: Prisma.BoolFilter<"Favorite"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Favorite"> | Date | string
   userId?: Prisma.StringFilter<"Favorite"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -185,6 +193,7 @@ export type FavoriteOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   recipe?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -198,6 +207,7 @@ export type FavoriteWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.FavoriteWhereInput | Prisma.FavoriteWhereInput[]
   title?: Prisma.StringFilter<"Favorite"> | string
   recipe?: Prisma.JsonFilter<"Favorite">
+  isPublic?: Prisma.BoolFilter<"Favorite"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Favorite"> | Date | string
   userId?: Prisma.StringFilter<"Favorite"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -207,6 +217,7 @@ export type FavoriteOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   recipe?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   _count?: Prisma.FavoriteCountOrderByAggregateInput
@@ -221,6 +232,7 @@ export type FavoriteScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Favorite"> | string
   title?: Prisma.StringWithAggregatesFilter<"Favorite"> | string
   recipe?: Prisma.JsonWithAggregatesFilter<"Favorite">
+  isPublic?: Prisma.BoolWithAggregatesFilter<"Favorite"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Favorite"> | Date | string
   userId?: Prisma.StringWithAggregatesFilter<"Favorite"> | string
 }
@@ -229,6 +241,7 @@ export type FavoriteCreateInput = {
   id?: string
   title: string
   recipe: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: boolean
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutFavoritesInput
 }
@@ -237,6 +250,7 @@ export type FavoriteUncheckedCreateInput = {
   id?: string
   title: string
   recipe: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: boolean
   createdAt?: Date | string
   userId: string
 }
@@ -245,6 +259,7 @@ export type FavoriteUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   recipe?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutFavoritesNestedInput
 }
@@ -253,6 +268,7 @@ export type FavoriteUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   recipe?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -261,6 +277,7 @@ export type FavoriteCreateManyInput = {
   id?: string
   title: string
   recipe: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: boolean
   createdAt?: Date | string
   userId: string
 }
@@ -269,6 +286,7 @@ export type FavoriteUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   recipe?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -276,6 +294,7 @@ export type FavoriteUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   recipe?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -299,6 +318,7 @@ export type FavoriteCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   recipe?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
@@ -306,6 +326,7 @@ export type FavoriteCountOrderByAggregateInput = {
 export type FavoriteMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
@@ -313,6 +334,7 @@ export type FavoriteMaxOrderByAggregateInput = {
 export type FavoriteMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
@@ -363,6 +385,7 @@ export type FavoriteCreateWithoutUserInput = {
   id?: string
   title: string
   recipe: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: boolean
   createdAt?: Date | string
 }
 
@@ -370,6 +393,7 @@ export type FavoriteUncheckedCreateWithoutUserInput = {
   id?: string
   title: string
   recipe: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: boolean
   createdAt?: Date | string
 }
 
@@ -406,6 +430,7 @@ export type FavoriteScalarWhereInput = {
   id?: Prisma.StringFilter<"Favorite"> | string
   title?: Prisma.StringFilter<"Favorite"> | string
   recipe?: Prisma.JsonFilter<"Favorite">
+  isPublic?: Prisma.BoolFilter<"Favorite"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Favorite"> | Date | string
   userId?: Prisma.StringFilter<"Favorite"> | string
 }
@@ -414,6 +439,7 @@ export type FavoriteCreateManyUserInput = {
   id?: string
   title: string
   recipe: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: boolean
   createdAt?: Date | string
 }
 
@@ -421,6 +447,7 @@ export type FavoriteUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   recipe?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -428,6 +455,7 @@ export type FavoriteUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   recipe?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -435,6 +463,7 @@ export type FavoriteUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   recipe?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -444,6 +473,7 @@ export type FavoriteSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   title?: boolean
   recipe?: boolean
+  isPublic?: boolean
   createdAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -453,6 +483,7 @@ export type FavoriteSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   title?: boolean
   recipe?: boolean
+  isPublic?: boolean
   createdAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -462,6 +493,7 @@ export type FavoriteSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   title?: boolean
   recipe?: boolean
+  isPublic?: boolean
   createdAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -471,11 +503,12 @@ export type FavoriteSelectScalar = {
   id?: boolean
   title?: boolean
   recipe?: boolean
+  isPublic?: boolean
   createdAt?: boolean
   userId?: boolean
 }
 
-export type FavoriteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "recipe" | "createdAt" | "userId", ExtArgs["result"]["favorite"]>
+export type FavoriteOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "recipe" | "isPublic" | "createdAt" | "userId", ExtArgs["result"]["favorite"]>
 export type FavoriteInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -495,6 +528,7 @@ export type $FavoritePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     title: string
     recipe: runtime.JsonValue
+    isPublic: boolean
     createdAt: Date
     userId: string
   }, ExtArgs["result"]["favorite"]>
@@ -924,6 +958,7 @@ export interface FavoriteFieldRefs {
   readonly id: Prisma.FieldRef<"Favorite", 'String'>
   readonly title: Prisma.FieldRef<"Favorite", 'String'>
   readonly recipe: Prisma.FieldRef<"Favorite", 'Json'>
+  readonly isPublic: Prisma.FieldRef<"Favorite", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Favorite", 'DateTime'>
   readonly userId: Prisma.FieldRef<"Favorite", 'String'>
 }

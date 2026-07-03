@@ -106,6 +106,7 @@ export default function Home() {
   const [desiredDishMaxTime, setDesiredDishMaxTime] = useState("0");
   const [desiredDishLoading, setDesiredDishLoading] = useState(false);
   const [desiredDishError, setDesiredDishError] = useState("");
+  const [sharePending, setSharePending] = useState(false);
   const [favorites, setFavorites] = useState<Recipe[]>([]);
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [shoppingList, setShoppingList] = useState<string[]>([]);
@@ -330,6 +331,94 @@ export default function Home() {
           ? { action: "favorite.remove", title: recipe.title }
           : { action: "favorite.add", recipe },
       );
+    }
+  }
+
+  function updateSavedRecipe(
+    title: string,
+    savedId: string,
+    isPublic: boolean,
+  ) {
+    const update = (recipe: Recipe) =>
+      recipe.title === title ? { ...recipe, savedId, isPublic } : recipe;
+
+    setFavorites((current) => {
+      const exists = current.some((recipe) => recipe.title === title);
+      const source =
+        current.find((recipe) => recipe.title === title) ??
+        generatedRecipes.find((recipe) => recipe.title === title) ??
+        sampleRecipes.find((recipe) => recipe.title === title);
+      if (!exists && source) return [update(source), ...current];
+      return current.map(update);
+    });
+    setGeneratedRecipes((current) => current.map(update));
+    setSampleRecipes((current) => current.map(update));
+    setSelectedRecipe((current) => (current ? update(current) : current));
+  }
+
+  async function shareRecipe(recipe: Recipe) {
+    if (!session?.user) {
+      setAuthOpen(true);
+      return;
+    }
+
+    setSharePending(true);
+    try {
+      const response = await fetch("/api/saved-recipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipe }),
+      });
+      const data = (await response.json()) as {
+        savedId?: string;
+        isPublic?: boolean;
+        path?: string;
+        error?: string;
+      };
+      if (!response.ok || !data.savedId || !data.path) {
+        throw new Error(data.error ?? "Nie udało się udostępnić przepisu.");
+      }
+
+      updateSavedRecipe(recipe.title, data.savedId, true);
+      const url = `${window.location.origin}${data.path}`;
+      await navigator.clipboard.writeText(url);
+      setToast("Przepis jest publiczny. Link został skopiowany.");
+    } catch (caughtError) {
+      setToast(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Nie udało się udostępnić przepisu.",
+      );
+    } finally {
+      setSharePending(false);
+    }
+  }
+
+  async function makeRecipePrivate(recipe: Recipe) {
+    if (!recipe.savedId) return;
+
+    setSharePending(true);
+    try {
+      const response = await fetch("/api/saved-recipes", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: recipe.savedId, isPublic: false }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(data.error ?? "Nie udało się ukryć przepisu.");
+      }
+
+      updateSavedRecipe(recipe.title, recipe.savedId, false);
+      setToast("Przepis jest teraz prywatny.");
+    } catch (caughtError) {
+      setToast(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Nie udało się ukryć przepisu.",
+      );
+    } finally {
+      setSharePending(false);
     }
   }
 
@@ -1018,8 +1107,8 @@ export default function Home() {
         </form>
       </section>
 
-      <section id="how" className="mx-auto max-w-7xl border-y border-[#e4e0d7] bg-[#eeebe3]">
-        <div className="mx-auto grid gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
+      <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
+        <div className="max-w-7xlmx-auto grid gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
           {[
             ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
             ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie."],
@@ -1036,8 +1125,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] mx-auto max-w-7xl px-4 py-10 sm:px-8 sm:py-14">
-        <div className="mx-auto grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-10 sm:px-8 sm:py-14">
+        <div className="mx-auto max-w-7xl grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
               Masz ochotę na konkretne danie?
@@ -1532,6 +1621,48 @@ export default function Home() {
               <span>B: {selectedRecipe.protein} g</span>
               <span>W: {selectedRecipe.carbs} g</span>
               <span>T: {selectedRecipe.fat} g</span>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-[#e1ddd4] bg-white p-3">
+              {selectedRecipe.isPublic && selectedRecipe.savedId ? (
+                <>
+                  <button
+                    disabled={sharePending}
+                    onClick={() => shareRecipe(selectedRecipe)}
+                    className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
+                  >
+                    {sharePending ? "Przetwarzam..." : "Kopiuj link"}
+                  </button>
+                  <a
+                    href={`/recipes/${selectedRecipe.savedId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-xl border border-[#ccd7cf] px-4 py-2.5 text-xs font-semibold text-[#356248]"
+                  >
+                    Otwórz publiczną stronę
+                  </a>
+                  <button
+                    disabled={sharePending}
+                    onClick={() => makeRecipePrivate(selectedRecipe)}
+                    className="px-3 py-2.5 text-xs font-semibold text-[#9a6251] disabled:opacity-50"
+                  >
+                    Ustaw jako prywatny
+                  </button>
+                </>
+              ) : (
+                <button
+                  disabled={sharePending}
+                  onClick={() => shareRecipe(selectedRecipe)}
+                  className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
+                >
+                  {sharePending ? "Udostępniam..." : "Udostępnij przepis"}
+                </button>
+              )}
+              <span className="text-xs text-[#7a857e]">
+                {selectedRecipe.isPublic
+                  ? "Każda osoba z linkiem może zobaczyć ten przepis."
+                  : "Przepis jest prywatny, dopóki go nie udostępnisz."}
+              </span>
             </div>
 
             {selectedRecipe.missing.length > 0 && (

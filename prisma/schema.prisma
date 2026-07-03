@@ -83,12 +83,14 @@ model Favorite {
   id        String   @id @default(cuid())
   title     String
   recipe    Json
+  isPublic  Boolean  @default(false)
   createdAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, title])
   @@index([userId])
+  @@index([isPublic])
 }
 
 model SearchHistory {

@@ -18,6 +18,8 @@ const recipeSchema = z.object({
   missing: z.array(z.string()),
   steps: z.array(z.string()),
   emoji: z.string(),
+  savedId: z.string().optional(),
+  isPublic: z.boolean().optional(),
   imageQuery: z.string().optional(),
   image: z
     .object({
@@ -111,7 +113,11 @@ export async function GET() {
   ]);
 
   return Response.json({
-    favorites: favorites.map((favorite) => favorite.recipe as Recipe),
+    favorites: favorites.map((favorite) => ({
+      ...(favorite.recipe as Recipe),
+      savedId: favorite.id,
+      isPublic: favorite.isPublic,
+    })),
     history: history.map((entry) => ({
       id: entry.id,
       createdAt: entry.createdAt.toISOString(),

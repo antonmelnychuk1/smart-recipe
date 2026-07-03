@@ -147,6 +147,7 @@ export const FavoriteScalarFieldEnum = {
   id: 'id',
   title: 'title',
   recipe: 'recipe',
+  isPublic: 'isPublic',
   createdAt: 'createdAt',
   userId: 'userId'
 } as const

@@ -12,6 +12,8 @@ export type Recipe = {
   missing: string[];
   steps: string[];
   emoji: string;
+  savedId?: string;
+  isPublic?: boolean;
   imageQuery?: string;
   image?: {
     url: string;
