@@ -8,6 +8,7 @@ type PantryProps = {
   isSignedIn: boolean;
   onSave: (item: Omit<PantryItem, "id">) => void;
   onRemove: (item: PantryItem) => void;
+  onConsume: (item: PantryItem) => void;
   onUseIngredients: (labels: string[]) => void;
 };
 
@@ -38,11 +39,13 @@ export function Pantry({
   isSignedIn,
   onSave,
   onRemove,
+  onConsume,
   onUseIngredients,
 }: PantryProps) {
   const [label, setLabel] = useState("");
   const [quantity, setQuantity] = useState("1 szt.");
   const [expiresAt, setExpiresAt] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const sortedItems = useMemo(
     () =>
@@ -71,6 +74,21 @@ export function Pantry({
       quantity: normalizedQuantity,
       expiresAt: expiresAt || null,
     });
+    setLabel("");
+    setQuantity("1 szt.");
+    setExpiresAt("");
+    setEditingId(null);
+  }
+
+  function startEditing(item: PantryItem) {
+    setEditingId(item.id);
+    setLabel(item.label);
+    setQuantity(item.quantity);
+    setExpiresAt(item.expiresAt ?? "");
+  }
+
+  function cancelEditing() {
+    setEditingId(null);
     setLabel("");
     setQuantity("1 szt.");
     setExpiresAt("");
@@ -123,9 +141,10 @@ export function Pantry({
             required
             value={label}
             onChange={(event) => setLabel(event.target.value)}
+            disabled={editingId !== null}
             maxLength={80}
             placeholder="np. jogurt naturalny"
-            className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e]"
+            className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] disabled:bg-[#f3f1eb]"
           />
         </label>
         <label className="text-xs font-semibold text-[#59675f]">
@@ -148,9 +167,20 @@ export function Pantry({
             className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e]"
           />
         </label>
-        <button className="mt-auto h-11 rounded-xl bg-[#356248] px-5 text-sm font-semibold text-white transition hover:bg-[#2b553d]">
-          Dodaj produkt
-        </button>
+        <div className="mt-auto flex gap-2">
+          {editingId && (
+            <button
+              type="button"
+              onClick={cancelEditing}
+              className="h-11 rounded-xl border border-[#d8d7d0] px-3 text-xs font-semibold text-[#68736b]"
+            >
+              Anuluj
+            </button>
+          )}
+          <button className="h-11 flex-1 rounded-xl bg-[#356248] px-5 text-sm font-semibold text-white transition hover:bg-[#2b553d]">
+            {editingId ? "Zapisz" : "Dodaj produkt"}
+          </button>
+        </div>
       </form>
 
       <p className="mt-2 text-[11px] text-[#8a948e]">
@@ -201,13 +231,29 @@ export function Pantry({
                     )}
                   </span>
                 </button>
-                <button
-                  onClick={() => onRemove(item)}
-                  aria-label={`Usuń ${item.label} ze spiżarni`}
-                  className="grid size-9 shrink-0 place-items-center rounded-full text-lg text-[#9a6251] transition hover:bg-[#fff0e8]"
-                >
-                  ×
-                </button>
+                <div className="flex shrink-0 items-center gap-1">
+                  <button
+                    onClick={() => startEditing(item)}
+                    className="rounded-lg px-2 py-2 text-[11px] font-semibold text-[#59675f] transition hover:bg-[#edf1ec]"
+                  >
+                    Edytuj
+                  </button>
+                  <button
+                    onClick={() => onConsume(item)}
+                    aria-label={`Oznacz ${item.label} jako zużyte`}
+                    title="Oznacz jako zużyte"
+                    className="grid size-9 place-items-center rounded-full text-sm font-bold text-[#356248] transition hover:bg-[#dfeae1]"
+                  >
+                    ✓
+                  </button>
+                  <button
+                    onClick={() => onRemove(item)}
+                    aria-label={`Usuń ${item.label} ze spiżarni`}
+                    className="grid size-9 place-items-center rounded-full text-lg text-[#9a6251] transition hover:bg-[#fff0e8]"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
             );
           })

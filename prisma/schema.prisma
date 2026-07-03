@@ -95,6 +95,8 @@ model Favorite {
 
 model SearchHistory {
   id          String   @id @default(cuid())
+  mode        String   @default("ingredients")
+  query       String?
   ingredients String[]
   diet        String
   maxTime     Int

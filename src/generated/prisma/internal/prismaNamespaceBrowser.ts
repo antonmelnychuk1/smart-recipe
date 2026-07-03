@@ -157,6 +157,8 @@ export type FavoriteScalarFieldEnum = (typeof FavoriteScalarFieldEnum)[keyof typ
 
 export const SearchHistoryScalarFieldEnum = {
   id: 'id',
+  mode: 'mode',
+  query: 'query',
   ingredients: 'ingredients',
   diet: 'diet',
   maxTime: 'maxTime',

@@ -27,6 +27,8 @@ export type Recipe = {
 export type SearchHistoryEntry = {
   id: string;
   createdAt: string;
+  mode?: "ingredients" | "dish";
+  query?: string | null;
   ingredients: string[];
   diet: string;
   maxTime: number;

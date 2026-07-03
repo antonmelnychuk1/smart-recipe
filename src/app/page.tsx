@@ -233,6 +233,8 @@ export default function Home() {
           ...history.map((entry) =>
             saveKitchenAction({
               action: "history.add",
+              mode: entry.mode ?? "ingredients",
+              query: entry.query ?? null,
               ingredients: entry.ingredients,
               diet: entry.diet,
               maxTime: entry.maxTime,
@@ -465,6 +467,11 @@ export default function Home() {
   }
 
   function savePantryItem(item: Omit<PantryItem, "id">) {
+    const isUpdate = pantryItems.some(
+      (savedItem) =>
+        savedItem.label.toLocaleLowerCase("pl") ===
+        item.label.toLocaleLowerCase("pl"),
+    );
     setPantryItems((current) => {
       const existing = current.find(
         (savedItem) =>
@@ -480,7 +487,11 @@ export default function Home() {
 
       return [{ ...item, id: crypto.randomUUID() }, ...current];
     });
-    setToast(`Dodano do spiżarni: ${item.label}`);
+    setToast(
+      isUpdate
+        ? `Zaktualizowano: ${item.label}`
+        : `Dodano do spiżarni: ${item.label}`,
+    );
 
     if (session?.user) {
       void saveKitchenAction({ action: "pantry.upsert", ...item });
@@ -498,6 +509,11 @@ export default function Home() {
         label: item.label,
       });
     }
+  }
+
+  function consumePantryItem(item: PantryItem) {
+    removePantryItem(item);
+    setToast(`Zużyto: ${item.label}`);
   }
 
   function usePantryIngredients(labels: string[]) {
@@ -532,12 +548,19 @@ export default function Home() {
   }
 
   function restoreHistory(entry: SearchHistoryEntry) {
-    setIngredients(entry.ingredients);
-    setDiet(entry.diet);
-    setMaxTime(String(entry.maxTime));
+    if (entry.mode === "dish" && entry.query) {
+      setDesiredDish(entry.query);
+      setDesiredDishDiet(entry.diet);
+      setDesiredDishMaxTime(String(entry.maxTime));
+      setGenerationMode("dish");
+    } else {
+      setIngredients(entry.ingredients);
+      setDiet(entry.diet);
+      setMaxTime(String(entry.maxTime));
+      setGenerationMode("ingredients");
+    }
     setGeneratedRecipes(entry.recipes);
     setGenerated(true);
-    setGenerationMode("ingredients");
     window.setTimeout(
       () =>
         document
@@ -610,6 +633,8 @@ export default function Home() {
           {
             id: crypto.randomUUID(),
             createdAt: new Date().toISOString(),
+            mode: "ingredients" as const,
+            query: null,
             ingredients: submittedIngredients,
             diet,
             maxTime: Number(maxTime),
@@ -621,6 +646,8 @@ export default function Home() {
       if (session?.user) {
         void saveKitchenAction({
           action: "history.add",
+          mode: "ingredients",
+          query: null,
           ingredients: submittedIngredients,
           diet,
           maxTime: Number(maxTime),
@@ -685,6 +712,28 @@ export default function Home() {
       setGeneratedRecipes(data.recipes);
       setGenerated(true);
       setGenerationMode("dish");
+      const historyEntry: SearchHistoryEntry = {
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        mode: "dish",
+        query: dish,
+        ingredients: [`Danie: ${dish}`],
+        diet: desiredDishDiet,
+        maxTime: Number(desiredDishMaxTime),
+        recipes: data.recipes,
+      };
+      setHistory((current) => [historyEntry, ...current].slice(0, 10));
+      if (session?.user) {
+        void saveKitchenAction({
+          action: "history.add",
+          mode: "dish",
+          query: dish,
+          ingredients: historyEntry.ingredients,
+          diet: desiredDishDiet,
+          maxTime: Number(desiredDishMaxTime),
+          recipes: data.recipes,
+        });
+      }
       window.setTimeout(
         () =>
           document
@@ -1108,7 +1157,7 @@ export default function Home() {
       </section>
 
       <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
-        <div className="max-w-7xlmx-auto grid gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
+        <div className="max-w-7xl mx-auto grid gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
           {[
             ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
             ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie."],
@@ -1396,6 +1445,7 @@ export default function Home() {
               isSignedIn={Boolean(session?.user)}
               onSave={savePantryItem}
               onRemove={removePantryItem}
+              onConsume={consumePantryItem}
               onUseIngredients={usePantryIngredients}
             />
           </div>
@@ -1482,7 +1532,9 @@ export default function Home() {
                       className="block w-full rounded-xl bg-[#faf8f3] p-3 text-left transition hover:bg-[#f1eee6]"
                     >
                       <span className="break-anywhere block text-sm font-semibold">
-                        {entry.ingredients.join(", ")}
+                        {entry.mode === "dish" && entry.query
+                          ? `Danie: ${entry.query}`
+                          : entry.ingredients.join(", ")}
                       </span>
                       <span className="mt-1 block text-xs text-[#7a857e]">
                         {new Intl.DateTimeFormat("pl-PL", {
@@ -1492,6 +1544,7 @@ export default function Home() {
                           minute: "2-digit",
                         }).format(new Date(entry.createdAt))}{" "}
                         · {entry.diet}
+                        {entry.mode === "dish" && " · konkretne danie"}
                       </span>
                     </button>
                   ))

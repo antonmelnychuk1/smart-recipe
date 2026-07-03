@@ -36,6 +36,8 @@ export type SearchHistorySumAggregateOutputType = {
 
 export type SearchHistoryMinAggregateOutputType = {
   id: string | null
+  mode: string | null
+  query: string | null
   diet: string | null
   maxTime: number | null
   createdAt: Date | null
@@ -44,6 +46,8 @@ export type SearchHistoryMinAggregateOutputType = {
 
 export type SearchHistoryMaxAggregateOutputType = {
   id: string | null
+  mode: string | null
+  query: string | null
   diet: string | null
   maxTime: number | null
   createdAt: Date | null
@@ -52,6 +56,8 @@ export type SearchHistoryMaxAggregateOutputType = {
 
 export type SearchHistoryCountAggregateOutputType = {
   id: number
+  mode: number
+  query: number
   ingredients: number
   diet: number
   maxTime: number
@@ -72,6 +78,8 @@ export type SearchHistorySumAggregateInputType = {
 
 export type SearchHistoryMinAggregateInputType = {
   id?: true
+  mode?: true
+  query?: true
   diet?: true
   maxTime?: true
   createdAt?: true
@@ -80,6 +88,8 @@ export type SearchHistoryMinAggregateInputType = {
 
 export type SearchHistoryMaxAggregateInputType = {
   id?: true
+  mode?: true
+  query?: true
   diet?: true
   maxTime?: true
   createdAt?: true
@@ -88,6 +98,8 @@ export type SearchHistoryMaxAggregateInputType = {
 
 export type SearchHistoryCountAggregateInputType = {
   id?: true
+  mode?: true
+  query?: true
   ingredients?: true
   diet?: true
   maxTime?: true
@@ -185,6 +197,8 @@ export type SearchHistoryGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 
 export type SearchHistoryGroupByOutputType = {
   id: string
+  mode: string
+  query: string | null
   ingredients: string[]
   diet: string
   maxTime: number
@@ -218,6 +232,8 @@ export type SearchHistoryWhereInput = {
   OR?: Prisma.SearchHistoryWhereInput[]
   NOT?: Prisma.SearchHistoryWhereInput | Prisma.SearchHistoryWhereInput[]
   id?: Prisma.StringFilter<"SearchHistory"> | string
+  mode?: Prisma.StringFilter<"SearchHistory"> | string
+  query?: Prisma.StringNullableFilter<"SearchHistory"> | string | null
   ingredients?: Prisma.StringNullableListFilter<"SearchHistory">
   diet?: Prisma.StringFilter<"SearchHistory"> | string
   maxTime?: Prisma.IntFilter<"SearchHistory"> | number
@@ -229,6 +245,8 @@ export type SearchHistoryWhereInput = {
 
 export type SearchHistoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
+  query?: Prisma.SortOrderInput | Prisma.SortOrder
   ingredients?: Prisma.SortOrder
   diet?: Prisma.SortOrder
   maxTime?: Prisma.SortOrder
@@ -243,6 +261,8 @@ export type SearchHistoryWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.SearchHistoryWhereInput | Prisma.SearchHistoryWhereInput[]
   OR?: Prisma.SearchHistoryWhereInput[]
   NOT?: Prisma.SearchHistoryWhereInput | Prisma.SearchHistoryWhereInput[]
+  mode?: Prisma.StringFilter<"SearchHistory"> | string
+  query?: Prisma.StringNullableFilter<"SearchHistory"> | string | null
   ingredients?: Prisma.StringNullableListFilter<"SearchHistory">
   diet?: Prisma.StringFilter<"SearchHistory"> | string
   maxTime?: Prisma.IntFilter<"SearchHistory"> | number
@@ -254,6 +274,8 @@ export type SearchHistoryWhereUniqueInput = Prisma.AtLeast<{
 
 export type SearchHistoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
+  query?: Prisma.SortOrderInput | Prisma.SortOrder
   ingredients?: Prisma.SortOrder
   diet?: Prisma.SortOrder
   maxTime?: Prisma.SortOrder
@@ -272,6 +294,8 @@ export type SearchHistoryScalarWhereWithAggregatesInput = {
   OR?: Prisma.SearchHistoryScalarWhereWithAggregatesInput[]
   NOT?: Prisma.SearchHistoryScalarWhereWithAggregatesInput | Prisma.SearchHistoryScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"SearchHistory"> | string
+  mode?: Prisma.StringWithAggregatesFilter<"SearchHistory"> | string
+  query?: Prisma.StringNullableWithAggregatesFilter<"SearchHistory"> | string | null
   ingredients?: Prisma.StringNullableListFilter<"SearchHistory">
   diet?: Prisma.StringWithAggregatesFilter<"SearchHistory"> | string
   maxTime?: Prisma.IntWithAggregatesFilter<"SearchHistory"> | number
@@ -282,6 +306,8 @@ export type SearchHistoryScalarWhereWithAggregatesInput = {
 
 export type SearchHistoryCreateInput = {
   id?: string
+  mode?: string
+  query?: string | null
   ingredients?: Prisma.SearchHistoryCreateingredientsInput | string[]
   diet: string
   maxTime: number
@@ -292,6 +318,8 @@ export type SearchHistoryCreateInput = {
 
 export type SearchHistoryUncheckedCreateInput = {
   id?: string
+  mode?: string
+  query?: string | null
   ingredients?: Prisma.SearchHistoryCreateingredientsInput | string[]
   diet: string
   maxTime: number
@@ -302,6 +330,8 @@ export type SearchHistoryUncheckedCreateInput = {
 
 export type SearchHistoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  query?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.SearchHistoryUpdateingredientsInput | string[]
   diet?: Prisma.StringFieldUpdateOperationsInput | string
   maxTime?: Prisma.IntFieldUpdateOperationsInput | number
@@ -312,6 +342,8 @@ export type SearchHistoryUpdateInput = {
 
 export type SearchHistoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  query?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.SearchHistoryUpdateingredientsInput | string[]
   diet?: Prisma.StringFieldUpdateOperationsInput | string
   maxTime?: Prisma.IntFieldUpdateOperationsInput | number
@@ -322,6 +354,8 @@ export type SearchHistoryUncheckedUpdateInput = {
 
 export type SearchHistoryCreateManyInput = {
   id?: string
+  mode?: string
+  query?: string | null
   ingredients?: Prisma.SearchHistoryCreateingredientsInput | string[]
   diet: string
   maxTime: number
@@ -332,6 +366,8 @@ export type SearchHistoryCreateManyInput = {
 
 export type SearchHistoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  query?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.SearchHistoryUpdateingredientsInput | string[]
   diet?: Prisma.StringFieldUpdateOperationsInput | string
   maxTime?: Prisma.IntFieldUpdateOperationsInput | number
@@ -341,6 +377,8 @@ export type SearchHistoryUpdateManyMutationInput = {
 
 export type SearchHistoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  query?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.SearchHistoryUpdateingredientsInput | string[]
   diet?: Prisma.StringFieldUpdateOperationsInput | string
   maxTime?: Prisma.IntFieldUpdateOperationsInput | number
@@ -369,6 +407,8 @@ export type StringNullableListFilter<$PrismaModel = never> = {
 
 export type SearchHistoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
+  query?: Prisma.SortOrder
   ingredients?: Prisma.SortOrder
   diet?: Prisma.SortOrder
   maxTime?: Prisma.SortOrder
@@ -383,6 +423,8 @@ export type SearchHistoryAvgOrderByAggregateInput = {
 
 export type SearchHistoryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
+  query?: Prisma.SortOrder
   diet?: Prisma.SortOrder
   maxTime?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -391,6 +433,8 @@ export type SearchHistoryMaxOrderByAggregateInput = {
 
 export type SearchHistoryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  mode?: Prisma.SortOrder
+  query?: Prisma.SortOrder
   diet?: Prisma.SortOrder
   maxTime?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -454,6 +498,8 @@ export type SearchHistoryUpdateingredientsInput = {
 
 export type SearchHistoryCreateWithoutUserInput = {
   id?: string
+  mode?: string
+  query?: string | null
   ingredients?: Prisma.SearchHistoryCreateingredientsInput | string[]
   diet: string
   maxTime: number
@@ -463,6 +509,8 @@ export type SearchHistoryCreateWithoutUserInput = {
 
 export type SearchHistoryUncheckedCreateWithoutUserInput = {
   id?: string
+  mode?: string
+  query?: string | null
   ingredients?: Prisma.SearchHistoryCreateingredientsInput | string[]
   diet: string
   maxTime: number
@@ -501,6 +549,8 @@ export type SearchHistoryScalarWhereInput = {
   OR?: Prisma.SearchHistoryScalarWhereInput[]
   NOT?: Prisma.SearchHistoryScalarWhereInput | Prisma.SearchHistoryScalarWhereInput[]
   id?: Prisma.StringFilter<"SearchHistory"> | string
+  mode?: Prisma.StringFilter<"SearchHistory"> | string
+  query?: Prisma.StringNullableFilter<"SearchHistory"> | string | null
   ingredients?: Prisma.StringNullableListFilter<"SearchHistory">
   diet?: Prisma.StringFilter<"SearchHistory"> | string
   maxTime?: Prisma.IntFilter<"SearchHistory"> | number
@@ -511,6 +561,8 @@ export type SearchHistoryScalarWhereInput = {
 
 export type SearchHistoryCreateManyUserInput = {
   id?: string
+  mode?: string
+  query?: string | null
   ingredients?: Prisma.SearchHistoryCreateingredientsInput | string[]
   diet: string
   maxTime: number
@@ -520,6 +572,8 @@ export type SearchHistoryCreateManyUserInput = {
 
 export type SearchHistoryUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  query?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.SearchHistoryUpdateingredientsInput | string[]
   diet?: Prisma.StringFieldUpdateOperationsInput | string
   maxTime?: Prisma.IntFieldUpdateOperationsInput | number
@@ -529,6 +583,8 @@ export type SearchHistoryUpdateWithoutUserInput = {
 
 export type SearchHistoryUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  query?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.SearchHistoryUpdateingredientsInput | string[]
   diet?: Prisma.StringFieldUpdateOperationsInput | string
   maxTime?: Prisma.IntFieldUpdateOperationsInput | number
@@ -538,6 +594,8 @@ export type SearchHistoryUncheckedUpdateWithoutUserInput = {
 
 export type SearchHistoryUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  mode?: Prisma.StringFieldUpdateOperationsInput | string
+  query?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ingredients?: Prisma.SearchHistoryUpdateingredientsInput | string[]
   diet?: Prisma.StringFieldUpdateOperationsInput | string
   maxTime?: Prisma.IntFieldUpdateOperationsInput | number
@@ -549,6 +607,8 @@ export type SearchHistoryUncheckedUpdateManyWithoutUserInput = {
 
 export type SearchHistorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  mode?: boolean
+  query?: boolean
   ingredients?: boolean
   diet?: boolean
   maxTime?: boolean
@@ -560,6 +620,8 @@ export type SearchHistorySelect<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type SearchHistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  mode?: boolean
+  query?: boolean
   ingredients?: boolean
   diet?: boolean
   maxTime?: boolean
@@ -571,6 +633,8 @@ export type SearchHistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types
 
 export type SearchHistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  mode?: boolean
+  query?: boolean
   ingredients?: boolean
   diet?: boolean
   maxTime?: boolean
@@ -582,6 +646,8 @@ export type SearchHistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types
 
 export type SearchHistorySelectScalar = {
   id?: boolean
+  mode?: boolean
+  query?: boolean
   ingredients?: boolean
   diet?: boolean
   maxTime?: boolean
@@ -590,7 +656,7 @@ export type SearchHistorySelectScalar = {
   userId?: boolean
 }
 
-export type SearchHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ingredients" | "diet" | "maxTime" | "recipes" | "createdAt" | "userId", ExtArgs["result"]["searchHistory"]>
+export type SearchHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "mode" | "query" | "ingredients" | "diet" | "maxTime" | "recipes" | "createdAt" | "userId", ExtArgs["result"]["searchHistory"]>
 export type SearchHistoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -608,6 +674,8 @@ export type $SearchHistoryPayload<ExtArgs extends runtime.Types.Extensions.Inter
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    mode: string
+    query: string | null
     ingredients: string[]
     diet: string
     maxTime: number
@@ -1039,6 +1107,8 @@ export interface Prisma__SearchHistoryClient<T, Null = never, ExtArgs extends ru
  */
 export interface SearchHistoryFieldRefs {
   readonly id: Prisma.FieldRef<"SearchHistory", 'String'>
+  readonly mode: Prisma.FieldRef<"SearchHistory", 'String'>
+  readonly query: Prisma.FieldRef<"SearchHistory", 'String'>
   readonly ingredients: Prisma.FieldRef<"SearchHistory", 'String[]'>
   readonly diet: Prisma.FieldRef<"SearchHistory", 'String'>
   readonly maxTime: Prisma.FieldRef<"SearchHistory", 'Int'>

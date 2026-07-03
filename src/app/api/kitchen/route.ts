@@ -44,6 +44,8 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("history.add"),
     ingredients: z.array(z.string()).min(1),
+    mode: z.enum(["ingredients", "dish"]).default("ingredients"),
+    query: z.string().trim().min(1).max(120).nullable().default(null),
     diet: z.string(),
     maxTime: z.number().int(),
     recipes: z.array(recipeSchema),
@@ -121,6 +123,8 @@ export async function GET() {
     history: history.map((entry) => ({
       id: entry.id,
       createdAt: entry.createdAt.toISOString(),
+      mode: entry.mode,
+      query: entry.query,
       ingredients: entry.ingredients,
       diet: entry.diet,
       maxTime: entry.maxTime,
@@ -173,6 +177,8 @@ export async function POST(request: Request) {
         await tx.searchHistory.create({
           data: {
             userId,
+            mode: data.mode,
+            query: data.query,
             ingredients: data.ingredients,
             diet: data.diet,
             maxTime: data.maxTime,
