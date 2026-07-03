@@ -1018,7 +1018,7 @@ export default function Home() {
         </form>
       </section>
 
-      <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
+      <section id="how" className="mx-auto max-w-7xl border-y border-[#e4e0d7] bg-[#eeebe3]">
         <div className="mx-auto grid gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
           {[
             ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
@@ -1036,7 +1036,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-10 sm:px-8 sm:py-14">
+      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] mx-auto max-w-7xl px-4 py-10 sm:px-8 sm:py-14">
         <div className="mx-auto grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
@@ -1136,7 +1136,7 @@ export default function Home() {
             </p>
             <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
               {generationMode === "dish"
-                ? generatedRecipes[0]?.title
+                ? `${visibleRecipes.length} warianty wybranego dania`
                 : generated
                 ? `${visibleRecipes.length} pomysły na dzisiaj`
                 : "Tak mogą wyglądać wyniki"}
@@ -1144,18 +1144,12 @@ export default function Home() {
           </div>
           <p className="max-w-md text-sm leading-6 text-[#748078]">
             {generationMode === "dish"
-              ? "Pełna lista produktów, instrukcja przygotowania i wartości odżywcze — wszystko w jednym miejscu."
+              ? "Wybierz najlepszy z trzech wariantów. Każdy zawiera pełną listę produktów, instrukcję i wartości odżywcze."
               : "Procent dopasowania pokazuje, ile potrzebnych produktów już masz. Brakujące składniki łatwo przeniesiesz później na listę zakupów."}
           </p>
         </div>
 
-        <div
-          className={`mt-7 grid gap-4 sm:mt-10 sm:gap-6 ${
-            generationMode === "dish"
-              ? "mx-auto max-w-2xl"
-              : "lg:grid-cols-3"
-          }`}
-        >
+        <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-3">
           {visibleRecipes.map((recipe, index) => (
             <article
               key={recipe.title}

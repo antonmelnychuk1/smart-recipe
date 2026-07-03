@@ -51,7 +51,7 @@ const ingredientsResponseSchema = z.object({
 });
 
 const dishResponseSchema = z.object({
-  recipes: z.array(recipeSchema).length(1),
+  recipes: z.array(recipeSchema).length(3),
 });
 
 export async function POST(request: Request) {
@@ -84,12 +84,12 @@ export async function POST(request: Request) {
 
   if (requestData.mode === "dish") {
     responseSchema = dishResponseSchema;
-    requestPrompt = `Przygotuj dokładnie jeden kompletny przepis na danie opisane przez użytkownika: ${requestData.dish}.
+    requestPrompt = `Przygotuj dokładnie 3 różne przepisy lub warianty dania opisanego przez użytkownika: ${requestData.dish}.
 
 Dieta: ${diet}
 Czas przygotowania: ${timeRequirement}
 
-Zachowaj charakter wskazanego dania, ale dopasuj je do diety i podanych wymagań czasowych. Podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tę samą kompletną listę produktów potrzebnych do zakupów, a pole match ustaw na 0.`;
+Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tę samą kompletną listę produktów potrzebnych do zakupów, a pole match ustaw na 0.`;
   } else {
     responseSchema = ingredientsResponseSchema;
     requestPrompt = `Wygeneruj dokładnie 3 różne przepisy.
