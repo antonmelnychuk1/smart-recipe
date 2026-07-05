@@ -162,6 +162,8 @@ Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęci
 
 Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka lub łyżka. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka oliwy”, „0,5 łyżeczki soli”.
 
+W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
+
 Przykładowy format imageQuery:
 - chicken rice egg bowl top view asian style plated food
 - creamy chicken spinach risotto

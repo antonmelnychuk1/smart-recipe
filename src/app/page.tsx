@@ -1926,7 +1926,7 @@ export default function Home() {
           aria-modal="true"
           aria-label={`Tryb gotowania: ${selectedRecipe.title}`}
         >
-          <div className="w-full max-w-2xl rounded-3xl bg-[#fffdf8] p-5 shadow-2xl sm:p-8">
+          <div className="max-h-[95vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-5 shadow-2xl sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
@@ -1945,7 +1945,34 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="my-8 min-h-44 rounded-2xl bg-[#edf2ed] p-6 sm:p-8">
+            <div className="mt-6 rounded-2xl border border-[#dedbd2] bg-white p-4">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-bold text-[#35483e]">
+                  Składniki na {servings}{" "}
+                  {servings === 1
+                    ? "porcję"
+                    : servings < 5
+                      ? "porcje"
+                      : "porcji"}
+                </h3>
+                <span className="text-xs text-[#7a857e]">
+                  proporcje przeliczone
+                </span>
+              </div>
+              <ul className="mt-3 grid gap-2 text-sm text-[#59675f] sm:grid-cols-2">
+                {selectedRecipe.ingredients.map((ingredient) => (
+                  <li
+                    key={ingredient}
+                    className="rounded-xl bg-[#f6f3ec] px-3 py-2"
+                  >
+                    <span className="mr-1 text-[#d26849]">•</span>
+                    {scaleIngredient(ingredient, servings / 2)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="my-6 min-h-44 rounded-2xl bg-[#edf2ed] p-6 sm:p-8">
               <span className="grid size-10 place-items-center rounded-full bg-[#2f684f] text-sm font-bold text-white">
                 {cookingStep + 1}
               </span>
