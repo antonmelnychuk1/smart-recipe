@@ -16,6 +16,9 @@ const ingredientsRequestSchema = z.object({
     .optional(),
   diet: z.string().trim().min(1).max(60),
   maxTime: z.number().int().min(0).max(240),
+  maxBudget: z.number().int().min(0).max(1000),
+  calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
+  proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
 });
 
 const dishRequestSchema = z.object({
@@ -23,6 +26,9 @@ const dishRequestSchema = z.object({
   dish: z.string().trim().min(2).max(120),
   diet: z.string().trim().min(1).max(60),
   maxTime: z.number().int().min(0).max(240),
+  maxBudget: z.number().int().min(0).max(1000),
+  calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
+  proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
 });
 
 const requestSchema = z.union([ingredientsRequestSchema, dishRequestSchema]);
@@ -36,6 +42,7 @@ const recipeSchema = z.object({
   protein: z.number().int(),
   carbs: z.number().int(),
   fat: z.number().int(),
+  estimatedCost: z.number().int().min(1),
   match: z.number().int().min(0).max(100),
   ingredients: z.array(
     z
@@ -81,6 +88,13 @@ export async function POST(request: Request) {
   const requestData = parsedRequest.data;
   const isDishMode = requestData.mode === "dish";
   const { diet, maxTime } = requestData;
+  const budgetRequirement =
+    requestData.maxBudget === 0
+      ? "Bez ograniczeń budżetowych"
+      : `Maksymalnie ${requestData.maxBudget} zł za 2 porcje`;
+  const nutritionGoals = `Dzienne cele użytkownika: ${
+    requestData.calorieTarget ? `${requestData.calorieTarget} kcal` : "brak celu kalorii"
+  }, ${requestData.proteinTarget ? `${requestData.proteinTarget} g białka` : "brak celu białka"}.`;
   const timeRequirement =
     maxTime === 0
       ? "Bez ograniczeń czasowych"
@@ -94,6 +108,8 @@ export async function POST(request: Request) {
 
 Dieta: ${diet}
 Czas przygotowania: ${timeRequirement}
+Budżet: ${budgetRequirement}
+${nutritionGoals}
 
 Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tę samą kompletną listę produktów potrzebnych do zakupów, a pole match ustaw na 0.`;
   } else {
@@ -106,6 +122,8 @@ Produkty z krótką datą ważności, które należy wykorzystać w pierwszej ko
     }
 Dieta: ${diet}
 Czas przygotowania: ${timeRequirement}
+Budżet: ${budgetRequirement}
+${nutritionGoals}
 
 Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Jeśli podano produkty z krótką datą ważności, wykorzystaj je w możliwie wielu propozycjach. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
   }
@@ -163,6 +181,8 @@ Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęci
 Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka lub łyżka. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka oliwy”, „0,5 łyżeczki soli”.
 
 W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
+
+Pole estimatedCost to realistyczny, całkowity szacowany koszt składników dla 2 porcji w pełnych złotych. Przestrzegaj budżetu, jeśli został podany. Cele żywieniowe traktuj jako wskazówkę dla jednego posiłku, nie jako wartości całego dnia.
 
 Przykładowy format imageQuery:
 - chicken rice egg bowl top view asian style plated food

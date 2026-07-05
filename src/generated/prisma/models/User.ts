@@ -28,10 +28,14 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   dailyLimit: number | null
+  calorieTarget: number | null
+  proteinTarget: number | null
 }
 
 export type UserSumAggregateOutputType = {
   dailyLimit: number | null
+  calorieTarget: number | null
+  proteinTarget: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -43,6 +47,8 @@ export type UserMinAggregateOutputType = {
   banReason: string | null
   banExpires: Date | null
   dailyLimit: number | null
+  calorieTarget: number | null
+  proteinTarget: number | null
   emailVerified: boolean | null
   image: string | null
   createdAt: Date | null
@@ -58,6 +64,8 @@ export type UserMaxAggregateOutputType = {
   banReason: string | null
   banExpires: Date | null
   dailyLimit: number | null
+  calorieTarget: number | null
+  proteinTarget: number | null
   emailVerified: boolean | null
   image: string | null
   createdAt: Date | null
@@ -73,6 +81,8 @@ export type UserCountAggregateOutputType = {
   banReason: number
   banExpires: number
   dailyLimit: number
+  calorieTarget: number
+  proteinTarget: number
   emailVerified: number
   image: number
   createdAt: number
@@ -83,10 +93,14 @@ export type UserCountAggregateOutputType = {
 
 export type UserAvgAggregateInputType = {
   dailyLimit?: true
+  calorieTarget?: true
+  proteinTarget?: true
 }
 
 export type UserSumAggregateInputType = {
   dailyLimit?: true
+  calorieTarget?: true
+  proteinTarget?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -98,6 +112,8 @@ export type UserMinAggregateInputType = {
   banReason?: true
   banExpires?: true
   dailyLimit?: true
+  calorieTarget?: true
+  proteinTarget?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -113,6 +129,8 @@ export type UserMaxAggregateInputType = {
   banReason?: true
   banExpires?: true
   dailyLimit?: true
+  calorieTarget?: true
+  proteinTarget?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -128,6 +146,8 @@ export type UserCountAggregateInputType = {
   banReason?: true
   banExpires?: true
   dailyLimit?: true
+  calorieTarget?: true
+  proteinTarget?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -230,6 +250,8 @@ export type UserGroupByOutputType = {
   banReason: string | null
   banExpires: Date | null
   dailyLimit: number
+  calorieTarget: number | null
+  proteinTarget: number | null
   emailVerified: boolean
   image: string | null
   createdAt: Date
@@ -268,6 +290,8 @@ export type UserWhereInput = {
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   dailyLimit?: Prisma.IntFilter<"User"> | number
+  calorieTarget?: Prisma.IntNullableFilter<"User"> | number | null
+  proteinTarget?: Prisma.IntNullableFilter<"User"> | number | null
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -290,6 +314,8 @@ export type UserOrderByWithRelationInput = {
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   dailyLimit?: Prisma.SortOrder
+  calorieTarget?: Prisma.SortOrderInput | Prisma.SortOrder
+  proteinTarget?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -315,6 +341,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   dailyLimit?: Prisma.IntFilter<"User"> | number
+  calorieTarget?: Prisma.IntNullableFilter<"User"> | number | null
+  proteinTarget?: Prisma.IntNullableFilter<"User"> | number | null
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -337,6 +365,8 @@ export type UserOrderByWithAggregationInput = {
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   dailyLimit?: Prisma.SortOrder
+  calorieTarget?: Prisma.SortOrderInput | Prisma.SortOrder
+  proteinTarget?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -360,6 +390,8 @@ export type UserScalarWhereWithAggregatesInput = {
   banReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   dailyLimit?: Prisma.IntWithAggregatesFilter<"User"> | number
+  calorieTarget?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
+  proteinTarget?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -375,6 +407,8 @@ export type UserCreateInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -397,6 +431,8 @@ export type UserUncheckedCreateInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -419,6 +455,8 @@ export type UserUpdateInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -441,6 +479,8 @@ export type UserUncheckedUpdateInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -463,6 +503,8 @@ export type UserCreateManyInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -478,6 +520,8 @@ export type UserUpdateManyMutationInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -493,6 +537,8 @@ export type UserUncheckedUpdateManyInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -508,6 +554,8 @@ export type UserCountOrderByAggregateInput = {
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
   dailyLimit?: Prisma.SortOrder
+  calorieTarget?: Prisma.SortOrder
+  proteinTarget?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -516,6 +564,8 @@ export type UserCountOrderByAggregateInput = {
 
 export type UserAvgOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
+  calorieTarget?: Prisma.SortOrder
+  proteinTarget?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -527,6 +577,8 @@ export type UserMaxOrderByAggregateInput = {
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
   dailyLimit?: Prisma.SortOrder
+  calorieTarget?: Prisma.SortOrder
+  proteinTarget?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -542,6 +594,8 @@ export type UserMinOrderByAggregateInput = {
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
   dailyLimit?: Prisma.SortOrder
+  calorieTarget?: Prisma.SortOrder
+  proteinTarget?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -550,6 +604,8 @@ export type UserMinOrderByAggregateInput = {
 
 export type UserSumOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
+  calorieTarget?: Prisma.SortOrder
+  proteinTarget?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -575,6 +631,14 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
 
 export type IntFieldUpdateOperationsInput = {
   set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
   increment?: number
   decrement?: number
   multiply?: number
@@ -692,6 +756,8 @@ export type UserCreateWithoutSessionsInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -713,6 +779,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -750,6 +818,8 @@ export type UserUpdateWithoutSessionsInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -771,6 +841,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -792,6 +864,8 @@ export type UserCreateWithoutAccountsInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -813,6 +887,8 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -850,6 +926,8 @@ export type UserUpdateWithoutAccountsInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -871,6 +949,8 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -892,6 +972,8 @@ export type UserCreateWithoutFavoritesInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -913,6 +995,8 @@ export type UserUncheckedCreateWithoutFavoritesInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -950,6 +1034,8 @@ export type UserUpdateWithoutFavoritesInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -971,6 +1057,8 @@ export type UserUncheckedUpdateWithoutFavoritesInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -992,6 +1080,8 @@ export type UserCreateWithoutSearchesInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1013,6 +1103,8 @@ export type UserUncheckedCreateWithoutSearchesInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1050,6 +1142,8 @@ export type UserUpdateWithoutSearchesInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1071,6 +1165,8 @@ export type UserUncheckedUpdateWithoutSearchesInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1092,6 +1188,8 @@ export type UserCreateWithoutShoppingItemsInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1113,6 +1211,8 @@ export type UserUncheckedCreateWithoutShoppingItemsInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1150,6 +1250,8 @@ export type UserUpdateWithoutShoppingItemsInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1171,6 +1273,8 @@ export type UserUncheckedUpdateWithoutShoppingItemsInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1192,6 +1296,8 @@ export type UserCreateWithoutPantryItemsInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1213,6 +1319,8 @@ export type UserUncheckedCreateWithoutPantryItemsInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1250,6 +1358,8 @@ export type UserUpdateWithoutPantryItemsInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1271,6 +1381,8 @@ export type UserUncheckedUpdateWithoutPantryItemsInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1292,6 +1404,8 @@ export type UserCreateWithoutMealPlansInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1313,6 +1427,8 @@ export type UserUncheckedCreateWithoutMealPlansInput = {
   banReason?: string | null
   banExpires?: Date | string | null
   dailyLimit?: number
+  calorieTarget?: number | null
+  proteinTarget?: number | null
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1350,6 +1466,8 @@ export type UserUpdateWithoutMealPlansInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1371,6 +1489,8 @@ export type UserUncheckedUpdateWithoutMealPlansInput = {
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1477,6 +1597,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   banReason?: boolean
   banExpires?: boolean
   dailyLimit?: boolean
+  calorieTarget?: boolean
+  proteinTarget?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1500,6 +1622,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   banReason?: boolean
   banExpires?: boolean
   dailyLimit?: boolean
+  calorieTarget?: boolean
+  proteinTarget?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1515,6 +1639,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   banReason?: boolean
   banExpires?: boolean
   dailyLimit?: boolean
+  calorieTarget?: boolean
+  proteinTarget?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1530,13 +1656,15 @@ export type UserSelectScalar = {
   banReason?: boolean
   banExpires?: boolean
   dailyLimit?: boolean
+  calorieTarget?: boolean
+  proteinTarget?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "role" | "banned" | "banReason" | "banExpires" | "dailyLimit" | "emailVerified" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "role" | "banned" | "banReason" | "banExpires" | "dailyLimit" | "calorieTarget" | "proteinTarget" | "emailVerified" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
@@ -1570,6 +1698,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     banReason: string | null
     banExpires: Date | null
     dailyLimit: number
+    calorieTarget: number | null
+    proteinTarget: number | null
     emailVerified: boolean
     image: string | null
     createdAt: Date
@@ -2012,6 +2142,8 @@ export interface UserFieldRefs {
   readonly banReason: Prisma.FieldRef<"User", 'String'>
   readonly banExpires: Prisma.FieldRef<"User", 'DateTime'>
   readonly dailyLimit: Prisma.FieldRef<"User", 'Int'>
+  readonly calorieTarget: Prisma.FieldRef<"User", 'Int'>
+  readonly proteinTarget: Prisma.FieldRef<"User", 'Int'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>

@@ -16,6 +16,8 @@ model User {
   banReason     String?
   banExpires    DateTime?
   dailyLimit    Int             @default(20)
+  calorieTarget Int?
+  proteinTarget Int?
   emailVerified Boolean         @default(false)
   image         String?
   createdAt     DateTime        @default(now())

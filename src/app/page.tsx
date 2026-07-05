@@ -42,6 +42,14 @@ const timeOptions = [
   ["90", "do 90 minut"],
   ["120", "do 120 minut"],
 ];
+const budgetOptions = [
+  ["0", "Bez ograniczeń"],
+  ["15", "do 15 zł"],
+  ["25", "do 25 zł"],
+  ["40", "do 40 zł"],
+  ["60", "do 60 zł"],
+  ["100", "do 100 zł"],
+];
 
 const accents = [
   "from-[#f7c56c] to-[#e78a43]",
@@ -127,6 +135,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [diet, setDiet] = useState("Bez ograniczeń");
   const [maxTime, setMaxTime] = useState("0");
+  const [maxBudget, setMaxBudget] = useState("0");
   const [generated, setGenerated] = useState(false);
   const [generationMode, setGenerationMode] = useState<
     "ingredients" | "dish" | null
@@ -134,6 +143,9 @@ export default function Home() {
   const [desiredDish, setDesiredDish] = useState("");
   const [desiredDishDiet, setDesiredDishDiet] = useState("Bez ograniczeń");
   const [desiredDishMaxTime, setDesiredDishMaxTime] = useState("0");
+  const [desiredDishBudget, setDesiredDishBudget] = useState("0");
+  const [calorieTarget, setCalorieTarget] = useState<number | null>(null);
+  const [proteinTarget, setProteinTarget] = useState<number | null>(null);
   const [desiredDishLoading, setDesiredDishLoading] = useState(false);
   const [desiredDishError, setDesiredDishError] = useState("");
   const [sharePending, setSharePending] = useState(false);
@@ -339,6 +351,16 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
+  }, [session?.user]);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    fetch("/api/preferences")
+      .then((response) => response.json())
+      .then((data: { calorieTarget?: number | null; proteinTarget?: number | null }) => {
+        setCalorieTarget(data.calorieTarget ?? null);
+        setProteinTarget(data.proteinTarget ?? null);
+      });
   }, [session?.user]);
 
   const visibleRecipes = useMemo(
@@ -677,6 +699,9 @@ export default function Home() {
             .map((item) => item.label),
           diet,
           maxTime: Number(maxTime),
+          maxBudget: Number(maxBudget),
+          calorieTarget,
+          proteinTarget,
         }),
       });
       const data = (await response.json()) as {
@@ -763,6 +788,9 @@ export default function Home() {
           dish,
           diet: desiredDishDiet,
           maxTime: Number(desiredDishMaxTime),
+          maxBudget: Number(desiredDishBudget),
+          calorieTarget,
+          proteinTarget,
         }),
       });
       const data = (await response.json()) as {
@@ -1151,7 +1179,7 @@ export default function Home() {
               ))}
           </div>
 
-          <div className="mt-4 grid gap-3 border-t border-[#eeece5] pt-4 sm:mt-6 sm:grid-cols-[1fr_1fr_auto] sm:gap-4 sm:pt-6">
+          <div className="mt-4 grid gap-3 border-t border-[#eeece5] pt-4 sm:mt-6 sm:grid-cols-2 sm:gap-4 sm:pt-6 lg:grid-cols-[1fr_1fr_1fr_auto]">
             <label className="text-sm font-semibold text-[#35483e]">
               Dieta
               <select
@@ -1161,6 +1189,18 @@ export default function Home() {
               >
                 {dietOptions.map((option) => (
                   <option key={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm font-semibold text-[#35483e]">
+              Budżet na 2 porcje
+              <select
+                value={maxBudget}
+                onChange={(event) => setMaxBudget(event.target.value)}
+                className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+              >
+                {budgetOptions.map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
                 ))}
               </select>
             </label>
@@ -1311,7 +1351,7 @@ export default function Home() {
                 placeholder="np. puszyste pancakes z owocami"
               />
             </div>
-            <div className="mt-3 grid gap-3 border-t border-[#eeece5] pt-3 sm:grid-cols-[1fr_1fr_auto]">
+            <div className="mt-3 grid gap-3 border-t border-[#eeece5] pt-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
               <label className="text-sm font-semibold text-[#35483e]">
                 Dieta
                 <select
@@ -1321,6 +1361,18 @@ export default function Home() {
                 >
                   {dietOptions.map((option) => (
                     <option key={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-sm font-semibold text-[#35483e]">
+                Budżet na 2 porcje
+                <select
+                  value={desiredDishBudget}
+                  onChange={(event) => setDesiredDishBudget(event.target.value)}
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                >
+                  {budgetOptions.map(([value, label]) => (
+                    <option key={value} value={value}>{label}</option>
                   ))}
                 </select>
               </label>
@@ -1446,6 +1498,7 @@ export default function Home() {
                   </span>
                   <span>{recipe.difficulty}</span>
                   <span>{recipe.calories} kcal</span>
+                  {recipe.estimatedCost && <span>ok. {recipe.estimatedCost} zł</span>}
                 </div>
                 <h3 className="break-anywhere mt-4 font-serif text-2xl font-semibold">
                   {recipe.title}
@@ -1776,6 +1829,9 @@ export default function Home() {
               <span>B: {selectedRecipe.protein} g</span>
               <span>W: {selectedRecipe.carbs} g</span>
               <span>T: {selectedRecipe.fat} g</span>
+              {selectedRecipe.estimatedCost && (
+                <span>ok. {selectedRecipe.estimatedCost} zł / 2 porcje</span>
+              )}
             </div>
 
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#f6f3ec] p-3">

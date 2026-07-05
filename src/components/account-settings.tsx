@@ -43,6 +43,10 @@ export function AccountSettings() {
   const [deletePending, setDeletePending] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [confirmation, setConfirmation] = useState("");
+  const [calorieTarget, setCalorieTarget] = useState("");
+  const [proteinTarget, setProteinTarget] = useState("");
+  const [goalsPending, setGoalsPending] = useState(false);
+  const [goalsMessage, setGoalsMessage] = useState("");
 
   async function loadSessions() {
     setSessionsLoading(true);
@@ -54,10 +58,38 @@ export function AccountSettings() {
   useEffect(() => {
     const initialization = window.setTimeout(() => {
       void loadSessions();
+      void fetch("/api/preferences")
+        .then((response) => response.json())
+        .then(
+          (data: {
+            calorieTarget?: number | null;
+            proteinTarget?: number | null;
+          }) => {
+            setCalorieTarget(data.calorieTarget?.toString() ?? "");
+            setProteinTarget(data.proteinTarget?.toString() ?? "");
+          },
+        );
     }, 0);
 
     return () => window.clearTimeout(initialization);
   }, []);
+
+  async function saveGoals(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setGoalsPending(true);
+    setGoalsMessage("");
+    const response = await fetch("/api/preferences", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        calorieTarget: calorieTarget ? Number(calorieTarget) : null,
+        proteinTarget: proteinTarget ? Number(proteinTarget) : null,
+      }),
+    });
+    const data = (await response.json()) as { error?: string };
+    setGoalsPending(false);
+    setGoalsMessage(response.ok ? "Cele zostały zapisane." : data.error ?? "Błąd zapisu.");
+  }
 
   async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -135,6 +167,48 @@ export function AccountSettings() {
 
   return (
     <div className="mt-6 space-y-4 sm:mt-10 sm:space-y-6">
+      <section className="rounded-[1.7rem] border border-[#ced9cf] bg-[#f8fbf7] p-4 shadow-sm sm:p-8">
+        <h2 className="font-serif text-2xl font-semibold">Cele żywieniowe</h2>
+        <p className="mt-2 text-sm leading-6 text-[#748078]">
+          AI wykorzysta je jako wskazówkę przy układaniu przepisów.
+        </p>
+        <form onSubmit={saveGoals} className="mt-5 grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold">
+            Kalorie dziennie
+            <input
+              type="number"
+              min="800"
+              max="6000"
+              value={calorieTarget}
+              onChange={(event) => setCalorieTarget(event.target.value)}
+              placeholder="np. 2200"
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            />
+          </label>
+          <label className="text-sm font-semibold">
+            Białko dziennie (g)
+            <input
+              type="number"
+              min="20"
+              max="400"
+              value={proteinTarget}
+              onChange={(event) => setProteinTarget(event.target.value)}
+              placeholder="np. 120"
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            />
+          </label>
+          <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
+            <button
+              disabled={goalsPending}
+              className="h-11 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white disabled:opacity-50"
+            >
+              {goalsPending ? "Zapisuję..." : "Zapisz cele"}
+            </button>
+            {goalsMessage && <p className="text-sm text-[#59675f]">{goalsMessage}</p>}
+          </div>
+        </form>
+      </section>
+
       <section className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-sm sm:p-8">
         <h2 className="font-serif text-2xl font-semibold">Zmiana hasła</h2>
         <p className="mt-2 text-sm leading-6 text-[#748078]">

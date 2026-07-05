@@ -13,6 +13,7 @@ const recipeSchema = z.object({
   protein: z.number(),
   carbs: z.number(),
   fat: z.number(),
+  estimatedCost: z.number().optional(),
   match: z.number(),
   ingredients: z.array(z.string()),
   missing: z.array(z.string()),

@@ -88,6 +88,8 @@ export const UserScalarFieldEnum = {
   banReason: 'banReason',
   banExpires: 'banExpires',
   dailyLimit: 'dailyLimit',
+  calorieTarget: 'calorieTarget',
+  proteinTarget: 'proteinTarget',
   emailVerified: 'emailVerified',
   image: 'image',
   createdAt: 'createdAt',

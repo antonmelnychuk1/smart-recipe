@@ -7,6 +7,7 @@ export type Recipe = {
   protein: number;
   carbs: number;
   fat: number;
+  estimatedCost?: number;
   match: number;
   ingredients: string[];
   missing: string[];
