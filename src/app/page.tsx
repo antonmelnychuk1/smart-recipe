@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AuthDialog } from "@/components/auth-dialog";
 import { MealPlanner } from "@/components/meal-planner";
@@ -809,6 +810,11 @@ export default function Home() {
           <a className="transition hover:text-[#25322b]" href="#meal-planner">
             Planer
           </a>
+          {session?.user && (
+            <Link className="transition hover:text-[#25322b]" href="/recipes">
+              Zapisane
+            </Link>
+          )}
           {sessionPending ? (
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
           ) : session?.user ? (
@@ -885,15 +891,16 @@ export default function Home() {
               ["Przepisy", "#results"],
               ["Planer posiłków", "#meal-planner"],
               ["Moja kuchnia", "#my-kitchen"],
+              ...(session?.user ? [["Zapisane przepisy", "/recipes"]] : []),
             ].map(([label, href]) => (
-              <a
+              <Link
                 key={href}
                 href={href}
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-xl px-4 py-3 transition hover:bg-[#f3f6f2] hover:text-[#2f684f]"
               >
                 {label}
-              </a>
+              </Link>
             ))}
           </div>
 

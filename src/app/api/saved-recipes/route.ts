@@ -38,6 +38,10 @@ const visibilitySchema = z.object({
   isPublic: z.boolean(),
 });
 
+const deleteSchema = z.object({
+  id: z.string().min(1),
+});
+
 async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() });
   return session?.user.id ?? null;
@@ -119,4 +123,28 @@ export async function PATCH(request: Request) {
     isPublic: recipe.isPublic,
     path: `/recipes/${recipe.id}`,
   });
+}
+
+export async function DELETE(request: Request) {
+  const userId = await getUserId();
+  if (!userId) {
+    return Response.json({ error: "Brak uprawnień." }, { status: 401 });
+  }
+
+  const parsed = deleteSchema.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) {
+    return Response.json({ error: "Niepoprawne dane." }, { status: 400 });
+  }
+
+  const result = await prisma.favorite.deleteMany({
+    where: { id: parsed.data.id, userId },
+  });
+  if (result.count === 0) {
+    return Response.json(
+      { error: "Nie znaleziono zapisanego przepisu." },
+      { status: 404 },
+    );
+  }
+
+  return Response.json({ ok: true });
 }
