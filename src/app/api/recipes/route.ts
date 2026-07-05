@@ -37,7 +37,13 @@ const recipeSchema = z.object({
   carbs: z.number().int(),
   fat: z.number().int(),
   match: z.number().int().min(0).max(100),
-  ingredients: z.array(z.string()),
+  ingredients: z.array(
+    z
+      .string()
+      .describe(
+        "Składnik wraz z dokładną ilością i jednostką, np. 250 g mąki albo 2 łyżki oliwy",
+      ),
+  ),
   missing: z.array(z.string()),
   steps: z.array(z.string()),
   emoji: z.string(),
@@ -153,6 +159,8 @@ Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, w
           content: `${requestPrompt}
 
 Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęcia w Pexels. Użyj 6–10 konkretnych słów opisujących nazwę dania, najważniejsze widoczne składniki, sposób podania oraz opcjonalnie ujęcie lub styl. Nie używaj słów photo, image ani photography. Nie tłumacz frazy i nie dodawaj znaków interpunkcyjnych.
+
+Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka lub łyżka. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka oliwy”, „0,5 łyżeczki soli”.
 
 Przykładowy format imageQuery:
 - chicken rice egg bowl top view asian style plated food
