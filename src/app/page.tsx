@@ -65,6 +65,35 @@ function readStoredValue<T>(key: string, fallback: T): T {
   }
 }
 
+function daysUntilExpiry(date: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.ceil(
+    (new Date(`${date}T00:00:00`).getTime() - today.getTime()) / 86_400_000,
+  );
+}
+
+function scaleIngredient(ingredient: string, multiplier: number) {
+  return ingredient.replace(
+    /(\d+\s*\/\s*\d+|\d+(?:[.,]\d+)?)/,
+    (value) => {
+      let amount: number;
+      if (value.includes("/")) {
+        const [numerator, denominator] = value
+          .split("/")
+          .map((part) => Number(part.trim()));
+        amount = denominator ? numerator / denominator : numerator;
+      } else {
+        amount = Number(value.replace(",", "."));
+      }
+
+      return new Intl.NumberFormat("pl-PL", {
+        maximumFractionDigits: 2,
+      }).format(amount * multiplier);
+    },
+  );
+}
+
 function Icon({ name }: { name: "spark" | "clock" | "heart" | "leaf" }) {
   const paths = {
     spark: "M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zm6 11l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9L18 14z",
@@ -117,6 +146,9 @@ export default function Home() {
     useState<Recipe[]>(initialSampleRecipes);
   const [generatedRecipes, setGeneratedRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [servings, setServings] = useState(2);
+  const [cookingMode, setCookingMode] = useState(false);
+  const [cookingStep, setCookingStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
@@ -142,6 +174,15 @@ export default function Home() {
     generationUsage?.limit === dailyGenerationLimit
       ? generationUsage
       : null;
+  const expiringPantryItems = pantryItems.filter(
+    (item) =>
+      item.expiresAt !== null &&
+      daysUntilExpiry(item.expiresAt) >= 0 &&
+      daysUntilExpiry(item.expiresAt) <= 4,
+  );
+  const expiredPantryItems = pantryItems.filter(
+    (item) => item.expiresAt !== null && daysUntilExpiry(item.expiresAt) < 0,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -314,6 +355,13 @@ export default function Home() {
       setIngredients((current) => [...current, ingredient]);
     }
     setInput("");
+  }
+
+  function openRecipe(recipe: Recipe) {
+    setServings(2);
+    setCookingMode(false);
+    setCookingStep(0);
+    setSelectedRecipe(recipe);
   }
 
   function isFavorite(recipe: Recipe) {
@@ -515,6 +563,30 @@ export default function Home() {
   function consumePantryItem(item: PantryItem) {
     removePantryItem(item);
     setToast(`Zużyto: ${item.label}`);
+  }
+
+  function consumeRecipePantryItems(recipe: Recipe) {
+    const usedItems = pantryItems.filter((item) =>
+      recipe.ingredients.some((ingredient) =>
+        ingredient
+          .toLocaleLowerCase("pl")
+          .includes(item.label.toLocaleLowerCase("pl")),
+      ),
+    );
+    if (usedItems.length === 0) {
+      setToast("Nie znaleziono pasujących produktów w spiżarni.");
+      return;
+    }
+    if (
+      !window.confirm(
+        `Oznaczyć jako zużyte: ${usedItems.map((item) => item.label).join(", ")}?`,
+      )
+    ) {
+      return;
+    }
+
+    usedItems.forEach(removePantryItem);
+    setToast(`Usunięto ze spiżarni ${usedItems.length} produktów.`);
   }
 
   function usePantryIngredients(labels: string[]) {
@@ -982,6 +1054,29 @@ export default function Home() {
         </div>
         )}
 
+      {(expiringPantryItems.length > 0 || expiredPantryItems.length > 0) && (
+        <div className="border-y border-[#efd5ab] bg-[#fff8e9] px-4 py-3 sm:px-8">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-[#795d2f]">
+              <strong>Sprawdź spiżarnię:</strong>{" "}
+              {expiredPantryItems.length > 0 &&
+                `${expiredPantryItems.length} po terminie`}
+              {expiredPantryItems.length > 0 &&
+                expiringPantryItems.length > 0 &&
+                " · "}
+              {expiringPantryItems.length > 0 &&
+                `${expiringPantryItems.length} z krótką datą ważności`}
+            </p>
+            <a
+              href="#my-kitchen"
+              className="rounded-lg bg-[#795d2f] px-3 py-2 text-xs font-semibold text-white"
+            >
+              Zobacz produkty
+            </a>
+          </div>
+        </div>
+      )}
+
       <section className="relative mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20">
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />
         <div className="mx-auto max-w-3xl text-center">
@@ -1400,7 +1495,7 @@ export default function Home() {
                   )}
                 </div>
                 <button
-                  onClick={() => setSelectedRecipe(recipe)}
+                  onClick={() => openRecipe(recipe)}
                   className="mt-6 w-full rounded-xl border border-[#ccd7cf] py-3 text-sm font-semibold text-[#356248] transition hover:bg-[#edf3ee]"
                 >
                   Zobacz przepis
@@ -1415,7 +1510,7 @@ export default function Home() {
         recipes={generated ? generatedRecipes : sampleRecipes}
         favorites={favorites}
         isSignedIn={Boolean(session?.user)}
-        onOpenRecipe={setSelectedRecipe}
+        onOpenRecipe={openRecipe}
         onAddToShoppingList={addToShoppingList}
       />
 
@@ -1486,7 +1581,7 @@ export default function Home() {
                         <span className="text-2xl">{recipe.emoji}</span>
                       )}
                       <button
-                        onClick={() => setSelectedRecipe(recipe)}
+                        onClick={() => openRecipe(recipe)}
                         className="min-w-0 flex-1 text-left"
                       >
                         <span className="break-anywhere block text-sm font-semibold">
@@ -1683,6 +1778,46 @@ export default function Home() {
               <span>T: {selectedRecipe.fat} g</span>
             </div>
 
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#f6f3ec] p-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-[#59675f]">
+                  Porcje
+                </span>
+                <button
+                  onClick={() => setServings((current) => Math.max(1, current - 1))}
+                  className="grid size-9 place-items-center rounded-full bg-white text-lg shadow-sm"
+                  aria-label="Zmniejsz liczbę porcji"
+                >
+                  −
+                </button>
+                <strong className="min-w-6 text-center">{servings}</strong>
+                <button
+                  onClick={() => setServings((current) => Math.min(12, current + 1))}
+                  className="grid size-9 place-items-center rounded-full bg-white text-lg shadow-sm"
+                  aria-label="Zwiększ liczbę porcji"
+                >
+                  +
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => {
+                    setCookingStep(0);
+                    setCookingMode(true);
+                  }}
+                  className="rounded-xl bg-[#d66a49] px-4 py-2.5 text-xs font-semibold text-white"
+                >
+                  Tryb gotowania
+                </button>
+                <button
+                  onClick={() => consumeRecipePantryItems(selectedRecipe)}
+                  className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-xs font-semibold text-[#356248]"
+                >
+                  Oznacz produkty jako zużyte
+                </button>
+              </div>
+            </div>
+
             <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-[#e1ddd4] bg-white p-3">
               {selectedRecipe.isPublic && selectedRecipe.savedId ? (
                 <>
@@ -1758,7 +1893,8 @@ export default function Home() {
                 <ul className="mt-4 space-y-2 text-sm leading-6 text-[#59675f]">
                   {selectedRecipe.ingredients.map((ingredient) => (
                     <li key={ingredient} className="flex gap-2">
-                      <span className="text-[#d26849]">•</span> {ingredient}
+                      <span className="text-[#d26849]">•</span>{" "}
+                      {scaleIngredient(ingredient, servings / 2)}
                     </li>
                   ))}
                 </ul>
@@ -1780,6 +1916,86 @@ export default function Home() {
               </div>
             </div>
           </article>
+        </div>
+      )}
+
+      {selectedRecipe && cookingMode && (
+        <div
+          className="fixed inset-0 z-[70] grid place-items-center bg-[#18241e]/85 p-4 backdrop-blur-md"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Tryb gotowania: ${selectedRecipe.title}`}
+        >
+          <div className="w-full max-w-2xl rounded-3xl bg-[#fffdf8] p-5 shadow-2xl sm:p-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+                  Krok {cookingStep + 1} z {selectedRecipe.steps.length}
+                </p>
+                <h2 className="mt-2 font-serif text-3xl font-semibold">
+                  {selectedRecipe.title}
+                </h2>
+              </div>
+              <button
+                onClick={() => setCookingMode(false)}
+                aria-label="Zamknij tryb gotowania"
+                className="grid size-10 place-items-center rounded-full bg-[#eeeae2] text-xl"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="my-8 min-h-44 rounded-2xl bg-[#edf2ed] p-6 sm:p-8">
+              <span className="grid size-10 place-items-center rounded-full bg-[#2f684f] text-sm font-bold text-white">
+                {cookingStep + 1}
+              </span>
+              <p className="mt-5 font-serif text-2xl leading-9 text-[#25322b] sm:text-3xl sm:leading-10">
+                {selectedRecipe.steps[cookingStep]}
+              </p>
+            </div>
+
+            <div className="h-2 overflow-hidden rounded-full bg-[#e5e2da]">
+              <div
+                className="h-full rounded-full bg-[#d66a49] transition-all"
+                style={{
+                  width: `${((cookingStep + 1) / selectedRecipe.steps.length) * 100}%`,
+                }}
+              />
+            </div>
+            <div className="mt-5 flex justify-between gap-3">
+              <button
+                disabled={cookingStep === 0}
+                onClick={() =>
+                  setCookingStep((current) => Math.max(0, current - 1))
+                }
+                className="h-12 rounded-xl border border-[#ccd7cf] px-5 text-sm font-semibold text-[#356248] disabled:opacity-30"
+              >
+                ← Poprzedni
+              </button>
+              {cookingStep === selectedRecipe.steps.length - 1 ? (
+                <button
+                  onClick={() => {
+                    setCookingMode(false);
+                    consumeRecipePantryItems(selectedRecipe);
+                  }}
+                  className="h-12 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
+                >
+                  Gotowe
+                </button>
+              ) : (
+                <button
+                  onClick={() =>
+                    setCookingStep((current) =>
+                      Math.min(selectedRecipe.steps.length - 1, current + 1),
+                    )
+                  }
+                  className="h-12 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
+                >
+                  Następny →
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
