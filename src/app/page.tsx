@@ -1459,10 +1459,13 @@ export default function Home() {
             <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <input
                 id="desired-dish"
+                type="text"
+                inputMode="text"
+                autoComplete="off"
                 value={desiredDish}
                 onChange={(event) => setDesiredDish(event.target.value)}
                 maxLength={120}
-                className="h-12 min-w-0 flex-1 rounded-xl border border-[#dedfd9] bg-[#fbfaf6] px-4 outline-none transition focus:border-[#71927e] focus:ring-4 focus:ring-[#71927e]/10"
+                className="h-12 w-full min-w-0 flex-1 appearance-none rounded-xl border border-[#dedfd9] bg-[#fbfaf6] px-4 text-base text-[#25322b] shadow-inner shadow-[#25322b]/[0.03] outline-none transition placeholder:text-[#9aa39c] focus:border-[#71927e] focus:bg-white focus:ring-4 focus:ring-[#71927e]/10"
                 placeholder="np. puszyste pancakes z owocami"
               />
             </div>
@@ -1472,7 +1475,7 @@ export default function Home() {
                 <select
                   value={desiredDishDiet}
                   onChange={(event) => setDesiredDishDiet(event.target.value)}
-                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                  className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
                 >
                   {dietOptions.map((option) => (
                     <option key={option}>{option}</option>
@@ -1484,7 +1487,7 @@ export default function Home() {
                 <select
                   value={desiredDishBudget}
                   onChange={(event) => setDesiredDishBudget(event.target.value)}
-                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                  className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
                 >
                   {budgetOptions.map(([value, label]) => (
                     <option key={value} value={value}>{label}</option>
@@ -1498,7 +1501,7 @@ export default function Home() {
                   onChange={(event) =>
                     setDesiredDishMaxTime(event.target.value)
                   }
-                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                  className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
                 >
                   {timeOptions.map(([value, label]) => (
                     <option key={value} value={value}>
