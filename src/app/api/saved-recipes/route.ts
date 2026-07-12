@@ -16,6 +16,14 @@ const recipeSchema = z.object({
   match: z.number(),
   ingredients: z.array(z.string()),
   missing: z.array(z.string()),
+  substitutions: z
+    .array(
+      z.object({
+        ingredient: z.string(),
+        substitutes: z.array(z.string()),
+      }),
+    )
+    .optional(),
   steps: z.array(z.string()),
   emoji: z.string(),
   imageQuery: z.string().optional(),

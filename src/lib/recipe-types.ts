@@ -11,6 +11,10 @@ export type Recipe = {
   match: number;
   ingredients: string[];
   missing: string[];
+  substitutions?: {
+    ingredient: string;
+    substitutes: string[];
+  }[];
   steps: string[];
   emoji: string;
   savedId?: string;

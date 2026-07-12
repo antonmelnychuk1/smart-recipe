@@ -11,6 +11,7 @@ export const sampleRecipes: Recipe[] = [
     protein: 38,
     carbs: 62,
     fat: 16,
+    estimatedCost: 27,
     match: 92,
     ingredients: [
       "180 g ryżu arborio",
@@ -22,6 +23,16 @@ export const sampleRecipes: Recipe[] = [
       "0,5 łyżeczki soli",
     ],
     missing: ["700 ml bulionu", "50 g parmezanu"],
+    substitutions: [
+      {
+        ingredient: "50 g parmezanu",
+        substitutes: ["50 g grana padano", "40 g sera bursztyn"],
+      },
+      {
+        ingredient: "100 g świeżego szpinaku",
+        substitutes: ["80 g rukoli", "120 g mrożonego szpinaku"],
+      },
+    ],
     steps: [
       "Pokrój kurczaka i podsmaż go na rozgrzanej patelni.",
       "Dodaj ryż i stopniowo dolewaj gorący bulion.",
@@ -40,6 +51,7 @@ export const sampleRecipes: Recipe[] = [
     protein: 30,
     carbs: 50,
     fat: 14,
+    estimatedCost: 22,
     match: 87,
     ingredients: [
       "200 g ugotowanego ryżu",
@@ -50,6 +62,16 @@ export const sampleRecipes: Recipe[] = [
       "1 łyżka oleju",
     ],
     missing: ["150 g mieszanki warzyw", "2 łyżki sosu sojowego"],
+    substitutions: [
+      {
+        ingredient: "2 łyżki sosu sojowego",
+        substitutes: ["2 łyżki tamari", "1 łyżka sosu teriyaki"],
+      },
+      {
+        ingredient: "150 g mieszanki warzyw",
+        substitutes: ["150 g brokułu", "150 g papryki i marchewki"],
+      },
+    ],
     steps: [
       "Podsmaż pokrojonego kurczaka na patelni.",
       "W międzyczasie podgrzej ugotowany ryż.",
@@ -69,6 +91,7 @@ export const sampleRecipes: Recipe[] = [
     protein: 33,
     carbs: 42,
     fat: 18,
+    estimatedCost: 18,
     match: 89,
     ingredients: [
       "150 g ugotowanego ryżu",
@@ -80,6 +103,16 @@ export const sampleRecipes: Recipe[] = [
       "0,25 łyżeczki pieprzu",
     ],
     missing: ["50 g tartego sera", "0,25 łyżeczki pieprzu"],
+    substitutions: [
+      {
+        ingredient: "50 g tartego sera",
+        substitutes: ["50 g mozzarelli", "40 g sera cheddar"],
+      },
+      {
+        ingredient: "1 łyżka oleju",
+        substitutes: ["1 łyżka oliwy", "10 g masła"],
+      },
+    ],
     steps: [
       "Podsmaż pokrojonego kurczaka na patelni.",
       "Dodaj ugotowany ryż i wymieszaj.",

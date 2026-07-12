@@ -52,6 +52,14 @@ const recipeSchema = z.object({
       ),
   ),
   missing: z.array(z.string()),
+  substitutions: z
+    .array(
+      z.object({
+        ingredient: z.string(),
+        substitutes: z.array(z.string()).min(1).max(3),
+      }),
+    )
+    .max(6),
   steps: z.array(z.string()),
   emoji: z.string(),
   imageQuery: z.string(),
@@ -183,6 +191,8 @@ Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednos
 W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
 
 Pole estimatedCost to realistyczny, całkowity szacowany koszt składników dla 2 porcji w pełnych złotych. Przestrzegaj budżetu, jeśli został podany. Cele żywieniowe traktuj jako wskazówkę dla jednego posiłku, nie jako wartości całego dnia.
+
+Pole substitutions ma zawierać 2–5 praktycznych zamienników dla składników, które użytkownik może chcieć podmienić lub które często są problematyczne. Każdy element ma wskazywać oryginalny składnik z przepisu oraz 1–3 zamienniki z krótką ilością, np. „150 g jogurtu greckiego” zamiast „150 g śmietany”. Zamienniki muszą pasować do wybranej diety i nie mogą łamać ograniczeń użytkownika.
 
 Przykładowy format imageQuery:
 - chicken rice egg bowl top view asian style plated food

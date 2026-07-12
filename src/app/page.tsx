@@ -51,6 +51,94 @@ const budgetOptions = [
   ["100", "do 100 zł"],
 ];
 
+const shoppingCategoryMatchers = [
+  {
+    name: "Warzywa i owoce",
+    keywords: [
+      "pomidor",
+      "ogórek",
+      "cebula",
+      "czosnek",
+      "marchew",
+      "papryka",
+      "ziemni",
+      "szpinak",
+      "sałata",
+      "broku",
+      "cukinia",
+      "jabł",
+      "banan",
+      "cytryn",
+      "limonk",
+      "warzyw",
+      "owoc",
+    ],
+  },
+  {
+    name: "Mięso, ryby i jajka",
+    keywords: [
+      "kurcz",
+      "indyk",
+      "wołow",
+      "wieprz",
+      "mięso",
+      "ryba",
+      "łosoś",
+      "tuńczyk",
+      "jaj",
+      "boczek",
+      "szynk",
+    ],
+  },
+  {
+    name: "Nabiał",
+    keywords: [
+      "mleko",
+      "jogurt",
+      "ser",
+      "parmezan",
+      "mozzarella",
+      "feta",
+      "śmietan",
+      "masło",
+      "twaróg",
+    ],
+  },
+  {
+    name: "Produkty suche",
+    keywords: [
+      "ryż",
+      "makaron",
+      "kasz",
+      "mąk",
+      "płatki",
+      "soczewic",
+      "ciecierzyc",
+      "fasol",
+      "chleb",
+      "bułk",
+    ],
+  },
+  {
+    name: "Przyprawy i sosy",
+    keywords: [
+      "sól",
+      "pieprz",
+      "papryka słodka",
+      "curry",
+      "oregano",
+      "bazyl",
+      "sos",
+      "ocet",
+      "musztard",
+      "bulion",
+      "oliw",
+      "olej",
+      "przypraw",
+    ],
+  },
+];
+
 const accents = [
   "from-[#f7c56c] to-[#e78a43]",
   "from-[#8fbb72] to-[#4f8457]",
@@ -100,6 +188,29 @@ function scaleIngredient(ingredient: string, multiplier: number) {
       }).format(amount * multiplier);
     },
   );
+}
+
+function getShoppingCategory(item: string) {
+  const normalized = item.toLocaleLowerCase("pl");
+  const category = shoppingCategoryMatchers.find(({ keywords }) =>
+    keywords.some((keyword) => normalized.includes(keyword)),
+  );
+
+  return category?.name ?? "Pozostałe";
+}
+
+function groupShoppingItems(items: string[]) {
+  return items.reduce<{ name: string; items: string[] }[]>((groups, item) => {
+    const categoryName = getShoppingCategory(item);
+    const existingGroup = groups.find((group) => group.name === categoryName);
+
+    if (existingGroup) {
+      existingGroup.items.push(item);
+      return groups;
+    }
+
+    return [...groups, { name: categoryName, items: [item] }];
+  }, []);
 }
 
 function Icon({ name }: { name: "spark" | "clock" | "heart" | "leaf" }) {
@@ -369,6 +480,10 @@ export default function Home() {
         (recipe) => maxTime === "0" || recipe.time <= Number(maxTime),
       ),
     [generated, generatedRecipes, maxTime, sampleRecipes],
+  );
+  const groupedShoppingList = useMemo(
+    () => groupShoppingItems(shoppingList),
+    [shoppingList],
   );
 
   function addIngredient(value = input) {
@@ -1547,6 +1662,23 @@ export default function Home() {
                     </button>
                   )}
                 </div>
+                {recipe.substitutions && recipe.substitutions.length > 0 && (
+                  <div className="mt-4 rounded-2xl bg-[#f8f4ec] p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#829087]">
+                      Zamienniki
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-[#59675f]">
+                      {recipe.substitutions[0].ingredient}:{" "}
+                      {recipe.substitutions[0].substitutes.join(" / ")}
+                    </p>
+                    {recipe.substitutions.length > 1 && (
+                      <p className="mt-1 text-xs text-[#7a857e]">
+                        +{recipe.substitutions.length - 1} więcej w szczegółach
+                        przepisu
+                      </p>
+                    )}
+                  </div>
+                )}
                 <button
                   onClick={() => openRecipe(recipe)}
                   className="mt-6 w-full rounded-xl border border-[#ccd7cf] py-3 text-sm font-semibold text-[#356248] transition hover:bg-[#edf3ee]"
@@ -1731,34 +1863,46 @@ export default function Home() {
                   </button>
                 )}
               </div>
-              <div className="mt-5 space-y-2">
+              <div className="mt-5 space-y-4">
                 {shoppingList.length > 0 ? (
-                  shoppingList.map((item) => (
-                    <label
-                      key={item}
-                      className="flex cursor-pointer items-center gap-3 rounded-xl bg-[#faf8f3] p-3 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        onChange={() =>
-                          {
-                            setShoppingList((current) =>
-                              current.filter(
-                                (savedItem) => savedItem !== item,
-                              ),
-                            );
-                            if (session?.user) {
-                              void saveKitchenAction({
-                                action: "shopping.remove",
-                                label: item,
-                              });
-                            }
-                          }
-                        }
-                        className="size-4 accent-[#356248]"
-                      />
-                      <span>{item}</span>
-                    </label>
+                  groupedShoppingList.map((group) => (
+                    <div key={group.name}>
+                      <div className="mb-2 flex items-center justify-between gap-3 px-1">
+                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#7a857e]">
+                          {group.name}
+                        </p>
+                        <span className="rounded-full bg-[#edf3ee] px-2 py-0.5 text-[11px] font-bold text-[#356248]">
+                          {group.items.length}
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {group.items.map((item) => (
+                          <label
+                            key={item}
+                            className="flex cursor-pointer items-center gap-3 rounded-xl bg-[#faf8f3] p-3 text-sm transition hover:bg-[#f2eee5]"
+                          >
+                            <input
+                              type="checkbox"
+                              onChange={() => {
+                                setShoppingList((current) =>
+                                  current.filter(
+                                    (savedItem) => savedItem !== item,
+                                  ),
+                                );
+                                if (session?.user) {
+                                  void saveKitchenAction({
+                                    action: "shopping.remove",
+                                    label: item,
+                                  });
+                                }
+                              }}
+                              className="size-4 shrink-0 accent-[#356248]"
+                            />
+                            <span className="break-anywhere">{item}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                   ))
                 ) : (
                   <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
@@ -1943,6 +2087,30 @@ export default function Home() {
               </div>
             )}
 
+            {selectedRecipe.substitutions &&
+              selectedRecipe.substitutions.length > 0 && (
+                <div className="mt-5 rounded-2xl border border-[#dde7dc] bg-[#f6faf5] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#4f765e]">
+                    Zamienniki składników
+                  </p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    {selectedRecipe.substitutions.map((item) => (
+                      <div
+                        key={`${item.ingredient}-${item.substitutes.join("-")}`}
+                        className="rounded-xl bg-white p-3 shadow-sm"
+                      >
+                        <p className="text-sm font-bold text-[#35483e]">
+                          {item.ingredient}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-[#59675f]">
+                          {item.substitutes.join(" / ")}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
             <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-2 md:gap-8">
               <div>
                 <h3 className="font-serif text-2xl font-semibold">Składniki</h3>
@@ -2027,6 +2195,25 @@ export default function Home() {
                 ))}
               </ul>
             </div>
+
+            {selectedRecipe.substitutions &&
+              selectedRecipe.substitutions.length > 0 && (
+                <details className="mt-3 rounded-2xl border border-[#dde7dc] bg-[#f6faf5] p-4">
+                  <summary className="cursor-pointer text-sm font-bold text-[#356248]">
+                    Pokaż zamienniki składników
+                  </summary>
+                  <div className="mt-3 space-y-2 text-sm text-[#59675f]">
+                    {selectedRecipe.substitutions.map((item) => (
+                      <p key={`${item.ingredient}-cooking`}>
+                        <span className="font-semibold text-[#35483e]">
+                          {item.ingredient}:
+                        </span>{" "}
+                        {item.substitutes.join(" / ")}
+                      </p>
+                    ))}
+                  </div>
+                </details>
+              )}
 
             <div className="my-6 min-h-44 rounded-2xl bg-[#edf2ed] p-6 sm:p-8">
               <span className="grid size-10 place-items-center rounded-full bg-[#2f684f] text-sm font-bold text-white">
