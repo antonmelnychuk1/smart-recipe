@@ -63,6 +63,7 @@ const shoppingCategoryMatchers = [
       "papryka",
       "ziemni",
       "szpinak",
+      "seler",
       "sałata",
       "broku",
       "cukinia",
@@ -188,6 +189,37 @@ function scaleIngredient(ingredient: string, multiplier: number) {
       }).format(amount * multiplier);
     },
   );
+}
+
+function normalizeShoppingItem(item: string) {
+  const withoutAmount = item
+    .trim()
+    .replace(
+      /^(?:ok\.\s*)?\d+(?:[.,]\d+)?\s*(?:g|kg|ml|l|szt\.?|łyżeczki|łyżeczek|łyżka|łyżki|łyżek|szklanki|szklanka|ząbki|ząbek|garści|garść|plastry|plaster|łodyga|łodygi|liść|liścia)\s+/i,
+      "",
+    )
+    .replace(/^(?:stołowa|stołowe|stołowych)\s+/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const normalized = withoutAmount.toLocaleLowerCase("pl");
+  const commonNames: Record<string, string> = {
+    "filetu z kurczaka": "filet z kurczaka",
+    "tartego sera": "tarty ser",
+    "parmezanu": "parmezan",
+    "pieprzu": "pieprz",
+    "oleju": "olej",
+    "oliwy": "oliwa",
+    "mieszanki warzyw": "mieszanka warzyw",
+    "sosu sojowego": "sos sojowy",
+    "sera cheddar": "ser cheddar",
+    "sera bursztyn": "ser bursztyn",
+    "marchewki": "marchewka",
+    "cebuli": "cebula",
+    "liścia laurowego": "liść laurowy",
+  };
+
+  return commonNames[normalized] ?? withoutAmount;
 }
 
 function getShoppingCategory(item: string) {
@@ -628,7 +660,10 @@ export default function Home() {
   }
 
   function addToShoppingList(items: string[]) {
-    const newItems = items.filter(
+    const cleanedItems = items
+      .map(normalizeShoppingItem)
+      .filter(Boolean);
+    const newItems = cleanedItems.filter(
       (item) =>
         !shoppingList.some(
           (savedItem) =>
@@ -686,9 +721,11 @@ export default function Home() {
   }
 
   function isOnShoppingList(item: string) {
+    const normalizedItem = normalizeShoppingItem(item);
     return shoppingList.some(
       (savedItem) =>
-        savedItem.toLocaleLowerCase("pl") === item.toLocaleLowerCase("pl"),
+        savedItem.toLocaleLowerCase("pl") ===
+        normalizedItem.toLocaleLowerCase("pl"),
     );
   }
 
@@ -1663,11 +1700,12 @@ export default function Home() {
                   <div className="mt-2 flex flex-wrap gap-2">
                     {recipe.missing.length > 0 ? (
                       recipe.missing.map((item) => {
-                        const added = isOnShoppingList(item);
+                        const shoppingItem = normalizeShoppingItem(item);
+                        const added = isOnShoppingList(shoppingItem);
                         return (
                         <button
                           key={item}
-                          onClick={() => addToShoppingList([item])}
+                          onClick={() => addToShoppingList([shoppingItem])}
                           disabled={added}
                           className={`break-anywhere max-w-full whitespace-normal rounded-full px-2.5 py-1 text-left text-xs font-medium transition-all duration-200 ${
                             added
@@ -1675,7 +1713,7 @@ export default function Home() {
                               : "bg-[#f7eee8] text-[#a45c45] hover:-translate-y-0.5 hover:bg-[#f2ded3] hover:shadow-sm"
                           }`}
                         >
-                          {added ? "✓" : "+"} {item}
+                          {added ? "✓" : "+"} {shoppingItem}
                         </button>
                         );
                       })
@@ -2129,11 +2167,12 @@ export default function Home() {
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {selectedRecipe.missing.map((item) => {
-                    const added = isOnShoppingList(item);
+                    const shoppingItem = normalizeShoppingItem(item);
+                    const added = isOnShoppingList(shoppingItem);
                     return (
                       <button
                         key={item}
-                        onClick={() => addToShoppingList([item])}
+                        onClick={() => addToShoppingList([shoppingItem])}
                         disabled={added}
                         className={`break-anywhere max-w-full whitespace-normal rounded-full px-3 py-1.5 text-left text-xs font-semibold transition-all ${
                           added
@@ -2141,7 +2180,7 @@ export default function Home() {
                             : "bg-white text-[#a45c45] shadow-sm hover:-translate-y-0.5 hover:shadow-md"
                         }`}
                       >
-                        {added ? "✓" : "+"} {item}
+                        {added ? "✓" : "+"} {shoppingItem}
                       </button>
                     );
                   })}

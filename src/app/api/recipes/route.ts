@@ -48,10 +48,14 @@ const recipeSchema = z.object({
     z
       .string()
       .describe(
-        "Składnik wraz z dokładną ilością i jednostką, np. 250 g mąki albo 2 łyżki oliwy",
+        "Składnik wraz z dokładną ilością i jednostką, np. 250 g mąki albo 2 łyżki stołowe oliwy",
       ),
   ),
-  missing: z.array(z.string()),
+  missing: z
+    .array(z.string())
+    .describe(
+      "Lista zakupowa: tylko czyste nazwy brakujących produktów bez ilości i jednostek, np. parmezan albo mieszanka warzyw",
+    ),
   substitutions: z
     .array(
       z.object({
@@ -119,7 +123,7 @@ Czas przygotowania: ${timeRequirement}
 Budżet: ${budgetRequirement}
 ${nutritionGoals}
 
-Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tę samą kompletną listę produktów potrzebnych do zakupów, a pole match ustaw na 0.`;
+Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tylko czyste nazwy produktów do kupienia bez ilości i jednostek, a pole match ustaw na 0.`;
   } else {
     responseSchema = ingredientsResponseSchema;
     requestPrompt = `Wygeneruj dokładnie 3 różne przepisy.
@@ -178,7 +182,7 @@ Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, w
         {
           role: "system",
           content:
-            "Jesteś doświadczonym kucharzem i dietetykiem. Tworzysz bezpieczne, realne przepisy po polsku. Szacunki wartości odżywczych dotyczą jednej porcji. Nie deklaruj, że danie jest bezpieczne dla alergika. Podstawowe produkty spiżarniane, których użytkownik nie podał, umieszczaj w brakujących składnikach.",
+            "Jesteś doświadczonym kucharzem i dietetykiem. Tworzysz bezpieczne, realne przepisy po polsku. Szacunki wartości odżywczych dotyczą jednej porcji. Nie deklaruj, że danie jest bezpieczne dla alergika. Podstawowe produkty spiżarniane, takie jak woda, sól, pieprz i niewielka ilość oleju, mogą być w składnikach przepisu, ale nie dodawaj ich do listy brakujących zakupów.",
         },
         {
           role: "user",
@@ -186,7 +190,9 @@ Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, w
 
 Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęcia w Pexels. Użyj 6–10 konkretnych słów opisujących nazwę dania, najważniejsze widoczne składniki, sposób podania oraz opcjonalnie ujęcie lub styl. Nie używaj słów photo, image ani photography. Nie tłumacz frazy i nie dodawaj znaków interpunkcyjnych.
 
-Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka lub łyżka. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka oliwy”, „0,5 łyżeczki soli”.
+Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka albo łyżka stołowa. „Łyżeczka” oznacza małą łyżeczkę do herbaty, a „łyżka stołowa” oznacza dużą łyżkę. Zawsze pisz konkretnie „łyżeczka” albo „łyżka stołowa”, nigdy samo niejasne „łyżki”. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka stołowa oliwy”, „0,5 łyżeczki soli”.
+
+Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing musi być krótką nazwą produktu bez ilości, gramów, ml, sztuk, łyżek i łyżeczek. Poprawnie: „parmezan”, „mieszanka warzyw”, „sos sojowy”. Niepoprawnie: „50 g parmezanu”, „150 g mieszanki warzyw”, „2 łyżki sosu sojowego”. Nie dodawaj do missing wody, soli, pieprzu ani drobnych ilości podstawowego oleju. Jeśli potrzebny jest bulion, nie traktuj go jako pojedynczego brakującego składnika: w ingredients podaj składniki do przygotowania prostego bulionu lub użyj wody i przypraw, a w missing podaj tylko produkty sklepowe potrzebne do jego przygotowania.
 
 W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
 
