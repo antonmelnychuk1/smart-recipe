@@ -104,6 +104,23 @@ select:focus-visible {
   animation: toast-in 220ms ease-out;
 }
 
+.modal-safe-area {
+  padding: max(1rem, calc(env(safe-area-inset-top) + 1rem)) 1rem
+    max(1rem, calc(env(safe-area-inset-bottom) + 1rem));
+}
+
+.modal-panel-safe {
+  max-height: calc(
+    100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2rem
+  );
+}
+
+.modal-panel-safe-tall {
+  max-height: calc(
+    100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 1.5rem
+  );
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

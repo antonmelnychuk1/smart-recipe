@@ -2049,14 +2049,14 @@ export default function Home() {
 
       {selectedRecipe && (
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-[#18241e]/60 p-4 backdrop-blur-sm"
+          className="modal-safe-area fixed inset-0 z-50 grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label={selectedRecipe.title}
           onClick={() => setSelectedRecipe(null)}
         >
           <article
-            className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-9"
+            className="modal-panel-safe w-full max-w-3xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-9"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="relative flex items-start justify-between gap-4">
@@ -2278,12 +2278,12 @@ export default function Home() {
 
       {selectedRecipe && cookingMode && (
         <div
-          className="fixed inset-0 z-[70] grid place-items-center bg-[#18241e]/85 p-4 backdrop-blur-md"
+          className="modal-safe-area fixed inset-0 z-[70] grid place-items-center bg-[#18241e]/85 backdrop-blur-md"
           role="dialog"
           aria-modal="true"
           aria-label={`Tryb gotowania: ${selectedRecipe.title}`}
         >
-          <div className="max-h-[95vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-5 shadow-2xl sm:p-8">
+          <div className="modal-panel-safe-tall w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-5 shadow-2xl sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
