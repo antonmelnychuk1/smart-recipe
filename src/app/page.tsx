@@ -1300,7 +1300,7 @@ export default function Home() {
               <select
                 value={diet}
                 onChange={(event) => setDiet(event.target.value)}
-                className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
               >
                 {dietOptions.map((option) => (
                   <option key={option}>{option}</option>
@@ -1312,7 +1312,7 @@ export default function Home() {
               <select
                 value={maxBudget}
                 onChange={(event) => setMaxBudget(event.target.value)}
-                className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
               >
                 {budgetOptions.map(([value, label]) => (
                   <option key={value} value={value}>{label}</option>
@@ -1324,7 +1324,7 @@ export default function Home() {
               <select
                 value={maxTime}
                 onChange={(event) => setMaxTime(event.target.value)}
-                className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-3 font-normal outline-none"
+                className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
               >
                 {timeOptions.map(([value, label]) => (
                   <option key={value} value={value}>
@@ -1450,25 +1450,17 @@ export default function Home() {
             onSubmit={submitDesiredDish}
             className="rounded-3xl border border-white bg-white/90 p-3 shadow-[0_18px_60px_rgba(53,68,58,0.10)] sm:p-5"
           >
-            <label
-              htmlFor="desired-dish"
-              className="text-sm font-semibold text-[#35483e]"
-            >
+            <label className="text-sm font-semibold text-[#35483e]">
               Nazwa lub opis dania
-            </label>
-            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
               <input
                 id="desired-dish"
-                type="text"
-                inputMode="text"
-                autoComplete="off"
                 value={desiredDish}
                 onChange={(event) => setDesiredDish(event.target.value)}
                 maxLength={120}
-                className="h-12 w-full min-w-0 flex-1 appearance-none rounded-xl border border-[#dedfd9] bg-[#fbfaf6] px-4 text-base text-[#25322b] shadow-inner shadow-[#25322b]/[0.03] outline-none transition placeholder:text-[#9aa39c] focus:border-[#71927e] focus:bg-white focus:ring-4 focus:ring-[#71927e]/10"
+                className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e]"
                 placeholder="np. puszyste pancakes z owocami"
               />
-            </div>
+            </label>
             <div className="mt-3 grid gap-3 border-t border-[#eeece5] pt-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
               <label className="text-sm font-semibold text-[#35483e]">
                 Dieta
