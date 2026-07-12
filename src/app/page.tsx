@@ -213,6 +213,22 @@ function groupShoppingItems(items: string[]) {
   }, []);
 }
 
+function formatShoppingListForClipboard(
+  groups: ReturnType<typeof groupShoppingItems>,
+) {
+  return [
+    "Lista zakupów",
+    "",
+    ...groups.flatMap((group) => [
+      group.name,
+      ...group.items.map((item) => `- ${item}`),
+      "",
+    ]),
+  ]
+    .join("\n")
+    .trim();
+}
+
 function Icon({ name }: { name: "spark" | "clock" | "heart" | "leaf" }) {
   const paths = {
     spark: "M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zm6 11l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9L18 14z",
@@ -654,6 +670,19 @@ export default function Home() {
 
     addToShoppingList([item]);
     setShoppingInput("");
+  }
+
+  async function copyShoppingList() {
+    if (groupedShoppingList.length === 0) return;
+
+    try {
+      await navigator.clipboard.writeText(
+        formatShoppingListForClipboard(groupedShoppingList),
+      );
+      setToast("Lista zakupów została skopiowana.");
+    } catch {
+      setToast("Nie udało się skopiować listy zakupów.");
+    }
   }
 
   function isOnShoppingList(item: string) {
@@ -1851,22 +1880,30 @@ export default function Home() {
             </article>
 
             <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="font-serif text-2xl font-semibold">
                   Lista zakupów
                 </h3>
                 {shoppingList.length > 0 && (
-                  <button
-                    onClick={() => {
-                      setShoppingList([]);
-                      if (session?.user) {
-                        void saveKitchenAction({ action: "shopping.clear" });
-                      }
-                    }}
-                    className="text-xs font-semibold text-[#9a6251] hover:underline"
-                  >
-                    Wyczyść
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={copyShoppingList}
+                      className="rounded-full bg-[#edf3ee] px-3 py-1.5 text-xs font-semibold text-[#356248] transition hover:bg-[#dfece2]"
+                    >
+                      Kopiuj
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShoppingList([]);
+                        if (session?.user) {
+                          void saveKitchenAction({ action: "shopping.clear" });
+                        }
+                      }}
+                      className="rounded-full px-3 py-1.5 text-xs font-semibold text-[#9a6251] transition hover:bg-[#fff0e8]"
+                    >
+                      Wyczyść
+                    </button>
+                  </div>
                 )}
               </div>
               <form
