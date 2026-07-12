@@ -752,6 +752,51 @@ export default function Home() {
     }
   }
 
+  function removeShoppingItem(item: string) {
+    setShoppingList((current) =>
+      current.filter((savedItem) => savedItem !== item),
+    );
+    if (session?.user) {
+      void saveKitchenAction({
+        action: "shopping.remove",
+        label: item,
+      });
+    }
+  }
+
+  function moveShoppingItemToPantry(item: string) {
+    const label = normalizeShoppingItem(item);
+    const alreadyInPantry = pantryItems.some(
+      (savedItem) =>
+        savedItem.label.toLocaleLowerCase("pl") ===
+        label.toLocaleLowerCase("pl"),
+    );
+
+    if (!alreadyInPantry) {
+      const pantryItem = {
+        label,
+        quantity: "1 szt.",
+        expiresAt: null,
+      };
+
+      setPantryItems((current) => [
+        { ...pantryItem, id: crypto.randomUUID() },
+        ...current,
+      ]);
+
+      if (session?.user) {
+        void saveKitchenAction({ action: "pantry.upsert", ...pantryItem });
+      }
+    }
+
+    removeShoppingItem(item);
+    setToast(
+      alreadyInPantry
+        ? `${label} jest już w spiżarni. Usunięto z listy zakupów.`
+        : `Przeniesiono do spiżarni: ${label}`,
+    );
+  }
+
   function isOnShoppingList(item: string) {
     const normalizedItem = normalizeShoppingItem(item);
     return shoppingList.some(
@@ -2009,29 +2054,26 @@ export default function Home() {
                       </div>
                       <div className="space-y-2">
                         {group.items.map((item) => (
-                          <label
+                          <div
                             key={item}
-                            className="flex cursor-pointer items-center gap-3 rounded-xl bg-[#faf8f3] p-3 text-sm transition hover:bg-[#f2eee5]"
+                            className="flex items-center gap-3 rounded-xl bg-[#faf8f3] p-3 text-sm transition hover:bg-[#f2eee5]"
                           >
                             <input
                               type="checkbox"
-                              onChange={() => {
-                                setShoppingList((current) =>
-                                  current.filter(
-                                    (savedItem) => savedItem !== item,
-                                  ),
-                                );
-                                if (session?.user) {
-                                  void saveKitchenAction({
-                                    action: "shopping.remove",
-                                    label: item,
-                                  });
-                                }
-                              }}
+                              aria-label={`Oznacz ${item} jako kupione`}
+                              onChange={() => removeShoppingItem(item)}
                               className="size-4 shrink-0 accent-[#356248]"
                             />
-                            <span className="break-anywhere">{item}</span>
-                          </label>
+                            <span className="break-anywhere min-w-0 flex-1">
+                              {item}
+                            </span>
+                            <button
+                              onClick={() => moveShoppingItemToPantry(item)}
+                              className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
+                            >
+                              Do spiżarni
+                            </button>
+                          </div>
                         ))}
                       </div>
                     </div>
