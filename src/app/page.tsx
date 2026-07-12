@@ -934,15 +934,7 @@ export default function Home() {
     );
   }
 
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-
-    const pendingIngredient = input.trim().toLocaleLowerCase("pl");
-    const submittedIngredients =
-      pendingIngredient && !ingredients.includes(pendingIngredient)
-        ? [...ingredients, pendingIngredient]
-        : ingredients;
-
+  async function generateFromIngredients(submittedIngredients: string[]) {
     if (submittedIngredients.length === 0) return;
 
     setIngredients(submittedIngredients);
@@ -1037,6 +1029,24 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+
+    const pendingIngredient = input.trim().toLocaleLowerCase("pl");
+    const submittedIngredients =
+      pendingIngredient && !ingredients.includes(pendingIngredient)
+        ? [...ingredients, pendingIngredient]
+        : ingredients;
+
+    await generateFromIngredients(submittedIngredients);
+  }
+
+  function cookFromPantry() {
+    const pantryLabels = pantryItems.map((item) => item.label);
+    if (pantryLabels.length === 0 || isLoading) return;
+    void generateFromIngredients(pantryLabels);
   }
 
   async function submitDesiredDish(event: FormEvent) {
@@ -1885,6 +1895,8 @@ export default function Home() {
               onConsume={consumePantryItem}
               onUseIngredients={usePantryIngredients}
               onAddToShoppingList={addToShoppingList}
+              onCookFromPantry={cookFromPantry}
+              isGenerating={isLoading}
             />
           </div>
 

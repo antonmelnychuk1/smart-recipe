@@ -11,6 +11,8 @@ type PantryProps = {
   onConsume: (item: PantryItem) => void;
   onUseIngredients: (labels: string[]) => void;
   onAddToShoppingList: (labels: string[]) => void;
+  onCookFromPantry: () => void;
+  isGenerating: boolean;
 };
 
 function daysUntil(date: string) {
@@ -35,6 +37,101 @@ function expiryLabel(expiresAt: string | null) {
   }).format(new Date(`${expiresAt}T12:00:00`));
 }
 
+const pantryCategories = [
+  {
+    name: "Warzywa i owoce",
+    keywords: [
+      "pomidor",
+      "ogórek",
+      "cebula",
+      "czosnek",
+      "marchew",
+      "papryka",
+      "ziemni",
+      "szpinak",
+      "seler",
+      "sałata",
+      "broku",
+      "cukinia",
+      "jabł",
+      "banan",
+      "cytryn",
+      "owoc",
+      "warzyw",
+    ],
+  },
+  {
+    name: "Mięso, ryby i jajka",
+    keywords: [
+      "kurcz",
+      "indyk",
+      "wołow",
+      "wieprz",
+      "mięso",
+      "ryba",
+      "łosoś",
+      "tuńczyk",
+      "jaj",
+      "boczek",
+      "szynk",
+    ],
+  },
+  {
+    name: "Nabiał",
+    keywords: [
+      "mleko",
+      "jogurt",
+      "ser",
+      "parmezan",
+      "mozzarella",
+      "feta",
+      "śmietan",
+      "masło",
+      "twaróg",
+    ],
+  },
+  {
+    name: "Produkty suche",
+    keywords: [
+      "ryż",
+      "makaron",
+      "kasz",
+      "mąk",
+      "płatki",
+      "soczewic",
+      "ciecierzyc",
+      "fasol",
+      "chleb",
+      "bułk",
+    ],
+  },
+  {
+    name: "Przyprawy i sosy",
+    keywords: [
+      "sól",
+      "pieprz",
+      "curry",
+      "oregano",
+      "bazyl",
+      "sos",
+      "ocet",
+      "musztard",
+      "oliw",
+      "olej",
+      "przypraw",
+    ],
+  },
+];
+
+function getPantryCategory(label: string) {
+  const normalized = label.toLocaleLowerCase("pl");
+  const category = pantryCategories.find(({ keywords }) =>
+    keywords.some((keyword) => normalized.includes(keyword)),
+  );
+
+  return category?.name ?? "Pozostałe";
+}
+
 export function Pantry({
   items,
   isSignedIn,
@@ -43,11 +140,14 @@ export function Pantry({
   onConsume,
   onUseIngredients,
   onAddToShoppingList,
+  onCookFromPantry,
+  isGenerating,
 }: PantryProps) {
   const [label, setLabel] = useState("");
   const [quantity, setQuantity] = useState("1 szt.");
   const [expiresAt, setExpiresAt] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState("Wszystkie");
 
   const sortedItems = useMemo(
     () =>
@@ -63,6 +163,27 @@ export function Pantry({
       item.expiresAt !== null &&
       daysUntil(item.expiresAt) >= 0 &&
       daysUntil(item.expiresAt) <= 4,
+  );
+  const availableCategories = useMemo(() => {
+    const counts = items.reduce<Record<string, number>>((accumulator, item) => {
+      const category = getPantryCategory(item.label);
+      accumulator[category] = (accumulator[category] ?? 0) + 1;
+      return accumulator;
+    }, {});
+
+    return [
+      { name: "Wszystkie", count: items.length },
+      ...Object.entries(counts).map(([name, count]) => ({ name, count })),
+    ];
+  }, [items]);
+  const visibleItems = useMemo(
+    () =>
+      activeCategory === "Wszystkie"
+        ? sortedItems
+        : sortedItems.filter(
+            (item) => getPantryCategory(item.label) === activeCategory,
+          ),
+    [activeCategory, sortedItems],
   );
 
   function submit(event: FormEvent) {
@@ -139,6 +260,13 @@ export function Pantry({
             >
               Dodaj wszystkie do generatora
             </button>
+            <button
+              onClick={onCookFromPantry}
+              disabled={isGenerating}
+              className="rounded-xl bg-[#d66a49] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#c35d3e] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isGenerating ? "AI gotuje..." : "Ugotuj ze spiżarni"}
+            </button>
           </div>
         )}
       </div>
@@ -201,9 +329,27 @@ export function Pantry({
           : "Zaloguj się, aby synchronizować spiżarnię między urządzeniami."}
       </p>
 
+      {items.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {availableCategories.map((category) => (
+            <button
+              key={category.name}
+              onClick={() => setActiveCategory(category.name)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                activeCategory === category.name
+                  ? "bg-[#356248] text-white"
+                  : "bg-white text-[#59675f] hover:bg-[#edf1ec]"
+              }`}
+            >
+              {category.name} ({category.count})
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {sortedItems.length > 0 ? (
-          sortedItems.map((item) => {
+        {visibleItems.length > 0 ? (
+          visibleItems.map((item) => {
             const days = item.expiresAt ? daysUntil(item.expiresAt) : null;
             const isUrgent = days !== null && days >= 0 && days <= 4;
             const isExpired = days !== null && days < 0;
@@ -279,8 +425,9 @@ export function Pantry({
           })
         ) : (
           <p className="rounded-xl bg-white p-4 text-sm leading-6 text-[#7a857e] sm:col-span-2 lg:col-span-3">
-            Spiżarnia jest pusta. Dodaj pierwszy produkt wraz z ilością i
-            opcjonalną datą ważności.
+            {items.length === 0
+              ? "Spiżarnia jest pusta. Dodaj pierwszy produkt wraz z ilością i opcjonalną datą ważności."
+              : "Brak produktów w tej kategorii."}
           </p>
         )}
       </div>
