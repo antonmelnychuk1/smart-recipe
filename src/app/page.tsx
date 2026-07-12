@@ -355,6 +355,7 @@ export default function Home() {
   const expiredPantryItems = pantryItems.filter(
     (item) => item.expiresAt !== null && daysUntilExpiry(item.expiresAt) < 0,
   );
+  const modalOpen = Boolean(selectedRecipe) || cookingMode || authOpen;
 
   useEffect(() => {
     let cancelled = false;
@@ -375,6 +376,37 @@ export default function Home() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+
+    const scrollY = window.scrollY;
+    const originalStyle = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.position = originalStyle.position;
+      document.body.style.top = originalStyle.top;
+      document.body.style.left = originalStyle.left;
+      document.body.style.right = originalStyle.right;
+      document.body.style.width = originalStyle.width;
+      document.body.style.overflow = originalStyle.overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [modalOpen]);
 
   useEffect(() => {
     const initialization = window.setTimeout(() => {
