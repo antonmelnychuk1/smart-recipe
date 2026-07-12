@@ -263,6 +263,7 @@ export default function Home() {
   const [favorites, setFavorites] = useState<Recipe[]>([]);
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [shoppingList, setShoppingList] = useState<string[]>([]);
+  const [shoppingInput, setShoppingInput] = useState("");
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [sampleRecipes, setSampleRecipes] =
@@ -643,6 +644,16 @@ export default function Home() {
     if (session?.user && newItems.length > 0) {
       void saveKitchenAction({ action: "shopping.add", items: newItems });
     }
+  }
+
+  function submitShoppingItem(event: FormEvent) {
+    event.preventDefault();
+
+    const item = shoppingInput.trim();
+    if (!item) return;
+
+    addToShoppingList([item]);
+    setShoppingInput("");
   }
 
   function isOnShoppingList(item: string) {
@@ -1858,6 +1869,24 @@ export default function Home() {
                   </button>
                 )}
               </div>
+              <form
+                onSubmit={submitShoppingItem}
+                className="mt-4 flex flex-col gap-2 rounded-2xl border border-[#e5e2da] bg-[#fbfaf6] p-2 sm:flex-row"
+              >
+                <input
+                  value={shoppingInput}
+                  onChange={(event) => setShoppingInput(event.target.value)}
+                  maxLength={80}
+                  className="h-11 min-w-0 flex-1 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none focus:border-[#71927e]"
+                  placeholder="Dodaj produkt, np. banany"
+                />
+                <button
+                  disabled={shoppingInput.trim().length === 0}
+                  className="h-11 rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white transition hover:bg-[#275b44] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Dodaj
+                </button>
+              </form>
               <div className="mt-5 space-y-4">
                 {shoppingList.length > 0 ? (
                   groupedShoppingList.map((group) => (
@@ -1901,7 +1930,8 @@ export default function Home() {
                   ))
                 ) : (
                   <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
-                    Dodaj brakujące produkty bezpośrednio z karty przepisu.
+                    Dodaj produkt ręcznie albo przenieś brakujące składniki z
+                    karty przepisu.
                   </p>
                 )}
               </div>
