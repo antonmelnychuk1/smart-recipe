@@ -1839,6 +1839,7 @@ export default function Home() {
               onRemove={removePantryItem}
               onConsume={consumePantryItem}
               onUseIngredients={usePantryIngredients}
+              onAddToShoppingList={addToShoppingList}
             />
           </div>
 
@@ -1984,7 +1985,7 @@ export default function Home() {
                   value={shoppingInput}
                   onChange={(event) => setShoppingInput(event.target.value)}
                   maxLength={80}
-                  className="h-11 min-w-0 flex-1 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none focus:border-[#71927e]"
+                  className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] disabled:bg-[#f3f1eb]"
                   placeholder="Dodaj produkt, np. banany"
                 />
                 <button

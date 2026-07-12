@@ -10,6 +10,7 @@ type PantryProps = {
   onRemove: (item: PantryItem) => void;
   onConsume: (item: PantryItem) => void;
   onUseIngredients: (labels: string[]) => void;
+  onAddToShoppingList: (labels: string[]) => void;
 };
 
 function daysUntil(date: string) {
@@ -41,6 +42,7 @@ export function Pantry({
   onRemove,
   onConsume,
   onUseIngredients,
+  onAddToShoppingList,
 }: PantryProps) {
   const [label, setLabel] = useState("");
   const [quantity, setQuantity] = useState("1 szt.");
@@ -112,14 +114,24 @@ export function Pantry({
         {items.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {urgentItems.length > 0 && (
-              <button
-                onClick={() =>
-                  onUseIngredients(urgentItems.map((item) => item.label))
-                }
-                className="rounded-xl bg-[#fff0e3] px-4 py-2.5 text-xs font-semibold text-[#a45c45] transition hover:bg-[#f8e3d3]"
-              >
-                Użyj pilnych ({urgentItems.length})
-              </button>
+              <>
+                <button
+                  onClick={() =>
+                    onUseIngredients(urgentItems.map((item) => item.label))
+                  }
+                  className="rounded-xl bg-[#fff0e3] px-4 py-2.5 text-xs font-semibold text-[#a45c45] transition hover:bg-[#f8e3d3]"
+                >
+                  Użyj pilnych ({urgentItems.length})
+                </button>
+                <button
+                  onClick={() =>
+                    onAddToShoppingList(urgentItems.map((item) => item.label))
+                  }
+                  className="rounded-xl border border-[#efd5ab] bg-white px-4 py-2.5 text-xs font-semibold text-[#8d6840] transition hover:bg-[#fff8e9]"
+                >
+                  Pilne do zakupów
+                </button>
+              </>
             )}
             <button
               onClick={() => onUseIngredients(items.map((item) => item.label))}
@@ -232,6 +244,14 @@ export function Pantry({
                   </span>
                 </button>
                 <div className="flex shrink-0 items-center gap-1">
+                  {(isExpired || isUrgent) && (
+                    <button
+                      onClick={() => onAddToShoppingList([item.label])}
+                      className="rounded-lg px-2 py-2 text-[11px] font-semibold text-[#8d6840] transition hover:bg-[#fff4de]"
+                    >
+                      Na zakupy
+                    </button>
+                  )}
                   <button
                     onClick={() => startEditing(item)}
                     className="rounded-lg px-2 py-2 text-[11px] font-semibold text-[#59675f] transition hover:bg-[#edf1ec]"
