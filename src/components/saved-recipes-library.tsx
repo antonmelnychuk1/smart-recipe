@@ -21,6 +21,9 @@ export function SavedRecipesLibrary({
   const [search, setSearch] = useState("");
   const [visibility, setVisibility] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
+  const [maxTime, setMaxTime] = useState("all");
+  const [maxCalories, setMaxCalories] = useState("all");
+  const [maxCost, setMaxCost] = useState("all");
   const [sort, setSort] = useState("newest");
   const [pendingId, setPendingId] = useState("");
   const [message, setMessage] = useState("");
@@ -45,6 +48,10 @@ export function SavedRecipesLibrary({
 
   const visibleItems = useMemo(() => {
     const query = search.trim().toLocaleLowerCase("pl");
+    const timeLimit = maxTime === "all" ? null : Number(maxTime);
+    const calorieLimit = maxCalories === "all" ? null : Number(maxCalories);
+    const costLimit = maxCost === "all" ? null : Number(maxCost);
+
     return items
       .filter(
         (item) =>
@@ -56,18 +63,48 @@ export function SavedRecipesLibrary({
           (visibility === "all" ||
             (visibility === "public" && item.isPublic) ||
             (visibility === "private" && !item.isPublic)) &&
-          (difficulty === "all" || item.recipe.difficulty === difficulty),
+          (difficulty === "all" || item.recipe.difficulty === difficulty) &&
+          (timeLimit === null || item.recipe.time <= timeLimit) &&
+          (calorieLimit === null || item.recipe.calories <= calorieLimit) &&
+          (costLimit === null ||
+            (item.recipe.estimatedCost !== undefined &&
+              item.recipe.estimatedCost <= costLimit)),
       )
       .sort((first, second) => {
         if (sort === "fastest") return first.recipe.time - second.recipe.time;
         if (sort === "calories")
           return first.recipe.calories - second.recipe.calories;
+        if (sort === "cost") {
+          return (
+            (first.recipe.estimatedCost ?? Number.MAX_SAFE_INTEGER) -
+            (second.recipe.estimatedCost ?? Number.MAX_SAFE_INTEGER)
+          );
+        }
         return (
           new Date(second.createdAt).getTime() -
           new Date(first.createdAt).getTime()
         );
       });
-  }, [difficulty, items, search, sort, visibility]);
+  }, [
+    difficulty,
+    items,
+    maxCalories,
+    maxCost,
+    maxTime,
+    search,
+    sort,
+    visibility,
+  ]);
+
+  function resetFilters() {
+    setSearch("");
+    setVisibility("all");
+    setDifficulty("all");
+    setMaxTime("all");
+    setMaxCalories("all");
+    setMaxCost("all");
+    setSort("newest");
+  }
 
   async function setPublic(item: SavedRecipeListItem, isPublic: boolean) {
     setPendingId(item.id);
@@ -126,12 +163,12 @@ export function SavedRecipesLibrary({
 
   return (
     <>
-      <div className="mt-7 grid gap-3 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-sm sm:grid-cols-2 sm:p-4 lg:grid-cols-5">
+      <div className="mt-7 grid gap-3 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-sm sm:grid-cols-2 sm:p-4 lg:grid-cols-4 xl:grid-cols-8">
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Szukaj po nazwie lub składniku"
-          className="h-11 rounded-xl border border-[#dedfd9] px-3 text-sm outline-none focus:border-[#71927e] lg:col-span-2"
+          className="h-11 rounded-xl border border-[#dedfd9] px-3 text-sm outline-none focus:border-[#71927e] sm:col-span-2"
         />
         <select
           value={visibility}
@@ -153,6 +190,37 @@ export function SavedRecipesLibrary({
           ))}
         </select>
         <select
+          value={maxTime}
+          onChange={(event) => setMaxTime(event.target.value)}
+          className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
+        >
+          <option value="all">Dowolny czas</option>
+          <option value="15">do 15 min</option>
+          <option value="30">do 30 min</option>
+          <option value="45">do 45 min</option>
+          <option value="60">do 60 min</option>
+        </select>
+        <select
+          value={maxCalories}
+          onChange={(event) => setMaxCalories(event.target.value)}
+          className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
+        >
+          <option value="all">Dowolne kcal</option>
+          <option value="400">do 400 kcal</option>
+          <option value="600">do 600 kcal</option>
+          <option value="800">do 800 kcal</option>
+        </select>
+        <select
+          value={maxCost}
+          onChange={(event) => setMaxCost(event.target.value)}
+          className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
+        >
+          <option value="all">Dowolny koszt</option>
+          <option value="20">do 20 zł</option>
+          <option value="40">do 40 zł</option>
+          <option value="60">do 60 zł</option>
+        </select>
+        <select
           value={sort}
           onChange={(event) => setSort(event.target.value)}
           className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
@@ -160,7 +228,14 @@ export function SavedRecipesLibrary({
           <option value="newest">Najnowsze</option>
           <option value="fastest">Najszybsze</option>
           <option value="calories">Najmniej kalorii</option>
+          <option value="cost">Najtańsze</option>
         </select>
+        <button
+          onClick={resetFilters}
+          className="h-11 rounded-xl border border-[#d8d7d0] px-3 text-sm font-semibold text-[#59675f] transition hover:bg-[#f6f3ec]"
+        >
+          Reset
+        </button>
       </div>
 
       <div className="mt-4 flex min-h-6 items-center justify-between gap-3 text-xs text-[#7a857e]">
@@ -211,6 +286,9 @@ export function SavedRecipesLibrary({
                   <span>{item.recipe.time} min</span>
                   <span>{item.recipe.difficulty}</span>
                   <span>{item.recipe.calories} kcal</span>
+                  {item.recipe.estimatedCost && (
+                    <span>ok. {item.recipe.estimatedCost} zł</span>
+                  )}
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-2 border-t border-[#eeeae2] pt-4">
