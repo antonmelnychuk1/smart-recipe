@@ -10,6 +10,7 @@ import { authClient } from "@/lib/auth-client";
 import type {
   PantryItem,
   Recipe,
+  RecipeFeedback,
   SearchHistoryEntry,
 } from "@/lib/recipe-types";
 import { sampleRecipes as initialSampleRecipes } from "@/lib/sample-recipes";
@@ -151,7 +152,20 @@ const storageKeys = {
   history: "smart-recipe:history",
   shopping: "smart-recipe:shopping",
   pantry: "smart-recipe:pantry",
+  feedback: "smart-recipe:feedback",
 };
+
+const feedbackOptions: {
+  value: RecipeFeedback;
+  label: string;
+  tone: "positive" | "warning";
+}[] = [
+  { value: "liked", label: "👍 Super", tone: "positive" },
+  { value: "too_expensive", label: "Za drogie", tone: "warning" },
+  { value: "too_hard", label: "Za trudne", tone: "warning" },
+  { value: "too_caloric", label: "Za dużo kalorii", tone: "warning" },
+  { value: "bad_photo", label: "Zdjęcie nie pasuje", tone: "warning" },
+];
 
 function readStoredValue<T>(key: string, fallback: T): T {
   try {
@@ -312,6 +326,9 @@ export default function Home() {
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [shoppingList, setShoppingList] = useState<string[]>([]);
   const [shoppingInput, setShoppingInput] = useState("");
+  const [recipeFeedback, setRecipeFeedback] = useState<
+    Record<string, RecipeFeedback>
+  >({});
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [sampleRecipes, setSampleRecipes] =
@@ -413,6 +430,7 @@ export default function Home() {
       setFavorites(readStoredValue(storageKeys.favorites, []));
       setHistory(readStoredValue(storageKeys.history, []));
       setShoppingList(readStoredValue(storageKeys.shopping, []));
+      setRecipeFeedback(readStoredValue(storageKeys.feedback, {}));
       setPantryItems(readStoredValue(storageKeys.pantry, []));
       setStorageLoaded(true);
     }, 0);
@@ -435,7 +453,18 @@ export default function Home() {
       storageKeys.pantry,
       JSON.stringify(pantryItems),
     );
-  }, [favorites, history, pantryItems, shoppingList, storageLoaded]);
+    window.localStorage.setItem(
+      storageKeys.feedback,
+      JSON.stringify(recipeFeedback),
+    );
+  }, [
+    favorites,
+    history,
+    pantryItems,
+    recipeFeedback,
+    shoppingList,
+    storageLoaded,
+  ]);
 
   useEffect(() => {
     if (!toast) return;
@@ -689,6 +718,31 @@ export default function Home() {
     } finally {
       setSharePending(false);
     }
+  }
+
+  function getRecipeFeedback(recipe: Recipe) {
+    return recipeFeedback[recipe.savedId ?? recipe.title];
+  }
+
+  function setFeedback(recipe: Recipe, feedback: RecipeFeedback) {
+    const key = recipe.savedId ?? recipe.title;
+    const selectedAgain = recipeFeedback[key] === feedback;
+
+    setRecipeFeedback((current) => {
+      if (!selectedAgain) return { ...current, [key]: feedback };
+
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
+
+    setToast(
+      selectedAgain
+        ? "Usunięto ocenę przepisu."
+        : feedback === "liked"
+          ? "Dzięki! Zapisaliśmy, że ten przepis Ci pasuje."
+          : "Dzięki za feedback. Przyda się do dalszych ulepszeń.",
+    );
   }
 
   function addToShoppingList(items: string[]) {
@@ -1780,6 +1834,26 @@ export default function Home() {
                 <p className="mt-2 min-h-12 text-sm leading-6 text-[#748078]">
                   {recipe.description}
                 </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {feedbackOptions.slice(0, 3).map((option) => {
+                    const active = getRecipeFeedback(recipe) === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() => setFeedback(recipe, option.value)}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
+                          active
+                            ? option.tone === "positive"
+                              ? "bg-[#dfeae1] text-[#356248]"
+                              : "bg-[#fff0e8] text-[#a45c45]"
+                            : "bg-[#f6f3ec] text-[#748078] hover:bg-[#eee9df]"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
                 <div className="mt-5 border-t border-[#eeeae2] pt-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-[#829087]">
                     Brakuje
@@ -2163,6 +2237,32 @@ export default function Home() {
               {selectedRecipe.estimatedCost && (
                 <span>ok. {selectedRecipe.estimatedCost} zł / 2 porcje</span>
               )}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-[#e6e1d7] bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#829087]">
+                Oceń ten przepis
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {feedbackOptions.map((option) => {
+                  const active = getRecipeFeedback(selectedRecipe) === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      onClick={() => setFeedback(selectedRecipe, option.value)}
+                      className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                        active
+                          ? option.tone === "positive"
+                            ? "bg-[#dfeae1] text-[#356248]"
+                            : "bg-[#fff0e8] text-[#a45c45]"
+                          : "bg-[#f6f3ec] text-[#748078] hover:bg-[#eee9df]"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#f6f3ec] p-3">

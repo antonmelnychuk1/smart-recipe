@@ -29,6 +29,13 @@ export type Recipe = {
   };
 };
 
+export type RecipeFeedback =
+  | "liked"
+  | "too_expensive"
+  | "too_hard"
+  | "too_caloric"
+  | "bad_photo";
+
 export type SearchHistoryEntry = {
   id: string;
   createdAt: string;
