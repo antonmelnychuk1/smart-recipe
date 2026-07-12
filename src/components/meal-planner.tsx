@@ -21,6 +21,7 @@ type MealPlannerProps = {
   isSignedIn: boolean;
   onOpenRecipe: (recipe: Recipe) => void;
   onAddToShoppingList: (items: string[]) => void;
+  onEntriesChange?: (count: number) => void;
 };
 
 function mondayOf(date: Date) {
@@ -48,6 +49,7 @@ export function MealPlanner({
   isSignedIn,
   onOpenRecipe,
   onAddToShoppingList,
+  onEntriesChange,
 }: MealPlannerProps) {
   const [week, setWeek] = useState(() => mondayOf(new Date()));
   const [entries, setEntries] = useState<MealPlanEntry[]>([]);
@@ -77,7 +79,11 @@ export function MealPlanner({
           localStorageKey(weekStart),
         );
         if (!cancelled) {
-          setEntries(stored ? (JSON.parse(stored) as MealPlanEntry[]) : []);
+          const parsedEntries = stored
+            ? (JSON.parse(stored) as MealPlanEntry[])
+            : [];
+          setEntries(parsedEntries);
+          onEntriesChange?.(parsedEntries.length);
           setIsLoading(false);
         }
         return;
@@ -107,9 +113,13 @@ export function MealPlanner({
             }),
           ),
         );
-        if (!cancelled) setEntries(localEntries);
+        if (!cancelled) {
+          setEntries(localEntries);
+          onEntriesChange?.(localEntries.length);
+        }
       } else if (!cancelled) {
         setEntries(data.entries);
+        onEntriesChange?.(data.entries.length);
       }
 
       if (!cancelled) setIsLoading(false);
@@ -119,7 +129,7 @@ export function MealPlanner({
     return () => {
       cancelled = true;
     };
-  }, [isSignedIn, weekStart]);
+  }, [isSignedIn, onEntriesChange, weekStart]);
 
   function saveRemote(body: Record<string, unknown>) {
     return fetch("/api/meal-plan", {
@@ -131,6 +141,7 @@ export function MealPlanner({
 
   function persist(nextEntries: MealPlanEntry[]) {
     setEntries(nextEntries);
+    onEntriesChange?.(nextEntries.length);
     window.localStorage.setItem(
       localStorageKey(weekStart),
       JSON.stringify(nextEntries),

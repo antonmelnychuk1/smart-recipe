@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { AuthDialog } from "@/components/auth-dialog";
 import { MealPlanner } from "@/components/meal-planner";
 import { Pantry } from "@/components/pantry";
@@ -329,6 +329,7 @@ export default function Home() {
   const [recipeFeedback, setRecipeFeedback] = useState<
     Record<string, RecipeFeedback>
   >({});
+  const [mealPlanCount, setMealPlanCount] = useState(0);
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [sampleRecipes, setSampleRecipes] =
@@ -595,6 +596,23 @@ export default function Home() {
     () => groupShoppingItems(shoppingList),
     [shoppingList],
   );
+  const feedbackCount = Object.keys(recipeFeedback).length;
+  const generatedRecipeCount = history.reduce(
+    (sum, entry) => sum + entry.recipes.length,
+    0,
+  );
+  const kitchenStats = [
+    ["Wygenerowane", generatedRecipeCount, "przepisy z historii"],
+    ["Ulubione", favorites.length, "zapisane inspiracje"],
+    ["Historia", history.length, "ostatnie wyszukiwania"],
+    ["Spiżarnia", pantryItems.length, "produkty w domu"],
+    ["Zakupy", shoppingList.length, "produkty do kupienia"],
+    ["Plan", mealPlanCount, "posiłki w tygodniu"],
+    ["Feedback", feedbackCount, "oceny przepisów"],
+  ];
+  const handleMealPlanEntriesChange = useCallback((count: number) => {
+    setMealPlanCount(count);
+  }, []);
 
   function addIngredient(value = input) {
     const ingredient = value.trim().toLocaleLowerCase("pl");
@@ -1931,6 +1949,7 @@ export default function Home() {
         isSignedIn={Boolean(session?.user)}
         onOpenRecipe={openRecipe}
         onAddToShoppingList={addToShoppingList}
+        onEntriesChange={handleMealPlanEntriesChange}
       />
 
       <section
@@ -1958,6 +1977,23 @@ export default function Home() {
                 Zaloguj się lub utwórz konto
               </button>
             )}
+          </div>
+
+          <div className="mt-7 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
+            {kitchenStats.map(([label, value, hint]) => (
+              <div
+                key={label}
+                className="rounded-2xl border border-[#dedbd2] bg-white/80 p-4 shadow-sm"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#829087]">
+                  {label}
+                </p>
+                <p className="mt-2 font-serif text-3xl font-semibold text-[#25322b]">
+                  {value}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-[#748078]">{hint}</p>
+              </div>
+            ))}
           </div>
 
           <div className="mt-7 sm:mt-10">
