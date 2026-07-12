@@ -275,6 +275,16 @@ function formatShoppingListForClipboard(
     .trim();
 }
 
+function formatTimer(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const restSeconds = seconds % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(restSeconds).padStart(
+    2,
+    "0",
+  )}`;
+}
+
 function Icon({ name }: { name: "spark" | "clock" | "heart" | "leaf" }) {
   const paths = {
     spark: "M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zm6 11l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9L18 14z",
@@ -339,6 +349,14 @@ export default function Home() {
   const [servings, setServings] = useState(2);
   const [cookingMode, setCookingMode] = useState(false);
   const [cookingStep, setCookingStep] = useState(0);
+  const [cookingTimerSeconds, setCookingTimerSeconds] = useState(0);
+  const [cookingTimerRunning, setCookingTimerRunning] = useState(false);
+  const [checkedCookingIngredients, setCheckedCookingIngredients] = useState<
+    Record<string, boolean>
+  >({});
+  const [checkedCookingSteps, setCheckedCookingSteps] = useState<
+    Record<number, boolean>
+  >({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
@@ -473,6 +491,18 @@ export default function Home() {
     const timeout = window.setTimeout(() => setToast(null), 2600);
     return () => window.clearTimeout(timeout);
   }, [toast]);
+
+  useEffect(() => {
+    if (!cookingMode || !cookingTimerRunning || cookingTimerSeconds <= 0) {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setCookingTimerSeconds((current) => Math.max(0, current - 1));
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [cookingMode, cookingTimerRunning, cookingTimerSeconds]);
 
   useEffect(() => {
     if (!session?.user || !storageLoaded) return;
@@ -626,7 +656,20 @@ export default function Home() {
     setServings(2);
     setCookingMode(false);
     setCookingStep(0);
+    setCookingTimerSeconds(0);
+    setCookingTimerRunning(false);
+    setCheckedCookingIngredients({});
+    setCheckedCookingSteps({});
     setSelectedRecipe(recipe);
+  }
+
+  function startCookingMode() {
+    setCookingStep(0);
+    setCookingTimerSeconds(0);
+    setCookingTimerRunning(false);
+    setCheckedCookingIngredients({});
+    setCheckedCookingSteps({});
+    setCookingMode(true);
   }
 
   function isFavorite(recipe: Recipe) {
@@ -2324,10 +2367,7 @@ export default function Home() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
-                  onClick={() => {
-                    setCookingStep(0);
-                    setCookingMode(true);
-                  }}
+                  onClick={startCookingMode}
                   className="rounded-xl bg-[#d66a49] px-4 py-2.5 text-xs font-semibold text-white"
                 >
                   Tryb gotowania
@@ -2507,17 +2547,96 @@ export default function Home() {
                   proporcje przeliczone
                 </span>
               </div>
-              <ul className="mt-3 grid gap-2 text-sm text-[#59675f] sm:grid-cols-2">
-                {selectedRecipe.ingredients.map((ingredient) => (
-                  <li
-                    key={ingredient}
-                    className="rounded-xl bg-[#f6f3ec] px-3 py-2"
+              <div className="mt-3 grid gap-2 text-sm text-[#59675f] sm:grid-cols-2">
+                {selectedRecipe.ingredients.map((ingredient) => {
+                  const scaledIngredient = scaleIngredient(
+                    ingredient,
+                    servings / 2,
+                  );
+                  const checked = Boolean(
+                    checkedCookingIngredients[ingredient],
+                  );
+
+                  return (
+                    <button
+                      key={ingredient}
+                      onClick={() =>
+                        setCheckedCookingIngredients((current) => ({
+                          ...current,
+                          [ingredient]: !current[ingredient],
+                        }))
+                      }
+                      className={`flex items-start gap-2 rounded-xl px-3 py-2 text-left transition ${
+                        checked
+                          ? "bg-[#dfeae1] text-[#356248]"
+                          : "bg-[#f6f3ec] hover:bg-[#eee9df]"
+                      }`}
+                    >
+                      <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-current text-[10px]">
+                        {checked ? "✓" : ""}
+                      </span>
+                      <span
+                        className={checked ? "line-through opacity-75" : ""}
+                      >
+                        {scaledIngredient}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-3 rounded-2xl border border-[#dedbd2] bg-white p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#829087]">
+                    Timer kuchenny
+                  </p>
+                  <p className="mt-1 font-serif text-3xl font-semibold">
+                    {formatTimer(cookingTimerSeconds)}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() =>
+                      setCookingTimerSeconds((current) => current + 60)
+                    }
+                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#356248]"
                   >
-                    <span className="mr-1 text-[#d26849]">•</span>
-                    {scaleIngredient(ingredient, servings / 2)}
-                  </li>
-                ))}
-              </ul>
+                    +1 min
+                  </button>
+                  <button
+                    onClick={() =>
+                      setCookingTimerSeconds((current) => current + 300)
+                    }
+                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#356248]"
+                  >
+                    +5 min
+                  </button>
+                  <button
+                    onClick={() =>
+                      setCookingTimerRunning((current) =>
+                        cookingTimerSeconds > 0 ? !current : false,
+                      )
+                    }
+                    disabled={cookingTimerSeconds === 0}
+                    className="h-10 rounded-xl bg-[#2f684f] px-3 text-xs font-semibold text-white disabled:opacity-40"
+                  >
+                    {cookingTimerRunning && cookingTimerSeconds > 0
+                      ? "Pauza"
+                      : "Start"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCookingTimerSeconds(0);
+                      setCookingTimerRunning(false);
+                    }}
+                    className="h-10 rounded-xl px-3 text-xs font-semibold text-[#9a6251] hover:bg-[#fff0e8]"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
             </div>
 
             {selectedRecipe.substitutions &&
@@ -2540,9 +2659,26 @@ export default function Home() {
               )}
 
             <div className="my-6 min-h-44 rounded-2xl bg-[#edf2ed] p-6 sm:p-8">
-              <span className="grid size-10 place-items-center rounded-full bg-[#2f684f] text-sm font-bold text-white">
-                {cookingStep + 1}
-              </span>
+              <div className="flex items-center justify-between gap-3">
+                <span className="grid size-10 place-items-center rounded-full bg-[#2f684f] text-sm font-bold text-white">
+                  {cookingStep + 1}
+                </span>
+                <button
+                  onClick={() =>
+                    setCheckedCookingSteps((current) => ({
+                      ...current,
+                      [cookingStep]: !current[cookingStep],
+                    }))
+                  }
+                  className={`rounded-xl px-3 py-2 text-xs font-semibold ${
+                    checkedCookingSteps[cookingStep]
+                      ? "bg-[#dfeae1] text-[#356248]"
+                      : "bg-white text-[#356248]"
+                  }`}
+                >
+                  {checkedCookingSteps[cookingStep] ? "✓ Zrobione" : "Odhacz krok"}
+                </button>
+              </div>
               <p className="mt-5 font-serif text-2xl leading-9 text-[#25322b] sm:text-3xl sm:leading-10">
                 {selectedRecipe.steps[cookingStep]}
               </p>
@@ -2555,6 +2691,24 @@ export default function Home() {
                   width: `${((cookingStep + 1) / selectedRecipe.steps.length) * 100}%`,
                 }}
               />
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {selectedRecipe.steps.map((step, index) => (
+                <button
+                  key={step}
+                  onClick={() => setCookingStep(index)}
+                  aria-label={`Przejdź do kroku ${index + 1}`}
+                  className={`grid size-9 place-items-center rounded-full text-xs font-bold transition ${
+                    cookingStep === index
+                      ? "bg-[#d66a49] text-white"
+                      : checkedCookingSteps[index]
+                        ? "bg-[#dfeae1] text-[#356248]"
+                        : "bg-[#eeeae2] text-[#59675f]"
+                  }`}
+                >
+                  {checkedCookingSteps[index] ? "✓" : index + 1}
+                </button>
+              ))}
             </div>
             <div className="mt-5 flex justify-between gap-3">
               <button
@@ -2569,6 +2723,10 @@ export default function Home() {
               {cookingStep === selectedRecipe.steps.length - 1 ? (
                 <button
                   onClick={() => {
+                    setCheckedCookingSteps((current) => ({
+                      ...current,
+                      [cookingStep]: true,
+                    }));
                     setCookingMode(false);
                     consumeRecipePantryItems(selectedRecipe);
                   }}
@@ -2578,11 +2736,15 @@ export default function Home() {
                 </button>
               ) : (
                 <button
-                  onClick={() =>
+                  onClick={() => {
+                    setCheckedCookingSteps((current) => ({
+                      ...current,
+                      [cookingStep]: true,
+                    }));
                     setCookingStep((current) =>
                       Math.min(selectedRecipe.steps.length - 1, current + 1),
-                    )
-                  }
+                    );
+                  }}
                   className="h-12 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
                 >
                   Następny →
