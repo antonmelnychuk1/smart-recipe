@@ -11,7 +11,7 @@ type AuthDialogProps = {
 };
 
 export function AuthDialog({ onClose }: AuthDialogProps) {
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -24,6 +24,37 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email"));
+
+    if (mode === "forgot") {
+      const response = await fetch("/api/auth/request-password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          redirectTo: "/reset-password",
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as {
+        error?: { message?: string };
+        message?: string;
+      } | null;
+
+      setIsPending(false);
+
+      if (!response.ok) {
+        setError(
+          result?.error?.message ??
+            "Nie udało się wysłać linku resetującego. Spróbuj ponownie.",
+        );
+        return;
+      }
+
+      setMessage(
+        "Jeśli konto z tym adresem istnieje, wysłaliśmy link do ustawienia nowego hasła.",
+      );
+      return;
+    }
+
     const password = String(formData.get("password"));
 
     const result =
@@ -67,7 +98,13 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       className="modal-safe-area fixed inset-0 z-[60] grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label={mode === "login" ? "Logowanie" : "Rejestracja"}
+      aria-label={
+        mode === "login"
+          ? "Logowanie"
+          : mode === "register"
+            ? "Rejestracja"
+            : "Odzyskiwanie hasła"
+      }
       onClick={onClose}
     >
       <div
@@ -80,8 +117,17 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
               SmartRecipe
             </p>
             <h2 className="mt-2 font-serif text-3xl font-semibold">
-              {mode === "login" ? "Witaj ponownie" : "Utwórz konto"}
+              {mode === "login"
+                ? "Witaj ponownie"
+                : mode === "register"
+                  ? "Utwórz konto"
+                  : "Odzyskaj hasło"}
             </h2>
+            {mode === "forgot" && (
+              <p className="mt-2 text-sm leading-6 text-[#68736b]">
+                Podaj e-mail konta, a wyślemy link do ustawienia nowego hasła.
+              </p>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -115,17 +161,21 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
               className="mt-2 h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
             />
           </label>
-          <label className="block text-sm font-semibold">
-            Hasło
-            <input
-              required
-              minLength={8}
-              type="password"
-              name="password"
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              className="mt-2 h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
-            />
-          </label>
+          {mode !== "forgot" && (
+            <label className="block text-sm font-semibold">
+              Hasło
+              <input
+                required
+                minLength={8}
+                type="password"
+                name="password"
+                autoComplete={
+                  mode === "login" ? "current-password" : "new-password"
+                }
+                className="mt-2 h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+              />
+            </label>
+          )}
 
           {error && (
             <p role="alert" className="rounded-xl bg-[#fff0eb] p-3 text-sm text-[#a44436]">
@@ -149,9 +199,24 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
               ? "Chwileczkę..."
               : mode === "login"
                 ? "Zaloguj się"
-                : "Załóż konto"}
+                : mode === "register"
+                  ? "Załóż konto"
+                  : "Wyślij link resetujący"}
           </button>
         </form>
+
+        {mode === "login" && (
+          <button
+            onClick={() => {
+              setMode("forgot");
+              setError("");
+              setMessage("");
+            }}
+            className="mt-4 w-full text-sm font-semibold text-[#2f684f] hover:text-[#244f3c]"
+          >
+            Nie pamiętasz hasła?
+          </button>
+        )}
 
         <button
           onClick={() => {
@@ -163,7 +228,9 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
         >
           {mode === "login"
             ? "Nie masz konta? Zarejestruj się"
-            : "Masz już konto? Zaloguj się"}
+            : mode === "register"
+              ? "Masz już konto? Zaloguj się"
+              : "Wróć do logowania"}
         </button>
       </div>
     </div>
