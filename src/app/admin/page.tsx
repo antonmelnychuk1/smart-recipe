@@ -9,6 +9,22 @@ export const dynamic = "force-dynamic";
 const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
 
+const feedbackLabels: Record<string, string> = {
+  liked: "👍 Super",
+  too_expensive: "Za drogie",
+  too_hard: "Za trudne",
+  too_caloric: "Za dużo kalorii",
+  bad_photo: "Zdjęcie nie pasuje",
+};
+
+const feedbackStyles: Record<string, string> = {
+  liked: "bg-[#e8efe9] text-[#356248]",
+  too_expensive: "bg-[#fff5df] text-[#9c6a16]",
+  too_hard: "bg-[#fff0e8] text-[#a45c45]",
+  too_caloric: "bg-[#f4ece8] text-[#8a5a43]",
+  bad_photo: "bg-[#edf1ec] text-[#536159]",
+};
+
 function startOfUtcDay() {
   const now = new Date();
   return new Date(
@@ -39,6 +55,8 @@ export default async function AdminPage() {
     totalFavorites,
     totalMealPlans,
     totalFeedback,
+    feedbackRows,
+    recentFeedback,
   ] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
@@ -74,6 +92,26 @@ export default async function AdminPage() {
     prisma.favorite.count(),
     prisma.mealPlan.count(),
     prisma.recipeFeedback.count(),
+    prisma.recipeFeedback.groupBy({
+      by: ["feedback"],
+      _count: { _all: true },
+    }),
+    prisma.recipeFeedback.findMany({
+      orderBy: { updatedAt: "desc" },
+      take: 8,
+      select: {
+        id: true,
+        recipeTitle: true,
+        feedback: true,
+        updatedAt: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    }),
   ]);
 
   const usageByUser = new Map<
@@ -113,6 +151,9 @@ export default async function AdminPage() {
   const activeToday = users.filter(
     (user) => (usageByUser.get(user.id)?.today ?? 0) > 0,
   ).length;
+  const feedbackCountByType = new Map(
+    feedbackRows.map((row) => [row.feedback, row._count._all]),
+  );
 
   return (
     <main className="min-h-screen bg-[#f7f4ed] px-4 py-5 text-[#25322b] sm:px-8 sm:py-8">
@@ -177,6 +218,104 @@ export default async function AdminPage() {
               <p className="mt-1 text-2xl font-bold text-[#365a46]">{value}</p>
             </article>
           ))}
+        </section>
+
+        <section className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
+                  Jakość przepisów
+                </p>
+                <h2 className="mt-1 font-serif text-2xl font-semibold">
+                  Feedback użytkowników
+                </h2>
+              </div>
+              <span className="rounded-full bg-[#eef2ec] px-3 py-1.5 text-xs font-bold text-[#356248]">
+                {totalFeedback} ocen
+              </span>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {Object.entries(feedbackLabels).map(([value, label]) => {
+                const count = feedbackCountByType.get(value) ?? 0;
+                const percentage =
+                  totalFeedback > 0
+                    ? Math.round((count / totalFeedback) * 100)
+                    : 0;
+
+                return (
+                  <div key={value}>
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                          feedbackStyles[value]
+                        }`}
+                      >
+                        {label}
+                      </span>
+                      <span className="font-semibold text-[#4f5e56]">
+                        {count} · {percentage}%
+                      </span>
+                    </div>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eeeae2]">
+                      <div
+                        className="h-full rounded-full bg-[#d26849]"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </article>
+
+          <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
+                  Ostatnie sygnały
+                </p>
+                <h2 className="mt-1 font-serif text-2xl font-semibold">
+                  Najnowsze oceny
+                </h2>
+              </div>
+            </div>
+
+            <div className="mt-5 divide-y divide-[#efede7]">
+              {recentFeedback.length === 0 ? (
+                <p className="rounded-2xl bg-[#faf8f3] p-4 text-sm text-[#68736b]">
+                  Brak ocen. Gdy użytkownicy zaczną klikać feedback przy
+                  przepisach, zobaczysz je tutaj.
+                </p>
+              ) : (
+                recentFeedback.map((item) => (
+                  <div
+                    key={item.id}
+                    className="grid gap-2 py-3 first:pt-0 last:pb-0 sm:grid-cols-[1fr_auto]"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">
+                        {item.recipeTitle}
+                      </p>
+                      <p className="mt-1 text-xs text-[#7a857e]">
+                        {item.user.name || item.user.email} ·{" "}
+                        {formatDate(item.updatedAt)}
+                      </p>
+                    </div>
+                    <span
+                      className={`w-fit rounded-full px-2.5 py-1 text-xs font-bold ${
+                        feedbackStyles[item.feedback] ??
+                        "bg-[#edf1ec] text-[#536159]"
+                      }`}
+                    >
+                      {feedbackLabels[item.feedback] ?? item.feedback}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </article>
         </section>
 
         <section className="mt-6 overflow-hidden rounded-[1.7rem] border border-[#dedbd2] bg-white shadow-sm sm:mt-10">
