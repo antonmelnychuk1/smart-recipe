@@ -33,7 +33,13 @@ export default async function AdminPage() {
   if (!admin) redirect("/");
 
   const today = startOfUtcDay();
-  const [users, usageRows, totalFavorites, totalMealPlans] = await Promise.all([
+  const [
+    users,
+    usageRows,
+    totalFavorites,
+    totalMealPlans,
+    totalFeedback,
+  ] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       select: {
@@ -52,6 +58,7 @@ export default async function AdminPage() {
             searches: true,
             shoppingItems: true,
             mealPlans: true,
+            feedbacks: true,
           },
         },
       },
@@ -66,6 +73,7 @@ export default async function AdminPage() {
     }),
     prisma.favorite.count(),
     prisma.mealPlan.count(),
+    prisma.recipeFeedback.count(),
   ]);
 
   const usageByUser = new Map<
@@ -149,10 +157,11 @@ export default async function AdminPage() {
           ))}
         </section>
 
-        <section className="mt-6 grid gap-4 sm:grid-cols-3">
+        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             ["Ulubione przepisy", totalFavorites],
             ["Zaplanowane posiłki", totalMealPlans],
+            ["Oceny przepisów", totalFeedback],
             [
               "Średnio na użytkownika",
               users.length
@@ -253,6 +262,7 @@ export default async function AdminPage() {
                       ["Łącznie", usage.total],
                       ["Ulubione", user._count.favorites],
                       ["Historia", user._count.searches],
+                      ["Feedback", user._count.feedbacks],
                       ["Plan", user._count.mealPlans],
                       ["Aktywność", formatDate(usage.lastActivity)],
                       ["Rejestracja", formatDate(user.createdAt)],
@@ -295,7 +305,7 @@ export default async function AdminPage() {
           </div>
 
           <div className="hidden overflow-x-auto 2xl:block">
-            <table className="w-full min-w-[1320px] border-collapse text-left text-sm">
+            <table className="w-full min-w-[1400px] border-collapse text-left text-sm">
               <thead className="bg-[#faf8f3] text-xs uppercase tracking-wider text-[#7b857f]">
                 <tr>
                   <th className="px-6 py-4">Użytkownik</th>
@@ -305,6 +315,7 @@ export default async function AdminPage() {
                   <th className="px-4 py-4">Łącznie</th>
                   <th className="px-4 py-4">Ulubione</th>
                   <th className="px-4 py-4">Historia</th>
+                  <th className="px-4 py-4">Feedback</th>
                   <th className="px-4 py-4">Plan</th>
                   <th className="px-4 py-4">Ostatnia aktywność</th>
                   <th className="px-6 py-4">Rejestracja</th>
@@ -377,6 +388,7 @@ export default async function AdminPage() {
                       <td className="px-4 py-4 font-semibold">{usage.total}</td>
                       <td className="px-4 py-4">{user._count.favorites}</td>
                       <td className="px-4 py-4">{user._count.searches}</td>
+                      <td className="px-4 py-4">{user._count.feedbacks}</td>
                       <td className="px-4 py-4">{user._count.mealPlans}</td>
                       <td className="px-4 py-4 text-xs text-[#68736b]">
                         {formatDate(usage.lastActivity)}

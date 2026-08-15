@@ -518,18 +518,21 @@ export default function Home() {
         history: SearchHistoryEntry[];
         shoppingList: string[];
         pantryItems: PantryItem[];
+        feedback: Record<string, RecipeFeedback>;
       };
 
       const remoteIsEmpty =
         remote.favorites.length === 0 &&
         remote.history.length === 0 &&
         remote.shoppingList.length === 0 &&
-        remote.pantryItems.length === 0;
+        remote.pantryItems.length === 0 &&
+        Object.keys(remote.feedback).length === 0;
       const localHasData =
         favorites.length > 0 ||
         history.length > 0 ||
         shoppingList.length > 0 ||
-        pantryItems.length > 0;
+        pantryItems.length > 0 ||
+        Object.keys(recipeFeedback).length > 0;
 
       if (remoteIsEmpty && localHasData) {
         await Promise.all([
@@ -563,6 +566,14 @@ export default function Home() {
               expiresAt: item.expiresAt,
             }),
           ),
+          ...Object.entries(recipeFeedback).map(([recipeKey, feedback]) =>
+            saveKitchenAction({
+              action: "feedback.set",
+              recipeKey,
+              recipeTitle: recipeKey,
+              feedback,
+            }),
+          ),
         ]);
         return;
       }
@@ -572,6 +583,7 @@ export default function Home() {
         setHistory(remote.history);
         setShoppingList(remote.shoppingList);
         setPantryItems(remote.pantryItems);
+        setRecipeFeedback(remote.feedback);
       }
     }
 
@@ -804,6 +816,20 @@ export default function Home() {
           ? "Dzięki! Zapisaliśmy, że ten przepis Ci pasuje."
           : "Dzięki za feedback. Przyda się do dalszych ulepszeń.",
     );
+
+    if (session?.user) {
+      void saveKitchenAction(
+        selectedAgain
+          ? { action: "feedback.remove", recipeKey: key }
+          : {
+              action: "feedback.set",
+              recipeKey: key,
+              recipeTitle: recipe.title,
+              feedback,
+              recipe,
+            },
+      );
+    }
   }
 
   function addToShoppingList(items: string[]) {

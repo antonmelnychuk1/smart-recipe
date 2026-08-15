@@ -393,7 +393,8 @@ export const ModelName = {
   ShoppingItem: 'ShoppingItem',
   PantryItem: 'PantryItem',
   GenerationUsage: 'GenerationUsage',
-  MealPlan: 'MealPlan'
+  MealPlan: 'MealPlan',
+  RecipeFeedback: 'RecipeFeedback'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "favorite" | "searchHistory" | "shoppingItem" | "pantryItem" | "generationUsage" | "mealPlan"
+    modelProps: "user" | "session" | "account" | "verification" | "favorite" | "searchHistory" | "shoppingItem" | "pantryItem" | "generationUsage" | "mealPlan" | "recipeFeedback"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1153,6 +1154,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RecipeFeedback: {
+      payload: Prisma.$RecipeFeedbackPayload<ExtArgs>
+      fields: Prisma.RecipeFeedbackFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RecipeFeedbackFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RecipeFeedbackFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>
+        }
+        findFirst: {
+          args: Prisma.RecipeFeedbackFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RecipeFeedbackFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>
+        }
+        findMany: {
+          args: Prisma.RecipeFeedbackFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>[]
+        }
+        create: {
+          args: Prisma.RecipeFeedbackCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>
+        }
+        createMany: {
+          args: Prisma.RecipeFeedbackCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RecipeFeedbackCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>[]
+        }
+        delete: {
+          args: Prisma.RecipeFeedbackDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>
+        }
+        update: {
+          args: Prisma.RecipeFeedbackUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>
+        }
+        deleteMany: {
+          args: Prisma.RecipeFeedbackDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RecipeFeedbackUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RecipeFeedbackUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>[]
+        }
+        upsert: {
+          args: Prisma.RecipeFeedbackUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecipeFeedbackPayload>
+        }
+        aggregate: {
+          args: Prisma.RecipeFeedbackAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRecipeFeedback>
+        }
+        groupBy: {
+          args: Prisma.RecipeFeedbackGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecipeFeedbackGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RecipeFeedbackCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecipeFeedbackCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1334,6 +1409,20 @@ export const MealPlanScalarFieldEnum = {
 export type MealPlanScalarFieldEnum = (typeof MealPlanScalarFieldEnum)[keyof typeof MealPlanScalarFieldEnum]
 
 
+export const RecipeFeedbackScalarFieldEnum = {
+  id: 'id',
+  recipeKey: 'recipeKey',
+  recipeTitle: 'recipeTitle',
+  feedback: 'feedback',
+  recipe: 'recipe',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type RecipeFeedbackScalarFieldEnum = (typeof RecipeFeedbackScalarFieldEnum)[keyof typeof RecipeFeedbackScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1347,6 +1436,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -1576,6 +1673,7 @@ export type GlobalOmitConfig = {
   pantryItem?: Prisma.PantryItemOmit
   generationUsage?: Prisma.GenerationUsageOmit
   mealPlan?: Prisma.MealPlanOmit
+  recipeFeedback?: Prisma.RecipeFeedbackOmit
 }
 
 /* Types for Logging */

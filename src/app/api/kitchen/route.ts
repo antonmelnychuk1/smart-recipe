@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { Recipe } from "@/lib/recipe-types";
+import type { Recipe, RecipeFeedback } from "@/lib/recipe-types";
 
 const recipeSchema = z.object({
   title: z.string(),
@@ -86,6 +86,23 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({
     action: z.literal("pantry.clear"),
   }),
+  z.object({
+    action: z.literal("feedback.set"),
+    recipeKey: z.string().trim().min(1).max(220),
+    recipeTitle: z.string().trim().min(1).max(200),
+    feedback: z.enum([
+      "liked",
+      "too_expensive",
+      "too_hard",
+      "too_caloric",
+      "bad_photo",
+    ]),
+    recipe: recipeSchema.optional(),
+  }),
+  z.object({
+    action: z.literal("feedback.remove"),
+    recipeKey: z.string().trim().min(1).max(220),
+  }),
 ]);
 
 async function getUserId() {
@@ -103,7 +120,8 @@ export async function GET() {
     return Response.json({ error: "Zaloguj się, aby pobrać dane." }, { status: 401 });
   }
 
-  const [favorites, history, shoppingItems, pantryItems] = await Promise.all([
+  const [favorites, history, shoppingItems, pantryItems, feedbackItems] =
+    await Promise.all([
     prisma.favorite.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -120,6 +138,11 @@ export async function GET() {
     prisma.pantryItem.findMany({
       where: { userId },
       orderBy: [{ expiresAt: "asc" }, { createdAt: "asc" }],
+    }),
+    prisma.recipeFeedback.findMany({
+      where: { userId },
+      orderBy: { updatedAt: "desc" },
+      select: { recipeKey: true, feedback: true },
     }),
   ]);
 
@@ -146,6 +169,12 @@ export async function GET() {
       quantity: item.quantity,
       expiresAt: item.expiresAt?.toISOString().slice(0, 10) ?? null,
     })),
+    feedback: Object.fromEntries(
+      feedbackItems.map((item) => [
+        item.recipeKey,
+        item.feedback as RecipeFeedback,
+      ]),
+    ),
   });
 }
 
@@ -257,6 +286,33 @@ export async function POST(request: Request) {
       break;
     case "pantry.clear":
       await prisma.pantryItem.deleteMany({ where: { userId } });
+      break;
+    case "feedback.set":
+      await prisma.recipeFeedback.upsert({
+        where: {
+          userId_recipeKey: {
+            userId,
+            recipeKey: data.recipeKey,
+          },
+        },
+        create: {
+          userId,
+          recipeKey: data.recipeKey,
+          recipeTitle: data.recipeTitle,
+          feedback: data.feedback,
+          recipe: data.recipe,
+        },
+        update: {
+          recipeTitle: data.recipeTitle,
+          feedback: data.feedback,
+          recipe: data.recipe,
+        },
+      });
+      break;
+    case "feedback.remove":
+      await prisma.recipeFeedback.deleteMany({
+        where: { userId, recipeKey: data.recipeKey },
+      });
       break;
   }
 

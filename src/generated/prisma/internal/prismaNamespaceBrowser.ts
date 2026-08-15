@@ -60,7 +60,8 @@ export const ModelName = {
   ShoppingItem: 'ShoppingItem',
   PantryItem: 'PantryItem',
   GenerationUsage: 'GenerationUsage',
-  MealPlan: 'MealPlan'
+  MealPlan: 'MealPlan',
+  RecipeFeedback: 'RecipeFeedback'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -221,6 +222,20 @@ export const MealPlanScalarFieldEnum = {
 export type MealPlanScalarFieldEnum = (typeof MealPlanScalarFieldEnum)[keyof typeof MealPlanScalarFieldEnum]
 
 
+export const RecipeFeedbackScalarFieldEnum = {
+  id: 'id',
+  recipeKey: 'recipeKey',
+  recipeTitle: 'recipeTitle',
+  feedback: 'feedback',
+  recipe: 'recipe',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId'
+} as const
+
+export type RecipeFeedbackScalarFieldEnum = (typeof RecipeFeedbackScalarFieldEnum)[keyof typeof RecipeFeedbackScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -234,6 +249,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
