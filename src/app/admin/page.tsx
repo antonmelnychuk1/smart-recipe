@@ -186,7 +186,7 @@ export default async function AdminPage() {
             </span>
           </div>
 
-          <div className="divide-y divide-[#efede7] xl:hidden">
+          <div className="grid gap-3 p-3 2xl:hidden sm:p-4 lg:grid-cols-2">
             {users.map((user) => {
               const usage = usageByUser.get(user.id) ?? {
                 total: 0,
@@ -195,22 +195,24 @@ export default async function AdminPage() {
               };
 
               return (
-                <article key={user.id} className="p-4 sm:p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-semibold">{user.name}</p>
-                      <p className="mt-1 truncate text-xs text-[#7a857e]">
-                        {user.email}
-                      </p>
+                <article
+                  key={user.id}
+                  className="rounded-[1.35rem] border border-[#ebe8e0] bg-[#fffdf8] p-4 shadow-sm sm:p-5"
+                >
+                  <div className="min-w-0">
+                    <div className="flex min-w-0 items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold">
+                          {user.name || "Bez nazwy"}
+                        </p>
+                        <p className="mt-1 break-all text-xs text-[#7a857e]">
+                          {user.email}
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8a948e] ring-1 ring-[#e3e0d7]">
+                        konto
+                      </span>
                     </div>
-                    <AdminUserActions
-                      userId={user.id}
-                      userName={user.name}
-                      role={user.role}
-                      banned={user.banned}
-                      dailyLimit={user.dailyLimit}
-                      isCurrentAdmin={user.id === admin.id}
-                    />
                   </div>
 
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -240,7 +242,7 @@ export default async function AdminPage() {
                     )}
                   </div>
 
-                  <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-4">
+                  <dl className="mt-4 grid grid-cols-2 gap-2 text-sm min-[520px]:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
                     {[
                       [
                         "Dzisiaj",
@@ -255,22 +257,44 @@ export default async function AdminPage() {
                       ["Aktywność", formatDate(usage.lastActivity)],
                       ["Rejestracja", formatDate(user.createdAt)],
                     ].map(([label, value]) => (
-                      <div key={label} className="min-w-0">
+                      <div
+                        key={label}
+                        className="min-w-0 rounded-xl bg-white p-3 ring-1 ring-[#eeeae2]"
+                      >
                         <dt className="text-[10px] font-bold uppercase tracking-wider text-[#929a94]">
                           {label}
                         </dt>
-                        <dd className="mt-1 text-xs font-semibold text-[#4f5e56]">
+                        <dd
+                          className={`mt-1 text-xs font-semibold ${
+                            label === "Dzisiaj" &&
+                            user.role !== "admin" &&
+                            usage.today >= user.dailyLimit
+                              ? "text-[#b04f3a]"
+                              : "text-[#4f5e56]"
+                          }`}
+                        >
                           {value}
                         </dd>
                       </div>
                     ))}
                   </dl>
+
+                  <div className="mt-4">
+                    <AdminUserActions
+                      userId={user.id}
+                      userName={user.name}
+                      role={user.role}
+                      banned={user.banned}
+                      dailyLimit={user.dailyLimit}
+                      isCurrentAdmin={user.id === admin.id}
+                    />
+                  </div>
                 </article>
               );
             })}
           </div>
 
-          <div className="hidden overflow-x-auto xl:block">
+          <div className="hidden overflow-x-auto 2xl:block">
             <table className="w-full min-w-[1320px] border-collapse text-left text-sm">
               <thead className="bg-[#faf8f3] text-xs uppercase tracking-wider text-[#7b857f]">
                 <tr>

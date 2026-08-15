@@ -54,7 +54,7 @@ export function AdminUserActions({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="whitespace-nowrap rounded-lg border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold"
+        className="w-full whitespace-nowrap rounded-xl border border-[#d8d7d0] bg-white px-3 py-2.5 text-xs font-semibold shadow-sm transition hover:-translate-y-0.5 hover:border-[#c9c3b8] hover:shadow-md sm:w-auto"
       >
         Zarządzaj
       </button>
