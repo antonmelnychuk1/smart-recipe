@@ -50,7 +50,35 @@ const goalOptions = [
   ["cheap", "Tanio"],
   ["healthy", "Zdrowiej"],
   ["high_protein", "Wysokobiałkowo"],
+  ["use_pantry", "Z tego co mam"],
 ];
+
+const dislikedPrefix = "nie lubię: ";
+
+function splitPreferenceItems(value: string) {
+  return value
+    .split(",")
+    .map((item) => item.trim().toLocaleLowerCase("pl"))
+    .filter(Boolean);
+}
+
+function splitStoredExcludedIngredients(items: string[] = []) {
+  const allergies: string[] = [];
+  const disliked: string[] = [];
+
+  for (const item of items) {
+    if (item.startsWith(dislikedPrefix)) {
+      disliked.push(item.slice(dislikedPrefix.length));
+    } else {
+      allergies.push(item);
+    }
+  }
+
+  return {
+    allergies: allergies.join(", "),
+    disliked: disliked.join(", "),
+  };
+}
 
 function deviceName(userAgent?: string | null) {
   if (!userAgent) return "Nieznane urządzenie";
@@ -91,6 +119,7 @@ export function AccountSettings() {
   const [defaultBudget, setDefaultBudget] = useState("0");
   const [cookingGoal, setCookingGoal] = useState("balanced");
   const [excludedIngredients, setExcludedIngredients] = useState("");
+  const [dislikedIngredients, setDislikedIngredients] = useState("");
   const [goalsPending, setGoalsPending] = useState(false);
   const [goalsMessage, setGoalsMessage] = useState("");
 
@@ -122,9 +151,11 @@ export function AccountSettings() {
             setDefaultMaxTime(String(data.defaultMaxTime ?? 0));
             setDefaultBudget(String(data.defaultBudget ?? 0));
             setCookingGoal(data.cookingGoal ?? "balanced");
-            setExcludedIngredients(
-              data.excludedIngredients?.join(", ") ?? "",
+            const storedPreferences = splitStoredExcludedIngredients(
+              data.excludedIngredients,
             );
+            setExcludedIngredients(storedPreferences.allergies);
+            setDislikedIngredients(storedPreferences.disliked);
           },
         );
     }, 0);
@@ -146,10 +177,12 @@ export function AccountSettings() {
         defaultMaxTime: Number(defaultMaxTime),
         defaultBudget: Number(defaultBudget),
         cookingGoal,
-        excludedIngredients: excludedIngredients
-          .split(",")
-          .map((item) => item.trim().toLocaleLowerCase("pl"))
-          .filter(Boolean),
+        excludedIngredients: [
+          ...splitPreferenceItems(excludedIngredients),
+          ...splitPreferenceItems(dislikedIngredients).map(
+            (item) => `${dislikedPrefix}${item}`,
+          ),
+        ],
       }),
     });
     const data = (await response.json()) as { error?: string };
@@ -236,12 +269,30 @@ export function AccountSettings() {
   return (
     <div className="mt-6 space-y-4 sm:mt-10 sm:space-y-6">
       <section className="rounded-[1.7rem] border border-[#ced9cf] bg-[#f8fbf7] p-4 shadow-sm sm:p-8">
-        <h2 className="font-serif text-2xl font-semibold">
-          Preferencje generowania
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-[#748078]">
-          AI wykorzysta je jako domyślne ustawienia przy układaniu przepisów.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+              Personalizacja
+            </p>
+            <h2 className="mt-1 font-serif text-2xl font-semibold">
+              Preferencje gotowania
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#748078]">
+              Te ustawienia będą automatycznie używane w generatorze składników
+              i w sekcji „Wpisz, co chcesz ugotować”.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white px-4 py-3 text-xs leading-5 text-[#68736b] shadow-sm ring-1 ring-[#e2eadf]">
+            <p>
+              <strong className="text-[#365a46]">Dieta:</strong> {defaultDiet}
+            </p>
+            <p>
+              <strong className="text-[#365a46]">Cel:</strong>{" "}
+              {goalOptions.find(([value]) => value === cookingGoal)?.[1] ??
+                "Zbalansowanie"}
+            </p>
+          </div>
+        </div>
         <form onSubmit={saveGoals} className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold">
             Domyślna dieta
@@ -322,7 +373,7 @@ export function AccountSettings() {
             />
           </label>
           <label className="text-sm font-semibold sm:col-span-2">
-            Produkty wykluczone / alergie
+            Alergie i składniki zakazane
             <input
               value={excludedIngredients}
               onChange={(event) => setExcludedIngredients(event.target.value)}
@@ -330,10 +381,33 @@ export function AccountSettings() {
               className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
             />
             <span className="mt-1 block text-xs font-normal leading-5 text-[#748078]">
-              Wpisz po przecinku. Generator będzie unikał tych składników w
-              przepisach i zamiennikach.
+              Wpisz po przecinku. Generator ma całkowicie unikać tych
+              składników w przepisach, krokach i zamiennikach.
             </span>
           </label>
+          <label className="text-sm font-semibold sm:col-span-2">
+            Produkty, których nie lubisz
+            <input
+              value={dislikedIngredients}
+              onChange={(event) => setDislikedIngredients(event.target.value)}
+              placeholder="np. kolendra, oliwki, pieczarki"
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            />
+            <span className="mt-1 block text-xs font-normal leading-5 text-[#748078]">
+              To nie musi być alergia — po prostu produkty, których aplikacja
+              ma nie proponować.
+            </span>
+          </label>
+          <div className="rounded-2xl bg-white p-4 text-xs leading-5 text-[#68736b] ring-1 ring-[#e2eadf] sm:col-span-2">
+            <p className="font-semibold text-[#365a46]">
+              Jak to wpłynie na generator?
+            </p>
+            <p className="mt-1">
+              Domyślna dieta, czas, budżet i cel ustawią się automatycznie na
+              stronie głównej. Alergie i nielubiane produkty będą przekazywane
+              do AI przy każdym generowaniu.
+            </p>
+          </div>
           <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
             <button
               disabled={goalsPending}

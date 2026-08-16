@@ -20,7 +20,7 @@ const ingredientsRequestSchema = z.object({
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
   cookingGoal: z
-    .enum(["balanced", "quick", "cheap", "healthy", "high_protein"])
+    .enum(["balanced", "quick", "cheap", "healthy", "high_protein", "use_pantry"])
     .default("balanced"),
   excludedIngredients: z
     .array(z.string().trim().min(1).max(60))
@@ -37,7 +37,7 @@ const dishRequestSchema = z.object({
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
   cookingGoal: z
-    .enum(["balanced", "quick", "cheap", "healthy", "high_protein"])
+    .enum(["balanced", "quick", "cheap", "healthy", "high_protein", "use_pantry"])
     .default("balanced"),
   excludedIngredients: z
     .array(z.string().trim().min(1).max(60))
@@ -124,14 +124,15 @@ export async function POST(request: Request) {
     cheap: "jak najniższy koszt",
     healthy: "zdrowszy, lekki skład",
     high_protein: "wysoka zawartość białka",
+    use_pantry: "maksymalne wykorzystanie produktów użytkownika",
   };
   const cookingGoalRequirement = `Priorytet użytkownika: ${
     goalLabels[requestData.cookingGoal]
   }.`;
   const excludedRequirement =
     requestData.excludedIngredients.length > 0
-      ? `Produkty wykluczone/alergie: ${requestData.excludedIngredients.join(", ")}. Nie używaj ich w składnikach, missing, krokach ani zamiennikach.`
-      : "Brak dodatkowych wykluczeń składników.";
+      ? `Produkty wykluczone, alergie lub nielubiane składniki: ${requestData.excludedIngredients.join(", ")}. Nie używaj ich w składnikach, missing, krokach ani zamiennikach.`
+      : "Brak dodatkowych wykluczeń i nielubianych składników.";
   const nutritionGoals = `Dzienne cele użytkownika: ${
     requestData.calorieTarget ? `${requestData.calorieTarget} kcal` : "brak celu kalorii"
   }, ${requestData.proteinTarget ? `${requestData.proteinTarget} g białka` : "brak celu białka"}.`;

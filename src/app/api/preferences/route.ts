@@ -9,7 +9,14 @@ const schema = z.object({
   defaultDiet: z.string().trim().min(1).max(60),
   defaultMaxTime: z.number().int().min(0).max(240),
   defaultBudget: z.number().int().min(0).max(1000),
-  cookingGoal: z.enum(["balanced", "quick", "cheap", "healthy", "high_protein"]),
+  cookingGoal: z.enum([
+    "balanced",
+    "quick",
+    "cheap",
+    "healthy",
+    "high_protein",
+    "use_pantry",
+  ]),
   excludedIngredients: z
     .array(z.string().trim().min(1).max(60))
     .max(30)
