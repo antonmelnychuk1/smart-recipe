@@ -298,7 +298,7 @@ export function MealPlanner({
   return (
     <section
       id="meal-planner"
-      className="scroll-mt-8 border-t border-[#e5e0d7] bg-[#faf8f3] px-4 py-12 sm:px-8 sm:py-20"
+      className="scroll-mt-8 border-t border-[#e5e0d7] bg-[#faf8f3] px-4 py-8 sm:px-8 sm:py-20"
     >
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap items-end justify-between gap-5">
@@ -351,32 +351,38 @@ export function MealPlanner({
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {[
-            ["Zaplanowane", `${entries.length}/21`, "posiłków"],
-            ["Śr. kalorie", averageCalories, "kcal / posiłek"],
-            ["Białko", `${weekSummary.protein} g`, "łącznie"],
-            ["Koszt", `${weekSummary.cost} zł`, "szacunkowo"],
-            ["Czas", `${weekSummary.time} min`, "gotowania"],
-          ].map(([label, value, hint]) => (
-            <article
-              key={label}
-              className="rounded-2xl border border-[#e1ddd4] bg-white p-4 shadow-sm"
-            >
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#8a948e]">
-                {label}
-              </p>
-              <p className="mt-2 font-serif text-3xl font-semibold">{value}</p>
-              <p className="mt-1 text-xs text-[#7a857e]">{hint}</p>
-            </article>
-          ))}
+        <div className="mt-5 overflow-x-auto pb-1 sm:mt-6">
+          <div className="grid min-w-[620px] grid-cols-5 gap-2 sm:min-w-0 sm:gap-3">
+            {[
+              ["Zaplanowane", `${entries.length}/21`, "posiłków"],
+              ["Śr. kalorie", averageCalories, "kcal / posiłek"],
+              ["Białko", `${weekSummary.protein} g`, "łącznie"],
+              ["Koszt", `${weekSummary.cost} zł`, "szacunkowo"],
+              ["Czas", `${weekSummary.time} min`, "gotowania"],
+            ].map(([label, value, hint]) => (
+              <article
+                key={label}
+                className="rounded-2xl border border-[#e1ddd4] bg-white p-3 shadow-sm sm:p-4"
+              >
+                <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-[#8a948e] sm:text-xs">
+                  {label}
+                </p>
+                <p className="mt-1 font-serif text-2xl font-semibold sm:mt-2 sm:text-3xl">
+                  {value}
+                </p>
+                <p className="mt-1 line-clamp-1 text-[0.68rem] text-[#7a857e] sm:text-xs">
+                  {hint}
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-7 pb-3 sm:mt-10">
-          <div className="grid gap-3 lg:grid-cols-7">
+        <div className="mt-5 overflow-x-auto pb-3 sm:mt-10">
+          <div className="grid min-w-[1050px] grid-cols-7 gap-3">
             {days.map((day, dayIndex) => (
               <div key={day} className="space-y-3">
-                <div className="flex items-center justify-between gap-2 rounded-xl bg-[#2f684f] px-3 py-3 text-white lg:block lg:text-center">
+                <div className="rounded-xl bg-[#2f684f] px-3 py-3 text-center text-white">
                   <div>
                     <p className="text-sm font-bold">{day}</p>
                     <p className="mt-0.5 text-xs text-white/70">
@@ -390,7 +396,7 @@ export function MealPlanner({
                   {entries.some((entry) => entry.day === dayIndex) && (
                     <button
                       onClick={() => clearDay(dayIndex)}
-                      className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-white/25"
+                      className="mt-2 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-white/25"
                     >
                       Wyczyść
                     </button>
@@ -405,7 +411,7 @@ export function MealPlanner({
                   return (
                     <div
                       key={meal.key}
-                      className="rounded-2xl border border-[#e1ddd4] bg-white p-3 shadow-sm lg:min-h-36"
+                      className="min-h-36 rounded-2xl border border-[#e1ddd4] bg-white p-3 shadow-sm"
                     >
                       <p className="text-[10px] font-bold uppercase tracking-wider text-[#929a94]">
                         {meal.label}
@@ -414,10 +420,10 @@ export function MealPlanner({
                         <div className="mt-3">
                           <button
                             onClick={() => onOpenRecipe(entry.recipe)}
-                            className="flex w-full items-center gap-3 text-left lg:block"
+                            className="block w-full text-left"
                           >
                             {entry.recipe.image ? (
-                              <span className="relative block size-16 shrink-0 overflow-hidden rounded-lg lg:h-16 lg:w-full">
+                              <span className="relative block h-16 overflow-hidden rounded-lg">
                                 <Image
                                   src={entry.recipe.image.url}
                                   alt={entry.recipe.image.alt}
@@ -431,14 +437,11 @@ export function MealPlanner({
                                 {entry.recipe.emoji}
                               </span>
                             )}
-                            <span className="min-w-0">
-                              <span className="break-anywhere block text-sm font-semibold leading-5 lg:mt-2">
-                                {entry.recipe.title}
-                              </span>
-                              <span className="mt-1 block text-xs text-[#7a857e]">
-                                {entry.recipe.time} min ·{" "}
-                                {entry.recipe.calories} kcal
-                              </span>
+                            <span className="break-anywhere mt-2 block text-sm font-semibold leading-5">
+                              {entry.recipe.title}
+                            </span>
+                            <span className="mt-1 block text-xs text-[#7a857e]">
+                              {entry.recipe.time} min · {entry.recipe.calories} kcal
                             </span>
                           </button>
                           <div className="mt-3 flex gap-2 text-xs font-semibold">
@@ -469,7 +472,7 @@ export function MealPlanner({
                               mealType: meal.key,
                             })
                           }
-                          className="mt-3 grid h-16 w-full place-items-center rounded-xl border border-dashed border-[#d5d4ce] text-2xl text-[#9aa49d] transition hover:border-[#75917f] hover:bg-[#f4f7f3] hover:text-[#3f6852] lg:h-24"
+                          className="mt-3 grid h-24 w-full place-items-center rounded-xl border border-dashed border-[#d5d4ce] text-2xl text-[#9aa49d] transition hover:border-[#75917f] hover:bg-[#f4f7f3] hover:text-[#3f6852]"
                           aria-label={`Dodaj: ${day}, ${meal.label}`}
                         >
                           +

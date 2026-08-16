@@ -1948,13 +1948,13 @@ export default function Home() {
 
       {session?.user && (
         <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-8 sm:pt-6">
-          <div className="rounded-2xl border border-[#dfe4dc] bg-white/85 p-3 shadow-[0_12px_36px_rgba(53,68,58,0.07)] backdrop-blur sm:p-4">
+          <div className="min-w-0 overflow-hidden rounded-2xl border border-[#dfe4dc] bg-white/85 p-3 shadow-[0_12px_36px_rgba(53,68,58,0.07)] backdrop-blur sm:p-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div>
+              <div className="min-w-0">
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#d26849]">
                   Panel użytkownika
                 </p>
-                <h2 className="mt-0.5 font-serif text-2xl font-semibold tracking-tight sm:text-3xl">
+                <h2 className="mt-0.5 truncate font-serif text-2xl font-semibold tracking-tight sm:text-3xl">
                   Cześć, {session.user.name}
                 </h2>
                 <p className="mt-1 hidden max-w-2xl text-xs leading-5 text-[#68736b] sm:block">
@@ -1962,50 +1962,52 @@ export default function Home() {
                   ostatnie przepisy w jednym miejscu.
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
                 <a
                   href="#generator"
-                  className="rounded-xl bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#275b44]"
+                  className="shrink-0 rounded-xl bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#275b44]"
                 >
                   Generuj przepis
                 </a>
                 <a
                   href="#my-kitchen"
-                  className="rounded-xl border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
+                  className="shrink-0 rounded-xl border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
                 >
                   Moja kuchnia
                 </a>
                 <Link
                   href="/recipes"
-                  className="rounded-xl border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
+                  className="shrink-0 rounded-xl border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
                 >
                   Zapisane
                 </Link>
               </div>
             </div>
 
-            <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
-              {dashboardCards.map((card) => (
-                <a
-                  key={card.label}
-                  href={card.href}
-                  className="rounded-xl border border-[#ebe7dd] bg-[#fbfaf6] p-3 transition hover:-translate-y-0.5 hover:border-[#cfdacf] hover:bg-white"
-                >
-                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-[#829087]">
-                    {card.label}
-                  </p>
-                  <p className="mt-1 font-serif text-2xl font-semibold leading-none text-[#25322b] sm:text-3xl">
-                    {card.value}
-                  </p>
-                  <p className="mt-1 line-clamp-1 text-[0.7rem] leading-4 text-[#748078]">
-                    {card.hint}
-                  </p>
-                </a>
-              ))}
+            <div className="-mx-3 mt-3 overflow-x-auto px-3 pb-1 sm:mx-0 sm:px-0">
+              <div className="grid min-w-[520px] grid-cols-4 gap-2 sm:min-w-0">
+                {dashboardCards.map((card) => (
+                  <a
+                    key={card.label}
+                    href={card.href}
+                    className="min-w-0 rounded-xl border border-[#ebe7dd] bg-[#fbfaf6] p-3 transition hover:-translate-y-0.5 hover:border-[#cfdacf] hover:bg-white"
+                  >
+                    <p className="truncate text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-[#829087]">
+                      {card.label}
+                    </p>
+                    <p className="mt-1 truncate font-serif text-2xl font-semibold leading-none text-[#25322b] sm:text-3xl">
+                      {card.value}
+                    </p>
+                    <p className="mt-1 truncate text-[0.7rem] leading-4 text-[#748078]">
+                      {card.hint}
+                    </p>
+                  </a>
+                ))}
+              </div>
             </div>
 
-            <div className="mt-2 grid gap-2 lg:grid-cols-[1.15fr_0.85fr]">
-              <div className="rounded-xl bg-[#eef6ef] p-3">
+            <div className="mt-2 hidden gap-2 sm:grid lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="min-w-0 rounded-xl bg-[#eef6ef] p-3">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-xs font-semibold text-[#365a46]">
@@ -2035,7 +2037,7 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="rounded-xl bg-[#fff5df] p-3">
+              <div className="min-w-0 rounded-xl bg-[#fff5df] p-3">
                 <p className="text-xs font-semibold text-[#795d2f]">
                   Wykorzystanie limitu
                 </p>
@@ -2069,7 +2071,7 @@ export default function Home() {
 
       <section
         id="generator"
-        className="relative mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20"
+        className="relative mx-auto max-w-7xl px-4 pb-8 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20"
       >
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />
         <div className="mx-auto max-w-3xl text-center">
@@ -2290,7 +2292,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-10 sm:px-8 sm:py-14">
+      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-8 sm:px-8 sm:py-14">
         <div className="mx-auto max-w-7xl grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
@@ -2393,7 +2395,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="results" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-12 sm:px-8 sm:py-20">
+      <section id="results" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-8 sm:px-8 sm:py-20">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
@@ -2629,17 +2631,17 @@ export default function Home() {
 
       <section
         id="my-kitchen"
-        className="scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] px-4 py-12 sm:px-8 sm:py-20"
+        className="scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] px-4 py-8 sm:px-8 sm:py-20"
       >
         <div className="mx-auto max-w-7xl">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
               Twój zapisany kącik
             </p>
-            <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-5xl">
               Moja kuchnia
             </h2>
-            <p className="mt-3 leading-7 text-[#748078]">
+            <p className="mt-2 text-sm leading-6 text-[#748078] sm:mt-3 sm:text-base sm:leading-7">
               {session?.user
                 ? "Twoje dane są zapisane na koncie i dostępne po ponownym zalogowaniu."
                 : "Dane są teraz lokalne. Zaloguj się, aby zapisać je na koncie i synchronizować."}
@@ -2654,24 +2656,26 @@ export default function Home() {
             )}
           </div>
 
-          <div className="mt-7 grid gap-3 sm:mt-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 gap-2 sm:mt-10 sm:gap-3 lg:grid-cols-4">
             {kitchenStats.map(([label, value, hint]) => (
               <div
                 key={label}
-                className="rounded-2xl border border-[#dedbd2] bg-white/80 p-4 shadow-sm"
+                className="min-w-0 rounded-2xl border border-[#dedbd2] bg-white/80 p-3 shadow-sm sm:p-4"
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#829087]">
+                <p className="truncate text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-[#829087] sm:text-xs sm:tracking-[0.14em]">
                   {label}
                 </p>
-                <p className="mt-2 font-serif text-3xl font-semibold text-[#25322b]">
+                <p className="mt-1 font-serif text-2xl font-semibold text-[#25322b] sm:mt-2 sm:text-3xl">
                   {value}
                 </p>
-                <p className="mt-1 text-xs leading-5 text-[#748078]">{hint}</p>
+                <p className="mt-1 line-clamp-1 text-[0.68rem] leading-4 text-[#748078] sm:text-xs sm:leading-5">
+                  {hint}
+                </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-7 sm:mt-10">
+          <div className="mt-5 sm:mt-10">
             <Pantry
               items={pantryItems}
               isSignedIn={Boolean(session?.user)}
@@ -2685,15 +2689,15 @@ export default function Home() {
             />
           </div>
 
-          <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-3">
-            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
+          <div className="mt-4 grid gap-3 sm:mt-6 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <article className="min-w-0 rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-2xl font-semibold">Ulubione</h3>
                 <span className="rounded-full bg-[#f7eee8] px-3 py-1 text-xs font-bold text-[#a45c45]">
                   {favorites.length}
                 </span>
               </div>
-              <div className="mt-5 space-y-3">
+              <div className="mt-4 max-h-[22rem] space-y-3 overflow-y-auto sm:mt-5">
                 {favorites.length > 0 ? (
                   favorites.map((recipe) => (
                     <div
@@ -2741,7 +2745,7 @@ export default function Home() {
               </div>
             </article>
 
-            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
+            <article className="min-w-0 rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="font-serif text-2xl font-semibold">Historia</h3>
                 <div className="flex items-center gap-3">
@@ -2768,7 +2772,7 @@ export default function Home() {
                   )}
                 </div>
               </div>
-              <div className="mt-5 space-y-3">
+              <div className="mt-4 max-h-[22rem] space-y-3 overflow-y-auto sm:mt-5">
                 {history.length > 0 ? (
                   history.slice(0, 5).map((entry) => (
                     <button
@@ -2802,7 +2806,7 @@ export default function Home() {
               </div>
             </article>
 
-            <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
+            <article className="min-w-0 rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6 md:col-span-2 lg:col-span-1">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h3 className="font-serif text-2xl font-semibold">
