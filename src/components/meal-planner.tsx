@@ -207,6 +207,27 @@ export function MealPlanner({
     }
   }
 
+  function clearDay(day: number) {
+    const dayEntries = entries.filter((entry) => entry.day === day);
+    if (dayEntries.length === 0) return;
+
+    const nextEntries = entries.filter((entry) => entry.day !== day);
+    persist(nextEntries);
+
+    if (isSignedIn) {
+      for (const entry of dayEntries) {
+        void saveRemote({
+          action: "remove",
+          weekStart,
+          day: entry.day,
+          mealType: entry.mealType,
+        });
+      }
+    }
+
+    setPlannerMessage(`Wyczyszczono dzień: ${days[day]}.`);
+  }
+
   function clearWeek() {
     if (entries.length === 0) return;
     if (!window.confirm("Wyczyścić cały plan posiłków dla tego tygodnia?")) {
@@ -271,6 +292,8 @@ export function MealPlanner({
     }),
     { calories: 0, protein: 0, cost: 0, time: 0 },
   );
+  const averageCalories =
+    entries.length > 0 ? Math.round(weekSummary.calories / entries.length) : 0;
 
   return (
     <section
@@ -331,7 +354,7 @@ export function MealPlanner({
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {[
             ["Zaplanowane", `${entries.length}/21`, "posiłków"],
-            ["Kalorie", weekSummary.calories, "kcal łącznie"],
+            ["Śr. kalorie", averageCalories, "kcal / posiłek"],
             ["Białko", `${weekSummary.protein} g`, "łącznie"],
             ["Koszt", `${weekSummary.cost} zł`, "szacunkowo"],
             ["Czas", `${weekSummary.time} min`, "gotowania"],
@@ -349,19 +372,29 @@ export function MealPlanner({
           ))}
         </div>
 
-        <div className="mt-7 overflow-x-auto pb-3 sm:mt-10">
-          <div className="grid min-w-[1050px] grid-cols-7 gap-3">
+        <div className="mt-7 pb-3 sm:mt-10">
+          <div className="grid gap-3 lg:grid-cols-7">
             {days.map((day, dayIndex) => (
               <div key={day} className="space-y-3">
-                <div className="rounded-xl bg-[#2f684f] px-3 py-3 text-center text-white">
-                  <p className="text-sm font-bold">{day}</p>
-                  <p className="mt-0.5 text-xs text-white/70">
-                    {new Date(
-                      week.getFullYear(),
-                      week.getMonth(),
-                      week.getDate() + dayIndex,
-                    ).getDate()}
-                  </p>
+                <div className="flex items-center justify-between gap-2 rounded-xl bg-[#2f684f] px-3 py-3 text-white lg:block lg:text-center">
+                  <div>
+                    <p className="text-sm font-bold">{day}</p>
+                    <p className="mt-0.5 text-xs text-white/70">
+                      {new Date(
+                        week.getFullYear(),
+                        week.getMonth(),
+                        week.getDate() + dayIndex,
+                      ).getDate()}
+                    </p>
+                  </div>
+                  {entries.some((entry) => entry.day === dayIndex) && (
+                    <button
+                      onClick={() => clearDay(dayIndex)}
+                      className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-white/25"
+                    >
+                      Wyczyść
+                    </button>
+                  )}
                 </div>
                 {mealTypes.map((meal) => {
                   const entry = entries.find(
@@ -372,7 +405,7 @@ export function MealPlanner({
                   return (
                     <div
                       key={meal.key}
-                      className="min-h-36 rounded-2xl border border-[#e1ddd4] bg-white p-3 shadow-sm"
+                      className="rounded-2xl border border-[#e1ddd4] bg-white p-3 shadow-sm lg:min-h-36"
                     >
                       <p className="text-[10px] font-bold uppercase tracking-wider text-[#929a94]">
                         {meal.label}
@@ -381,10 +414,10 @@ export function MealPlanner({
                         <div className="mt-3">
                           <button
                             onClick={() => onOpenRecipe(entry.recipe)}
-                            className="block w-full text-left"
+                            className="flex w-full items-center gap-3 text-left lg:block"
                           >
                             {entry.recipe.image ? (
-                              <span className="relative block h-16 overflow-hidden rounded-lg">
+                              <span className="relative block size-16 shrink-0 overflow-hidden rounded-lg lg:h-16 lg:w-full">
                                 <Image
                                   src={entry.recipe.image.url}
                                   alt={entry.recipe.image.alt}
@@ -398,11 +431,14 @@ export function MealPlanner({
                                 {entry.recipe.emoji}
                               </span>
                             )}
-                            <span className="break-anywhere mt-2 block text-sm font-semibold leading-5">
-                              {entry.recipe.title}
-                            </span>
-                            <span className="mt-1 block text-xs text-[#7a857e]">
-                              {entry.recipe.time} min
+                            <span className="min-w-0">
+                              <span className="break-anywhere block text-sm font-semibold leading-5 lg:mt-2">
+                                {entry.recipe.title}
+                              </span>
+                              <span className="mt-1 block text-xs text-[#7a857e]">
+                                {entry.recipe.time} min ·{" "}
+                                {entry.recipe.calories} kcal
+                              </span>
                             </span>
                           </button>
                           <div className="mt-3 flex gap-2 text-xs font-semibold">
@@ -433,7 +469,7 @@ export function MealPlanner({
                               mealType: meal.key,
                             })
                           }
-                          className="mt-3 grid h-24 w-full place-items-center rounded-xl border border-dashed border-[#d5d4ce] text-2xl text-[#9aa49d] transition hover:border-[#75917f] hover:bg-[#f4f7f3] hover:text-[#3f6852]"
+                          className="mt-3 grid h-16 w-full place-items-center rounded-xl border border-dashed border-[#d5d4ce] text-2xl text-[#9aa49d] transition hover:border-[#75917f] hover:bg-[#f4f7f3] hover:text-[#3f6852] lg:h-24"
                           aria-label={`Dodaj: ${day}, ${meal.label}`}
                         >
                           +
