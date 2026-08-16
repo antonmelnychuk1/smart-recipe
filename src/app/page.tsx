@@ -377,6 +377,11 @@ export default function Home() {
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [shoppingInput, setShoppingInput] = useState("");
+  const [shoppingFilter, setShoppingFilter] = useState<
+    "all" | "pending" | "bought"
+  >("pending");
+  const [editingShoppingItem, setEditingShoppingItem] = useState("");
+  const [editingShoppingValue, setEditingShoppingValue] = useState("");
   const [recipeFeedback, setRecipeFeedback] = useState<
     Record<string, RecipeFeedback>
   >({});
@@ -740,6 +745,37 @@ export default function Home() {
   );
   const pendingShoppingCount = shoppingList.filter((item) => !item.checked).length;
   const boughtShoppingCount = shoppingList.length - pendingShoppingCount;
+  const visibleShoppingCount =
+    shoppingFilter === "all"
+      ? shoppingList.length
+      : shoppingFilter === "bought"
+        ? boughtShoppingCount
+        : pendingShoppingCount;
+  const shoppingSections = [
+    {
+      key: "pending",
+      title: "Do kupienia",
+      count: pendingShoppingCount,
+      groups: groupedShoppingList,
+      checked: false,
+    },
+    {
+      key: "bought",
+      title: "Kupione",
+      count: boughtShoppingCount,
+      groups: groupedBoughtShoppingList,
+      checked: true,
+    },
+  ].filter(
+    (section) =>
+      shoppingFilter === "all" ||
+      (shoppingFilter === "pending" && section.key === "pending") ||
+      (shoppingFilter === "bought" && section.key === "bought"),
+  );
+  const shoppingCategorySummary = groupedShoppingList.map((group) => ({
+    name: group.name,
+    count: group.items.length,
+  }));
   const feedbackCount = Object.keys(recipeFeedback).length;
   const generatedRecipeCount = history.reduce(
     (sum, entry) => sum + entry.recipes.length,
@@ -1084,6 +1120,61 @@ export default function Home() {
         checked,
       });
     }
+  }
+
+  function startEditingShoppingItem(item: string) {
+    setEditingShoppingItem(item);
+    setEditingShoppingValue(item);
+  }
+
+  function cancelEditingShoppingItem() {
+    setEditingShoppingItem("");
+    setEditingShoppingValue("");
+  }
+
+  function saveEditedShoppingItem() {
+    const oldLabel = editingShoppingItem;
+    const newLabel = normalizeShoppingItem(editingShoppingValue);
+    if (!oldLabel || !newLabel) {
+      cancelEditingShoppingItem();
+      return;
+    }
+
+    if (oldLabel.toLocaleLowerCase("pl") === newLabel.toLocaleLowerCase("pl")) {
+      cancelEditingShoppingItem();
+      return;
+    }
+
+    const oldItem = shoppingList.find((item) => item.label === oldLabel);
+    setShoppingList((current) => {
+      const exists = current.some(
+        (item) =>
+          item.label.toLocaleLowerCase("pl") === newLabel.toLocaleLowerCase("pl"),
+      );
+
+      if (exists) {
+        return current.filter((item) => item.label !== oldLabel);
+      }
+
+      return current.map((item) =>
+        item.label === oldLabel ? { ...item, label: newLabel } : item,
+      );
+    });
+
+    if (session?.user) {
+      void saveKitchenAction({
+        action: "shopping.rename",
+        oldLabel,
+        newLabel,
+      });
+    }
+
+    cancelEditingShoppingItem();
+    setToast(
+      oldItem
+        ? `Zmieniono: ${oldItem.label} → ${newLabel}`
+        : "Produkt został zmieniony.",
+    );
   }
 
   function moveShoppingItemToPantry(item: string) {
@@ -2605,9 +2696,14 @@ export default function Home() {
 
             <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="font-serif text-2xl font-semibold">
-                  Lista zakupów
-                </h3>
+                <div>
+                  <h3 className="font-serif text-2xl font-semibold">
+                    Lista zakupów
+                  </h3>
+                  <p className="mt-1 text-xs text-[#7a857e]">
+                    {visibleShoppingCount} widocznych · {shoppingList.length} łącznie
+                  </p>
+                </div>
                 {shoppingList.length > 0 && (
                   <div className="flex flex-wrap items-center gap-2">
                     <button
@@ -2665,21 +2761,73 @@ export default function Home() {
                   Dodaj
                 </button>
               </form>
+
+              {shoppingList.length > 0 && (
+                <>
+                  <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-[#f4f1e9] p-1.5 text-xs font-semibold">
+                    {[
+                      ["pending", `Do kupienia (${pendingShoppingCount})`],
+                      ["bought", `Kupione (${boughtShoppingCount})`],
+                      ["all", `Wszystko (${shoppingList.length})`],
+                    ].map(([value, label]) => (
+                      <button
+                        key={value}
+                        onClick={() =>
+                          setShoppingFilter(value as typeof shoppingFilter)
+                        }
+                        className={`rounded-xl px-2 py-2 transition ${
+                          shoppingFilter === value
+                            ? "bg-white text-[#2f684f] shadow-sm"
+                            : "text-[#68736b] hover:bg-white/60"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {shoppingCategorySummary.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {shoppingCategorySummary.map((category) => (
+                        <span
+                          key={category.name}
+                          className="rounded-full bg-[#f8f6f0] px-2.5 py-1 text-[0.68rem] font-bold text-[#68736b] ring-1 ring-[#eeeae2]"
+                        >
+                          {category.name}: {category.count}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
               <div className="mt-5 space-y-4">
                 {shoppingList.length > 0 ? (
-                  <>
-                    <div className="rounded-2xl border border-[#eeeae2] bg-[#fffdf8] p-3">
+                  shoppingSections.map((section) => (
+                    <div
+                      key={section.key}
+                      className={`rounded-2xl border p-3 ${
+                        section.checked
+                          ? "border-[#dfeae1] bg-[#f4faf5]"
+                          : "border-[#eeeae2] bg-[#fffdf8]"
+                      }`}
+                    >
                       <div className="mb-3 flex items-center justify-between gap-3 px-1">
-                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#7a857e]">
-                          Do kupienia
+                        <p
+                          className={`text-xs font-bold uppercase tracking-[0.14em] ${
+                            section.checked ? "text-[#356248]" : "text-[#7a857e]"
+                          }`}
+                        >
+                          {section.title}
                         </p>
-                        <span className="rounded-full bg-[#edf3ee] px-2 py-0.5 text-[11px] font-bold text-[#356248]">
-                          {pendingShoppingCount}
+                        <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-[#356248]">
+                          {section.count}
                         </span>
                       </div>
-                      {pendingShoppingCount > 0 ? (
+
+                      {section.count > 0 ? (
                         <div className="space-y-4">
-                          {groupedShoppingList.map((group) => (
+                          {section.groups.map((group) => (
                             <div key={group.name}>
                               <div className="mb-2 flex items-center justify-between gap-3 px-1">
                                 <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#9aa29d]">
@@ -2693,35 +2841,108 @@ export default function Home() {
                                 {group.items.map((item) => (
                                   <div
                                     key={item}
-                                    className="flex items-center gap-3 rounded-xl bg-[#faf8f3] p-3 text-sm transition hover:bg-[#f2eee5]"
+                                    className={`rounded-xl p-3 text-sm transition ${
+                                      section.checked
+                                        ? "bg-white ring-1 ring-[#dfeae1]"
+                                        : "bg-[#faf8f3] hover:bg-[#f2eee5]"
+                                    }`}
                                   >
-                                    <input
-                                      type="checkbox"
-                                      aria-label={`Oznacz ${item} jako kupione`}
-                                      checked={false}
-                                      onChange={(event) =>
-                                        toggleShoppingItem(
-                                          item,
-                                          event.currentTarget.checked,
-                                        )
-                                      }
-                                      className="size-4 shrink-0 accent-[#356248]"
-                                    />
-                                    <span className="break-anywhere min-w-0 flex-1">
-                                      {item}
-                                    </span>
-                                    <button
-                                      onClick={() => moveShoppingItemToPantry(item)}
-                                      className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
-                                    >
-                                      Do spiżarni
-                                    </button>
-                                    <button
-                                      onClick={() => removeShoppingItem(item)}
-                                      className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#9a6251] transition hover:bg-[#fff0e8]"
-                                    >
-                                      Usuń
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        type="checkbox"
+                                        aria-label={
+                                          section.checked
+                                            ? `Cofnij oznaczenie ${item}`
+                                            : `Oznacz ${item} jako kupione`
+                                        }
+                                        checked={section.checked}
+                                        onChange={(event) =>
+                                          toggleShoppingItem(
+                                            item,
+                                            event.currentTarget.checked,
+                                          )
+                                        }
+                                        className="size-4 shrink-0 accent-[#356248]"
+                                      />
+
+                                      {editingShoppingItem === item ? (
+                                        <input
+                                          value={editingShoppingValue}
+                                          onChange={(event) =>
+                                            setEditingShoppingValue(
+                                              event.target.value,
+                                            )
+                                          }
+                                          onKeyDown={(event) => {
+                                            if (event.key === "Enter") {
+                                              event.preventDefault();
+                                              saveEditedShoppingItem();
+                                            }
+                                            if (event.key === "Escape") {
+                                              cancelEditingShoppingItem();
+                                            }
+                                          }}
+                                          autoFocus
+                                          className="min-w-0 flex-1 rounded-lg border border-[#dedfd9] bg-white px-2 py-1.5 text-sm outline-none focus:border-[#71927e]"
+                                        />
+                                      ) : (
+                                        <span
+                                          className={`break-anywhere min-w-0 flex-1 ${
+                                            section.checked
+                                              ? "text-[#65736a] line-through"
+                                              : ""
+                                          }`}
+                                        >
+                                          {item}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <div className="mt-2 flex flex-wrap justify-end gap-1.5">
+                                      {editingShoppingItem === item ? (
+                                        <>
+                                          <button
+                                            onClick={saveEditedShoppingItem}
+                                            className="rounded-lg bg-[#2f684f] px-2 py-1.5 text-[11px] font-semibold text-white"
+                                          >
+                                            Zapisz
+                                          </button>
+                                          <button
+                                            onClick={cancelEditingShoppingItem}
+                                            className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#7a857e] transition hover:bg-white"
+                                          >
+                                            Anuluj
+                                          </button>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <button
+                                            onClick={() =>
+                                              startEditingShoppingItem(item)
+                                            }
+                                            className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#68736b] transition hover:bg-white"
+                                          >
+                                            Edytuj
+                                          </button>
+                                          <button
+                                            onClick={() =>
+                                              moveShoppingItemToPantry(item)
+                                            }
+                                            className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
+                                          >
+                                            Do spiżarni
+                                          </button>
+                                          <button
+                                            onClick={() =>
+                                              removeShoppingItem(item)
+                                            }
+                                            className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#9a6251] transition hover:bg-[#fff0e8]"
+                                          >
+                                            Usuń
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
                                 ))}
                               </div>
@@ -2730,63 +2951,13 @@ export default function Home() {
                         </div>
                       ) : (
                         <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
-                          Wszystko z listy jest oznaczone jako kupione.
+                          {section.checked
+                            ? "Nie masz jeszcze kupionych produktów."
+                            : "Wszystko z listy jest oznaczone jako kupione."}
                         </p>
                       )}
                     </div>
-
-                    {boughtShoppingCount > 0 && (
-                      <div className="rounded-2xl border border-[#dfeae1] bg-[#f4faf5] p-3">
-                        <div className="mb-3 flex items-center justify-between gap-3 px-1">
-                          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#356248]">
-                            Kupione
-                          </p>
-                          <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-[#356248]">
-                            {boughtShoppingCount}
-                          </span>
-                        </div>
-                        <div className="space-y-3">
-                          {groupedBoughtShoppingList.map((group) => (
-                            <div key={group.name}>
-                              <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#7a857e]">
-                                {group.name}
-                              </p>
-                              <div className="space-y-2">
-                                {group.items.map((item) => (
-                                  <div
-                                    key={item}
-                                    className="flex items-center gap-3 rounded-xl bg-white p-3 text-sm ring-1 ring-[#dfeae1]"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      aria-label={`Cofnij oznaczenie ${item}`}
-                                      checked
-                                      onChange={(event) =>
-                                        toggleShoppingItem(
-                                          item,
-                                          event.currentTarget.checked,
-                                        )
-                                      }
-                                      className="size-4 shrink-0 accent-[#356248]"
-                                    />
-                                    <span className="break-anywhere min-w-0 flex-1 text-[#65736a] line-through">
-                                      {item}
-                                    </span>
-                                    <button
-                                      onClick={() => moveShoppingItemToPantry(item)}
-                                      className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
-                                    >
-                                      Do spiżarni
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
+                  ))
                 ) : (
                   <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
                     Dodaj produkt ręcznie albo przenieś brakujące składniki z

@@ -76,6 +76,11 @@ const actionSchema = z.discriminatedUnion("action", [
     checked: z.boolean(),
   }),
   z.object({
+    action: z.literal("shopping.rename"),
+    oldLabel: z.string().trim().min(1).max(80),
+    newLabel: z.string().trim().min(1).max(80),
+  }),
+  z.object({
     action: z.literal("shopping.clear"),
   }),
   z.object({
@@ -273,6 +278,26 @@ export async function POST(request: Request) {
       await prisma.shoppingItem.updateMany({
         where: { userId, label: data.label },
         data: { checked: data.checked },
+      });
+      break;
+    case "shopping.rename":
+      await prisma.$transaction(async (tx) => {
+        const existing = await tx.shoppingItem.findUnique({
+          where: { userId_label: { userId, label: data.newLabel } },
+          select: { id: true },
+        });
+
+        if (existing) {
+          await tx.shoppingItem.deleteMany({
+            where: { userId, label: data.oldLabel },
+          });
+          return;
+        }
+
+        await tx.shoppingItem.updateMany({
+          where: { userId, label: data.oldLabel },
+          data: { label: data.newLabel },
+        });
       });
       break;
     case "shopping.clear":
