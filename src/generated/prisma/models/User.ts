@@ -30,12 +30,16 @@ export type UserAvgAggregateOutputType = {
   dailyLimit: number | null
   calorieTarget: number | null
   proteinTarget: number | null
+  defaultMaxTime: number | null
+  defaultBudget: number | null
 }
 
 export type UserSumAggregateOutputType = {
   dailyLimit: number | null
   calorieTarget: number | null
   proteinTarget: number | null
+  defaultMaxTime: number | null
+  defaultBudget: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -49,6 +53,11 @@ export type UserMinAggregateOutputType = {
   dailyLimit: number | null
   calorieTarget: number | null
   proteinTarget: number | null
+  defaultDiet: string | null
+  defaultMaxTime: number | null
+  defaultBudget: number | null
+  cookingGoal: string | null
+  preferencesCompleted: boolean | null
   emailVerified: boolean | null
   image: string | null
   createdAt: Date | null
@@ -66,6 +75,11 @@ export type UserMaxAggregateOutputType = {
   dailyLimit: number | null
   calorieTarget: number | null
   proteinTarget: number | null
+  defaultDiet: string | null
+  defaultMaxTime: number | null
+  defaultBudget: number | null
+  cookingGoal: string | null
+  preferencesCompleted: boolean | null
   emailVerified: boolean | null
   image: string | null
   createdAt: Date | null
@@ -83,6 +97,12 @@ export type UserCountAggregateOutputType = {
   dailyLimit: number
   calorieTarget: number
   proteinTarget: number
+  defaultDiet: number
+  defaultMaxTime: number
+  defaultBudget: number
+  cookingGoal: number
+  excludedIngredients: number
+  preferencesCompleted: number
   emailVerified: number
   image: number
   createdAt: number
@@ -95,12 +115,16 @@ export type UserAvgAggregateInputType = {
   dailyLimit?: true
   calorieTarget?: true
   proteinTarget?: true
+  defaultMaxTime?: true
+  defaultBudget?: true
 }
 
 export type UserSumAggregateInputType = {
   dailyLimit?: true
   calorieTarget?: true
   proteinTarget?: true
+  defaultMaxTime?: true
+  defaultBudget?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -114,6 +138,11 @@ export type UserMinAggregateInputType = {
   dailyLimit?: true
   calorieTarget?: true
   proteinTarget?: true
+  defaultDiet?: true
+  defaultMaxTime?: true
+  defaultBudget?: true
+  cookingGoal?: true
+  preferencesCompleted?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -131,6 +160,11 @@ export type UserMaxAggregateInputType = {
   dailyLimit?: true
   calorieTarget?: true
   proteinTarget?: true
+  defaultDiet?: true
+  defaultMaxTime?: true
+  defaultBudget?: true
+  cookingGoal?: true
+  preferencesCompleted?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -148,6 +182,12 @@ export type UserCountAggregateInputType = {
   dailyLimit?: true
   calorieTarget?: true
   proteinTarget?: true
+  defaultDiet?: true
+  defaultMaxTime?: true
+  defaultBudget?: true
+  cookingGoal?: true
+  excludedIngredients?: true
+  preferencesCompleted?: true
   emailVerified?: true
   image?: true
   createdAt?: true
@@ -252,6 +292,12 @@ export type UserGroupByOutputType = {
   dailyLimit: number
   calorieTarget: number | null
   proteinTarget: number | null
+  defaultDiet: string
+  defaultMaxTime: number
+  defaultBudget: number
+  cookingGoal: string
+  excludedIngredients: string[]
+  preferencesCompleted: boolean
   emailVerified: boolean
   image: string | null
   createdAt: Date
@@ -292,6 +338,12 @@ export type UserWhereInput = {
   dailyLimit?: Prisma.IntFilter<"User"> | number
   calorieTarget?: Prisma.IntNullableFilter<"User"> | number | null
   proteinTarget?: Prisma.IntNullableFilter<"User"> | number | null
+  defaultDiet?: Prisma.StringFilter<"User"> | string
+  defaultMaxTime?: Prisma.IntFilter<"User"> | number
+  defaultBudget?: Prisma.IntFilter<"User"> | number
+  cookingGoal?: Prisma.StringFilter<"User"> | string
+  excludedIngredients?: Prisma.StringNullableListFilter<"User">
+  preferencesCompleted?: Prisma.BoolFilter<"User"> | boolean
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -317,6 +369,12 @@ export type UserOrderByWithRelationInput = {
   dailyLimit?: Prisma.SortOrder
   calorieTarget?: Prisma.SortOrderInput | Prisma.SortOrder
   proteinTarget?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultDiet?: Prisma.SortOrder
+  defaultMaxTime?: Prisma.SortOrder
+  defaultBudget?: Prisma.SortOrder
+  cookingGoal?: Prisma.SortOrder
+  excludedIngredients?: Prisma.SortOrder
+  preferencesCompleted?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -345,6 +403,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   dailyLimit?: Prisma.IntFilter<"User"> | number
   calorieTarget?: Prisma.IntNullableFilter<"User"> | number | null
   proteinTarget?: Prisma.IntNullableFilter<"User"> | number | null
+  defaultDiet?: Prisma.StringFilter<"User"> | string
+  defaultMaxTime?: Prisma.IntFilter<"User"> | number
+  defaultBudget?: Prisma.IntFilter<"User"> | number
+  cookingGoal?: Prisma.StringFilter<"User"> | string
+  excludedIngredients?: Prisma.StringNullableListFilter<"User">
+  preferencesCompleted?: Prisma.BoolFilter<"User"> | boolean
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -370,6 +434,12 @@ export type UserOrderByWithAggregationInput = {
   dailyLimit?: Prisma.SortOrder
   calorieTarget?: Prisma.SortOrderInput | Prisma.SortOrder
   proteinTarget?: Prisma.SortOrderInput | Prisma.SortOrder
+  defaultDiet?: Prisma.SortOrder
+  defaultMaxTime?: Prisma.SortOrder
+  defaultBudget?: Prisma.SortOrder
+  cookingGoal?: Prisma.SortOrder
+  excludedIngredients?: Prisma.SortOrder
+  preferencesCompleted?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -395,6 +465,12 @@ export type UserScalarWhereWithAggregatesInput = {
   dailyLimit?: Prisma.IntWithAggregatesFilter<"User"> | number
   calorieTarget?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   proteinTarget?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
+  defaultDiet?: Prisma.StringWithAggregatesFilter<"User"> | string
+  defaultMaxTime?: Prisma.IntWithAggregatesFilter<"User"> | number
+  defaultBudget?: Prisma.IntWithAggregatesFilter<"User"> | number
+  cookingGoal?: Prisma.StringWithAggregatesFilter<"User"> | string
+  excludedIngredients?: Prisma.StringNullableListFilter<"User">
+  preferencesCompleted?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -412,6 +488,12 @@ export type UserCreateInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -437,6 +519,12 @@ export type UserUncheckedCreateInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -462,6 +550,12 @@ export type UserUpdateInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -487,6 +581,12 @@ export type UserUncheckedUpdateInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -512,6 +612,12 @@ export type UserCreateManyInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -529,6 +635,12 @@ export type UserUpdateManyMutationInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -546,10 +658,24 @@ export type UserUncheckedUpdateManyInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -563,6 +689,12 @@ export type UserCountOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
   calorieTarget?: Prisma.SortOrder
   proteinTarget?: Prisma.SortOrder
+  defaultDiet?: Prisma.SortOrder
+  defaultMaxTime?: Prisma.SortOrder
+  defaultBudget?: Prisma.SortOrder
+  cookingGoal?: Prisma.SortOrder
+  excludedIngredients?: Prisma.SortOrder
+  preferencesCompleted?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -573,6 +705,8 @@ export type UserAvgOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
   calorieTarget?: Prisma.SortOrder
   proteinTarget?: Prisma.SortOrder
+  defaultMaxTime?: Prisma.SortOrder
+  defaultBudget?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -586,6 +720,11 @@ export type UserMaxOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
   calorieTarget?: Prisma.SortOrder
   proteinTarget?: Prisma.SortOrder
+  defaultDiet?: Prisma.SortOrder
+  defaultMaxTime?: Prisma.SortOrder
+  defaultBudget?: Prisma.SortOrder
+  cookingGoal?: Prisma.SortOrder
+  preferencesCompleted?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -603,6 +742,11 @@ export type UserMinOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
   calorieTarget?: Prisma.SortOrder
   proteinTarget?: Prisma.SortOrder
+  defaultDiet?: Prisma.SortOrder
+  defaultMaxTime?: Prisma.SortOrder
+  defaultBudget?: Prisma.SortOrder
+  cookingGoal?: Prisma.SortOrder
+  preferencesCompleted?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -613,11 +757,17 @@ export type UserSumOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
   calorieTarget?: Prisma.SortOrder
   proteinTarget?: Prisma.SortOrder
+  defaultMaxTime?: Prisma.SortOrder
+  defaultBudget?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserCreateexcludedIngredientsInput = {
+  set: string[]
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -650,6 +800,11 @@ export type NullableIntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type UserUpdateexcludedIngredientsInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -779,6 +934,12 @@ export type UserCreateWithoutSessionsInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -803,6 +964,12 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -843,6 +1010,12 @@ export type UserUpdateWithoutSessionsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -867,6 +1040,12 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -891,6 +1070,12 @@ export type UserCreateWithoutAccountsInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -915,6 +1100,12 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -955,6 +1146,12 @@ export type UserUpdateWithoutAccountsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -979,6 +1176,12 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1003,6 +1206,12 @@ export type UserCreateWithoutFavoritesInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1027,6 +1236,12 @@ export type UserUncheckedCreateWithoutFavoritesInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1067,6 +1282,12 @@ export type UserUpdateWithoutFavoritesInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1091,6 +1312,12 @@ export type UserUncheckedUpdateWithoutFavoritesInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1115,6 +1342,12 @@ export type UserCreateWithoutSearchesInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1139,6 +1372,12 @@ export type UserUncheckedCreateWithoutSearchesInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1179,6 +1418,12 @@ export type UserUpdateWithoutSearchesInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1203,6 +1448,12 @@ export type UserUncheckedUpdateWithoutSearchesInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1227,6 +1478,12 @@ export type UserCreateWithoutShoppingItemsInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1251,6 +1508,12 @@ export type UserUncheckedCreateWithoutShoppingItemsInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1291,6 +1554,12 @@ export type UserUpdateWithoutShoppingItemsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1315,6 +1584,12 @@ export type UserUncheckedUpdateWithoutShoppingItemsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1339,6 +1614,12 @@ export type UserCreateWithoutPantryItemsInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1363,6 +1644,12 @@ export type UserUncheckedCreateWithoutPantryItemsInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1403,6 +1690,12 @@ export type UserUpdateWithoutPantryItemsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1427,6 +1720,12 @@ export type UserUncheckedUpdateWithoutPantryItemsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1451,6 +1750,12 @@ export type UserCreateWithoutMealPlansInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1475,6 +1780,12 @@ export type UserUncheckedCreateWithoutMealPlansInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1515,6 +1826,12 @@ export type UserUpdateWithoutMealPlansInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1539,6 +1856,12 @@ export type UserUncheckedUpdateWithoutMealPlansInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1563,6 +1886,12 @@ export type UserCreateWithoutFeedbacksInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1587,6 +1916,12 @@ export type UserUncheckedCreateWithoutFeedbacksInput = {
   dailyLimit?: number
   calorieTarget?: number | null
   proteinTarget?: number | null
+  defaultDiet?: string
+  defaultMaxTime?: number
+  defaultBudget?: number
+  cookingGoal?: string
+  excludedIngredients?: Prisma.UserCreateexcludedIngredientsInput | string[]
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: string | null
   createdAt?: Date | string
@@ -1627,6 +1962,12 @@ export type UserUpdateWithoutFeedbacksInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1651,6 +1992,12 @@ export type UserUncheckedUpdateWithoutFeedbacksInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   calorieTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   proteinTarget?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  defaultDiet?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultMaxTime?: Prisma.IntFieldUpdateOperationsInput | number
+  defaultBudget?: Prisma.IntFieldUpdateOperationsInput | number
+  cookingGoal?: Prisma.StringFieldUpdateOperationsInput | string
+  excludedIngredients?: Prisma.UserUpdateexcludedIngredientsInput | string[]
+  preferencesCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1769,6 +2116,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   dailyLimit?: boolean
   calorieTarget?: boolean
   proteinTarget?: boolean
+  defaultDiet?: boolean
+  defaultMaxTime?: boolean
+  defaultBudget?: boolean
+  cookingGoal?: boolean
+  excludedIngredients?: boolean
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1795,6 +2148,12 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   dailyLimit?: boolean
   calorieTarget?: boolean
   proteinTarget?: boolean
+  defaultDiet?: boolean
+  defaultMaxTime?: boolean
+  defaultBudget?: boolean
+  cookingGoal?: boolean
+  excludedIngredients?: boolean
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1812,6 +2171,12 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   dailyLimit?: boolean
   calorieTarget?: boolean
   proteinTarget?: boolean
+  defaultDiet?: boolean
+  defaultMaxTime?: boolean
+  defaultBudget?: boolean
+  cookingGoal?: boolean
+  excludedIngredients?: boolean
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
@@ -1829,13 +2194,19 @@ export type UserSelectScalar = {
   dailyLimit?: boolean
   calorieTarget?: boolean
   proteinTarget?: boolean
+  defaultDiet?: boolean
+  defaultMaxTime?: boolean
+  defaultBudget?: boolean
+  cookingGoal?: boolean
+  excludedIngredients?: boolean
+  preferencesCompleted?: boolean
   emailVerified?: boolean
   image?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "role" | "banned" | "banReason" | "banExpires" | "dailyLimit" | "calorieTarget" | "proteinTarget" | "emailVerified" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "role" | "banned" | "banReason" | "banExpires" | "dailyLimit" | "calorieTarget" | "proteinTarget" | "defaultDiet" | "defaultMaxTime" | "defaultBudget" | "cookingGoal" | "excludedIngredients" | "preferencesCompleted" | "emailVerified" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
@@ -1873,6 +2244,12 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     dailyLimit: number
     calorieTarget: number | null
     proteinTarget: number | null
+    defaultDiet: string
+    defaultMaxTime: number
+    defaultBudget: number
+    cookingGoal: string
+    excludedIngredients: string[]
+    preferencesCompleted: boolean
     emailVerified: boolean
     image: string | null
     createdAt: Date
@@ -2318,6 +2695,12 @@ export interface UserFieldRefs {
   readonly dailyLimit: Prisma.FieldRef<"User", 'Int'>
   readonly calorieTarget: Prisma.FieldRef<"User", 'Int'>
   readonly proteinTarget: Prisma.FieldRef<"User", 'Int'>
+  readonly defaultDiet: Prisma.FieldRef<"User", 'String'>
+  readonly defaultMaxTime: Prisma.FieldRef<"User", 'Int'>
+  readonly defaultBudget: Prisma.FieldRef<"User", 'Int'>
+  readonly cookingGoal: Prisma.FieldRef<"User", 'String'>
+  readonly excludedIngredients: Prisma.FieldRef<"User", 'String[]'>
+  readonly preferencesCompleted: Prisma.FieldRef<"User", 'Boolean'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>

@@ -329,6 +329,9 @@ export default function Home() {
   const [desiredDishBudget, setDesiredDishBudget] = useState("0");
   const [calorieTarget, setCalorieTarget] = useState<number | null>(null);
   const [proteinTarget, setProteinTarget] = useState<number | null>(null);
+  const [cookingGoal, setCookingGoal] = useState("balanced");
+  const [excludedIngredients, setExcludedIngredients] = useState<string[]>([]);
+  const [preferencesCompleted, setPreferencesCompleted] = useState(true);
   const [desiredDishLoading, setDesiredDishLoading] = useState(false);
   const [desiredDishError, setDesiredDishError] = useState("");
   const [sharePending, setSharePending] = useState(false);
@@ -621,9 +624,29 @@ export default function Home() {
     if (!session?.user) return;
     fetch("/api/preferences")
       .then((response) => response.json())
-      .then((data: { calorieTarget?: number | null; proteinTarget?: number | null }) => {
+      .then((data: {
+        calorieTarget?: number | null;
+        proteinTarget?: number | null;
+        defaultDiet?: string;
+        defaultMaxTime?: number;
+        defaultBudget?: number;
+        cookingGoal?: string;
+        excludedIngredients?: string[];
+        preferencesCompleted?: boolean;
+      }) => {
         setCalorieTarget(data.calorieTarget ?? null);
         setProteinTarget(data.proteinTarget ?? null);
+        setCookingGoal(data.cookingGoal ?? "balanced");
+        setExcludedIngredients(data.excludedIngredients ?? []);
+        setPreferencesCompleted(data.preferencesCompleted ?? true);
+        if (data.defaultDiet) {
+          setDiet(data.defaultDiet);
+          setDesiredDishDiet(data.defaultDiet);
+        }
+        setMaxTime(String(data.defaultMaxTime ?? 0));
+        setDesiredDishMaxTime(String(data.defaultMaxTime ?? 0));
+        setMaxBudget(String(data.defaultBudget ?? 0));
+        setDesiredDishBudget(String(data.defaultBudget ?? 0));
       });
   }, [session?.user]);
 
@@ -1104,6 +1127,8 @@ export default function Home() {
           maxBudget: Number(maxBudget),
           calorieTarget,
           proteinTarget,
+          cookingGoal,
+          excludedIngredients,
         }),
       });
       const data = (await response.json()) as {
@@ -1211,6 +1236,8 @@ export default function Home() {
           maxBudget: Number(desiredDishBudget),
           calorieTarget,
           proteinTarget,
+          cookingGoal,
+          excludedIngredients,
         }),
       });
       const data = (await response.json()) as {
@@ -1521,6 +1548,28 @@ export default function Home() {
             >
               Zobacz produkty
             </a>
+          </div>
+        </div>
+      )}
+
+      {session?.user && !preferencesCompleted && (
+        <div className="border-y border-[#d6e2d8] bg-[#eef6ef] px-4 py-3 sm:px-8">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-[#365a46]">
+                Ustaw preferencje gotowania
+              </p>
+              <p className="mt-0.5 text-xs leading-5 text-[#68736b]">
+                Dieta, budżet, czas i wykluczone składniki będą automatycznie
+                używane przy generowaniu przepisów.
+              </p>
+            </div>
+            <Link
+              href="/settings"
+              className="rounded-lg bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white"
+            >
+              Uzupełnij teraz
+            </Link>
           </div>
         </div>
       )}

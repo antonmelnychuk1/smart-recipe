@@ -6,6 +6,14 @@ import { prisma } from "@/lib/prisma";
 const schema = z.object({
   calorieTarget: z.number().int().min(800).max(6000).nullable(),
   proteinTarget: z.number().int().min(20).max(400).nullable(),
+  defaultDiet: z.string().trim().min(1).max(60),
+  defaultMaxTime: z.number().int().min(0).max(240),
+  defaultBudget: z.number().int().min(0).max(1000),
+  cookingGoal: z.enum(["balanced", "quick", "cheap", "healthy", "high_protein"]),
+  excludedIngredients: z
+    .array(z.string().trim().min(1).max(60))
+    .max(30)
+    .default([]),
 });
 
 async function getUserId() {
@@ -19,7 +27,16 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { calorieTarget: true, proteinTarget: true },
+    select: {
+      calorieTarget: true,
+      proteinTarget: true,
+      defaultDiet: true,
+      defaultMaxTime: true,
+      defaultBudget: true,
+      cookingGoal: true,
+      excludedIngredients: true,
+      preferencesCompleted: true,
+    },
   });
   return Response.json(user);
 }
@@ -35,8 +52,20 @@ export async function PATCH(request: Request) {
 
   const user = await prisma.user.update({
     where: { id: userId },
-    data: parsed.data,
-    select: { calorieTarget: true, proteinTarget: true },
+    data: {
+      ...parsed.data,
+      preferencesCompleted: true,
+    },
+    select: {
+      calorieTarget: true,
+      proteinTarget: true,
+      defaultDiet: true,
+      defaultMaxTime: true,
+      defaultBudget: true,
+      cookingGoal: true,
+      excludedIngredients: true,
+      preferencesCompleted: true,
+    },
   });
   return Response.json(user);
 }

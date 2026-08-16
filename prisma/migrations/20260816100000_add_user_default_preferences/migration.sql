@@ -1,0 +1,7 @@
+ALTER TABLE "user"
+ADD COLUMN "defaultDiet" TEXT NOT NULL DEFAULT 'Bez ograniczeń',
+ADD COLUMN "defaultMaxTime" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN "defaultBudget" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN "cookingGoal" TEXT NOT NULL DEFAULT 'balanced',
+ADD COLUMN "excludedIngredients" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "preferencesCompleted" BOOLEAN NOT NULL DEFAULT false;

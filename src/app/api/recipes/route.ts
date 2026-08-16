@@ -19,6 +19,13 @@ const ingredientsRequestSchema = z.object({
   maxBudget: z.number().int().min(0).max(1000),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
+  cookingGoal: z
+    .enum(["balanced", "quick", "cheap", "healthy", "high_protein"])
+    .default("balanced"),
+  excludedIngredients: z
+    .array(z.string().trim().min(1).max(60))
+    .max(30)
+    .default([]),
 });
 
 const dishRequestSchema = z.object({
@@ -29,6 +36,13 @@ const dishRequestSchema = z.object({
   maxBudget: z.number().int().min(0).max(1000),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
+  cookingGoal: z
+    .enum(["balanced", "quick", "cheap", "healthy", "high_protein"])
+    .default("balanced"),
+  excludedIngredients: z
+    .array(z.string().trim().min(1).max(60))
+    .max(30)
+    .default([]),
 });
 
 const requestSchema = z.union([ingredientsRequestSchema, dishRequestSchema]);
@@ -104,6 +118,20 @@ export async function POST(request: Request) {
     requestData.maxBudget === 0
       ? "Bez ograniczeń budżetowych"
       : `Maksymalnie ${requestData.maxBudget} zł za 2 porcje`;
+  const goalLabels: Record<typeof requestData.cookingGoal, string> = {
+    balanced: "zbalansowany posiłek",
+    quick: "jak najszybsze przygotowanie",
+    cheap: "jak najniższy koszt",
+    healthy: "zdrowszy, lekki skład",
+    high_protein: "wysoka zawartość białka",
+  };
+  const cookingGoalRequirement = `Priorytet użytkownika: ${
+    goalLabels[requestData.cookingGoal]
+  }.`;
+  const excludedRequirement =
+    requestData.excludedIngredients.length > 0
+      ? `Produkty wykluczone/alergie: ${requestData.excludedIngredients.join(", ")}. Nie używaj ich w składnikach, missing, krokach ani zamiennikach.`
+      : "Brak dodatkowych wykluczeń składników.";
   const nutritionGoals = `Dzienne cele użytkownika: ${
     requestData.calorieTarget ? `${requestData.calorieTarget} kcal` : "brak celu kalorii"
   }, ${requestData.proteinTarget ? `${requestData.proteinTarget} g białka` : "brak celu białka"}.`;
@@ -121,6 +149,8 @@ export async function POST(request: Request) {
 Dieta: ${diet}
 Czas przygotowania: ${timeRequirement}
 Budżet: ${budgetRequirement}
+${cookingGoalRequirement}
+${excludedRequirement}
 ${nutritionGoals}
 
 Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tylko czyste nazwy produktów do kupienia bez ilości i jednostek, a pole match ustaw na 0.`;
@@ -135,6 +165,8 @@ Produkty z krótką datą ważności, które należy wykorzystać w pierwszej ko
 Dieta: ${diet}
 Czas przygotowania: ${timeRequirement}
 Budżet: ${budgetRequirement}
+${cookingGoalRequirement}
+${excludedRequirement}
 ${nutritionGoals}
 
 Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Jeśli podano produkty z krótką datą ważności, wykorzystaj je w możliwie wielu propozycjach. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;

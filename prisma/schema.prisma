@@ -8,28 +8,34 @@ datasource db {
 }
 
 model User {
-  id            String           @id
-  name          String
-  email         String           @unique
-  role          String           @default("user")
-  banned        Boolean          @default(false)
-  banReason     String?
-  banExpires    DateTime?
-  dailyLimit    Int              @default(20)
-  calorieTarget Int?
-  proteinTarget Int?
-  emailVerified Boolean          @default(false)
-  image         String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  favorites     Favorite[]
-  searches      SearchHistory[]
-  shoppingItems ShoppingItem[]
-  pantryItems   PantryItem[]
-  mealPlans     MealPlan[]
-  feedbacks     RecipeFeedback[]
+  id                   String           @id
+  name                 String
+  email                String           @unique
+  role                 String           @default("user")
+  banned               Boolean          @default(false)
+  banReason            String?
+  banExpires           DateTime?
+  dailyLimit           Int              @default(20)
+  calorieTarget        Int?
+  proteinTarget        Int?
+  defaultDiet          String           @default("Bez ograniczeń")
+  defaultMaxTime       Int              @default(0)
+  defaultBudget        Int              @default(0)
+  cookingGoal          String           @default("balanced")
+  excludedIngredients  String[]         @default([])
+  preferencesCompleted Boolean          @default(false)
+  emailVerified        Boolean          @default(false)
+  image                String?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  sessions             Session[]
+  accounts             Account[]
+  favorites            Favorite[]
+  searches             SearchHistory[]
+  shoppingItems        ShoppingItem[]
+  pantryItems          PantryItem[]
+  mealPlans            MealPlan[]
+  feedbacks            RecipeFeedback[]
 
   @@map("user")
 }

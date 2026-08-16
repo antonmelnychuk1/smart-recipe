@@ -11,6 +11,47 @@ type AccountSession = {
   userAgent?: string | null;
 };
 
+const dietOptions = [
+  "Bez ograniczeń",
+  "Wegetariańska",
+  "Wegańska",
+  "Pescetariańska",
+  "Bezglutenowa",
+  "Bez laktozy",
+  "Ketogeniczna",
+  "Niskowęglowodanowa",
+  "Śródziemnomorska",
+  "Wysokobiałkowa",
+];
+
+const timeOptions = [
+  ["0", "Bez ograniczeń"],
+  ["15", "do 15 minut"],
+  ["20", "do 20 minut"],
+  ["30", "do 30 minut"],
+  ["45", "do 45 minut"],
+  ["60", "do 60 minut"],
+  ["90", "do 90 minut"],
+  ["120", "do 120 minut"],
+];
+
+const budgetOptions = [
+  ["0", "Bez ograniczeń"],
+  ["15", "do 15 zł"],
+  ["25", "do 25 zł"],
+  ["40", "do 40 zł"],
+  ["60", "do 60 zł"],
+  ["100", "do 100 zł"],
+];
+
+const goalOptions = [
+  ["balanced", "Zbalansowanie"],
+  ["quick", "Szybko"],
+  ["cheap", "Tanio"],
+  ["healthy", "Zdrowiej"],
+  ["high_protein", "Wysokobiałkowo"],
+];
+
 function deviceName(userAgent?: string | null) {
   if (!userAgent) return "Nieznane urządzenie";
 
@@ -45,6 +86,11 @@ export function AccountSettings() {
   const [confirmation, setConfirmation] = useState("");
   const [calorieTarget, setCalorieTarget] = useState("");
   const [proteinTarget, setProteinTarget] = useState("");
+  const [defaultDiet, setDefaultDiet] = useState("Bez ograniczeń");
+  const [defaultMaxTime, setDefaultMaxTime] = useState("0");
+  const [defaultBudget, setDefaultBudget] = useState("0");
+  const [cookingGoal, setCookingGoal] = useState("balanced");
+  const [excludedIngredients, setExcludedIngredients] = useState("");
   const [goalsPending, setGoalsPending] = useState(false);
   const [goalsMessage, setGoalsMessage] = useState("");
 
@@ -64,9 +110,21 @@ export function AccountSettings() {
           (data: {
             calorieTarget?: number | null;
             proteinTarget?: number | null;
+            defaultDiet?: string;
+            defaultMaxTime?: number;
+            defaultBudget?: number;
+            cookingGoal?: string;
+            excludedIngredients?: string[];
           }) => {
             setCalorieTarget(data.calorieTarget?.toString() ?? "");
             setProteinTarget(data.proteinTarget?.toString() ?? "");
+            setDefaultDiet(data.defaultDiet ?? "Bez ograniczeń");
+            setDefaultMaxTime(String(data.defaultMaxTime ?? 0));
+            setDefaultBudget(String(data.defaultBudget ?? 0));
+            setCookingGoal(data.cookingGoal ?? "balanced");
+            setExcludedIngredients(
+              data.excludedIngredients?.join(", ") ?? "",
+            );
           },
         );
     }, 0);
@@ -84,11 +142,21 @@ export function AccountSettings() {
       body: JSON.stringify({
         calorieTarget: calorieTarget ? Number(calorieTarget) : null,
         proteinTarget: proteinTarget ? Number(proteinTarget) : null,
+        defaultDiet,
+        defaultMaxTime: Number(defaultMaxTime),
+        defaultBudget: Number(defaultBudget),
+        cookingGoal,
+        excludedIngredients: excludedIngredients
+          .split(",")
+          .map((item) => item.trim().toLocaleLowerCase("pl"))
+          .filter(Boolean),
       }),
     });
     const data = (await response.json()) as { error?: string };
     setGoalsPending(false);
-    setGoalsMessage(response.ok ? "Cele zostały zapisane." : data.error ?? "Błąd zapisu.");
+    setGoalsMessage(
+      response.ok ? "Preferencje zostały zapisane." : data.error ?? "Błąd zapisu.",
+    );
   }
 
   async function changePassword(event: FormEvent<HTMLFormElement>) {
@@ -168,11 +236,67 @@ export function AccountSettings() {
   return (
     <div className="mt-6 space-y-4 sm:mt-10 sm:space-y-6">
       <section className="rounded-[1.7rem] border border-[#ced9cf] bg-[#f8fbf7] p-4 shadow-sm sm:p-8">
-        <h2 className="font-serif text-2xl font-semibold">Cele żywieniowe</h2>
+        <h2 className="font-serif text-2xl font-semibold">
+          Preferencje generowania
+        </h2>
         <p className="mt-2 text-sm leading-6 text-[#748078]">
-          AI wykorzysta je jako wskazówkę przy układaniu przepisów.
+          AI wykorzysta je jako domyślne ustawienia przy układaniu przepisów.
         </p>
         <form onSubmit={saveGoals} className="mt-5 grid gap-4 sm:grid-cols-2">
+          <label className="text-sm font-semibold">
+            Domyślna dieta
+            <select
+              value={defaultDiet}
+              onChange={(event) => setDefaultDiet(event.target.value)}
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            >
+              {dietOptions.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-semibold">
+            Cel gotowania
+            <select
+              value={cookingGoal}
+              onChange={(event) => setCookingGoal(event.target.value)}
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            >
+              {goalOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-semibold">
+            Domyślny budżet
+            <select
+              value={defaultBudget}
+              onChange={(event) => setDefaultBudget(event.target.value)}
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            >
+              {budgetOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-semibold">
+            Domyślny czas
+            <select
+              value={defaultMaxTime}
+              onChange={(event) => setDefaultMaxTime(event.target.value)}
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            >
+              {timeOptions.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="text-sm font-semibold">
             Kalorie dziennie
             <input
@@ -197,12 +321,25 @@ export function AccountSettings() {
               className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
             />
           </label>
+          <label className="text-sm font-semibold sm:col-span-2">
+            Produkty wykluczone / alergie
+            <input
+              value={excludedIngredients}
+              onChange={(event) => setExcludedIngredients(event.target.value)}
+              placeholder="np. orzechy, krewetki, seler"
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            />
+            <span className="mt-1 block text-xs font-normal leading-5 text-[#748078]">
+              Wpisz po przecinku. Generator będzie unikał tych składników w
+              przepisach i zamiennikach.
+            </span>
+          </label>
           <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
             <button
               disabled={goalsPending}
               className="h-11 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white disabled:opacity-50"
             >
-              {goalsPending ? "Zapisuję..." : "Zapisz cele"}
+              {goalsPending ? "Zapisuję..." : "Zapisz preferencje"}
             </button>
             {goalsMessage && <p className="text-sm text-[#59675f]">{goalsMessage}</p>}
           </div>
