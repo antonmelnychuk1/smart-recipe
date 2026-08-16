@@ -148,15 +148,37 @@ export function Pantry({
   const [expiresAt, setExpiresAt] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState("Wszystkie");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "urgent" | "expired" | "no-date"
+  >("all");
+  const [sortBy, setSortBy] = useState<"expiry" | "name" | "category">(
+    "expiry",
+  );
 
   const sortedItems = useMemo(
-    () =>
-      [...items].sort((first, second) => {
+    () => {
+      const sortableItems = [...items];
+
+      return sortableItems.sort((first, second) => {
+        if (sortBy === "name") {
+          return first.label.localeCompare(second.label, "pl");
+        }
+        if (sortBy === "category") {
+          return getPantryCategory(first.label).localeCompare(
+            getPantryCategory(second.label),
+            "pl",
+          );
+        }
+
         if (!first.expiresAt) return 1;
         if (!second.expiresAt) return -1;
         return first.expiresAt.localeCompare(second.expiresAt);
-      }),
-    [items],
+      });
+    },
+    [items, sortBy],
+  );
+  const expiredItems = sortedItems.filter(
+    (item) => item.expiresAt !== null && daysUntil(item.expiresAt) < 0,
   );
   const urgentItems = sortedItems.filter(
     (item) =>
@@ -164,6 +186,7 @@ export function Pantry({
       daysUntil(item.expiresAt) >= 0 &&
       daysUntil(item.expiresAt) <= 4,
   );
+  const noDateItems = sortedItems.filter((item) => item.expiresAt === null);
   const availableCategories = useMemo(() => {
     const counts = items.reduce<Record<string, number>>((accumulator, item) => {
       const category = getPantryCategory(item.label);
@@ -178,12 +201,23 @@ export function Pantry({
   }, [items]);
   const visibleItems = useMemo(
     () =>
-      activeCategory === "Wszystkie"
-        ? sortedItems
-        : sortedItems.filter(
-            (item) => getPantryCategory(item.label) === activeCategory,
-          ),
-    [activeCategory, sortedItems],
+      sortedItems.filter((item) => {
+        const categoryMatches =
+          activeCategory === "Wszystkie" ||
+          getPantryCategory(item.label) === activeCategory;
+        const days = item.expiresAt ? daysUntil(item.expiresAt) : null;
+        const statusMatches =
+          statusFilter === "all" ||
+          (statusFilter === "urgent" &&
+            days !== null &&
+            days >= 0 &&
+            days <= 4) ||
+          (statusFilter === "expired" && days !== null && days < 0) ||
+          (statusFilter === "no-date" && item.expiresAt === null);
+
+        return categoryMatches && statusMatches;
+      }),
+    [activeCategory, sortedItems, statusFilter],
   );
 
   function submit(event: FormEvent) {
@@ -330,21 +364,81 @@ export function Pantry({
       </p>
 
       {items.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {availableCategories.map((category) => (
-            <button
-              key={category.name}
-              onClick={() => setActiveCategory(category.name)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                activeCategory === category.name
-                  ? "bg-[#356248] text-white"
-                  : "bg-white text-[#59675f] hover:bg-[#edf1ec]"
-              }`}
-            >
-              {category.name} ({category.count})
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="mt-4 grid gap-2 sm:grid-cols-4">
+            {[
+              ["Wszystkie", items.length, "bg-white text-[#365a46]"],
+              ["Pilne", urgentItems.length, "bg-[#fff8e9] text-[#8d6840]"],
+              ["Po terminie", expiredItems.length, "bg-[#fff3ef] text-[#a45c45]"],
+              ["Bez daty", noDateItems.length, "bg-[#eef2ec] text-[#59675f]"],
+            ].map(([label, value, className]) => (
+              <div
+                key={label}
+                className={`rounded-2xl p-3 ring-1 ring-[#e6e2d8] ${className}`}
+              >
+                <p className="text-[0.65rem] font-bold uppercase tracking-wider opacity-75">
+                  {label}
+                </p>
+                <p className="mt-1 font-serif text-2xl font-semibold">{value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 grid gap-3 rounded-2xl border border-[#dfe6df] bg-white p-3 lg:grid-cols-[1fr_auto]">
+            <div>
+              <p className="mb-2 px-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#8a948e]">
+                Kategorie
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {availableCategories.map((category) => (
+                  <button
+                    key={category.name}
+                    onClick={() => setActiveCategory(category.name)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                      activeCategory === category.name
+                        ? "bg-[#356248] text-white"
+                        : "bg-[#f6f5ef] text-[#59675f] hover:bg-[#edf1ec]"
+                    }`}
+                  >
+                    {category.name} ({category.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2 lg:min-w-72 lg:grid-cols-1">
+              <label className="text-xs font-semibold text-[#59675f]">
+                Status
+                <select
+                  value={statusFilter}
+                  onChange={(event) =>
+                    setStatusFilter(event.target.value as typeof statusFilter)
+                  }
+                  className="mt-1.5 block h-10 w-full rounded-xl border border-[#dedfd9] bg-white px-3 text-sm font-normal outline-none focus:border-[#71927e]"
+                >
+                  <option value="all">Wszystkie</option>
+                  <option value="urgent">Kończące się</option>
+                  <option value="expired">Po terminie</option>
+                  <option value="no-date">Bez daty</option>
+                </select>
+              </label>
+              <label className="text-xs font-semibold text-[#59675f]">
+                Sortowanie
+                <select
+                  value={sortBy}
+                  onChange={(event) =>
+                    setSortBy(event.target.value as typeof sortBy)
+                  }
+                  className="mt-1.5 block h-10 w-full rounded-xl border border-[#dedfd9] bg-white px-3 text-sm font-normal outline-none focus:border-[#71927e]"
+                >
+                  <option value="expiry">Najkrótsza data</option>
+                  <option value="name">Alfabetycznie</option>
+                  <option value="category">Kategoriami</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </>
       )}
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
