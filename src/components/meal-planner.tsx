@@ -43,6 +43,20 @@ function localStorageKey(weekStart: string) {
   return `smart-recipe:meal-plan:${weekStart}`;
 }
 
+function formatWeekRange(week: Date) {
+  const end = new Date(week);
+  end.setDate(end.getDate() + 6);
+
+  return `${new Intl.DateTimeFormat("pl-PL", {
+    day: "numeric",
+    month: "short",
+  }).format(week)} – ${new Intl.DateTimeFormat("pl-PL", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(end)}`;
+}
+
 export function MealPlanner({
   recipes,
   favorites,
@@ -58,6 +72,7 @@ export function MealPlanner({
     mealType: MealType;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [plannerMessage, setPlannerMessage] = useState("");
   const weekStart = dateKey(week);
 
   const availableRecipes = useMemo(() => {
@@ -150,6 +165,7 @@ export function MealPlanner({
 
   function assignRecipe(recipe: Recipe) {
     if (!selection) return;
+    setPlannerMessage("");
 
     const entry: MealPlanEntry = {
       id: `${selection.day}-${selection.mealType}`,
@@ -179,6 +195,7 @@ export function MealPlanner({
   }
 
   function removeEntry(entry: MealPlanEntry) {
+    setPlannerMessage("");
     persist(entries.filter((item) => item.id !== entry.id));
     if (isSignedIn) {
       void saveRemote({
@@ -190,7 +207,53 @@ export function MealPlanner({
     }
   }
 
+  function clearWeek() {
+    if (entries.length === 0) return;
+    if (!window.confirm("Wyczyścić cały plan posiłków dla tego tygodnia?")) {
+      return;
+    }
+
+    persist([]);
+    window.localStorage.removeItem(localStorageKey(weekStart));
+    if (isSignedIn) {
+      void saveRemote({
+        action: "clear-week",
+        weekStart,
+      });
+    }
+    setPlannerMessage("Plan tygodnia został wyczyszczony.");
+  }
+
+  async function copyWeekPlan() {
+    if (entries.length === 0) return;
+
+    const lines = [
+      `Plan posiłków: ${formatWeekRange(week)}`,
+      "",
+      ...days.flatMap((day, dayIndex) => {
+        const plannedMeals = mealTypes
+          .map((meal) => {
+            const entry = entries.find(
+              (item) => item.day === dayIndex && item.mealType === meal.key,
+            );
+            return entry ? `${meal.label}: ${entry.recipe.title}` : null;
+          })
+          .filter(Boolean);
+
+        return plannedMeals.length > 0 ? [day, ...plannedMeals, ""] : [];
+      }),
+    ];
+
+    try {
+      await navigator.clipboard.writeText(lines.join("\n").trim());
+      setPlannerMessage("Plan tygodnia został skopiowany.");
+    } catch {
+      setPlannerMessage("Nie udało się skopiować planu.");
+    }
+  }
+
   function shiftWeek(days: number) {
+    setPlannerMessage("");
     const next = new Date(week);
     next.setDate(next.getDate() + days);
     setWeek(next);
@@ -199,6 +262,15 @@ export function MealPlanner({
   const missingIngredients = [
     ...new Set(entries.flatMap((entry) => entry.recipe.missing)),
   ];
+  const weekSummary = entries.reduce(
+    (summary, entry) => ({
+      calories: summary.calories + entry.recipe.calories,
+      protein: summary.protein + entry.recipe.protein,
+      cost: summary.cost + (entry.recipe.estimatedCost ?? 0),
+      time: summary.time + entry.recipe.time,
+    }),
+    { calories: 0, protein: 0, cost: 0, time: 0 },
+  );
 
   return (
     <section
@@ -219,40 +291,62 @@ export function MealPlanner({
               pory posiłku.
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-[#dedbd2] bg-white p-1.5 shadow-sm">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex items-center gap-2 rounded-full border border-[#dedbd2] bg-white p-1.5 shadow-sm">
+              <button
+                onClick={() => shiftWeek(-7)}
+                className="grid size-9 place-items-center rounded-full hover:bg-[#f1eee7]"
+                aria-label="Poprzedni tydzień"
+              >
+                ←
+              </button>
+              <span className="min-w-44 text-center text-sm font-semibold">
+                {formatWeekRange(week)}
+              </span>
+              <button
+                onClick={() => shiftWeek(7)}
+                className="grid size-9 place-items-center rounded-full hover:bg-[#f1eee7]"
+                aria-label="Następny tydzień"
+              >
+                →
+              </button>
+            </div>
             <button
-              onClick={() => shiftWeek(-7)}
-              className="grid size-9 place-items-center rounded-full hover:bg-[#f1eee7]"
-              aria-label="Poprzedni tydzień"
+              onClick={copyWeekPlan}
+              disabled={entries.length === 0}
+              className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold text-[#365a46] shadow-sm disabled:opacity-40"
             >
-              ←
+              Kopiuj plan
             </button>
-            <span className="min-w-44 text-center text-sm font-semibold">
-              {new Intl.DateTimeFormat("pl-PL", {
-                day: "numeric",
-                month: "short",
-              }).format(week)}
-              {" – "}
-              {new Intl.DateTimeFormat("pl-PL", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              }).format(
-                new Date(
-                  week.getFullYear(),
-                  week.getMonth(),
-                  week.getDate() + 6,
-                ),
-              )}
-            </span>
             <button
-              onClick={() => shiftWeek(7)}
-              className="grid size-9 place-items-center rounded-full hover:bg-[#f1eee7]"
-              aria-label="Następny tydzień"
+              onClick={clearWeek}
+              disabled={entries.length === 0}
+              className="rounded-xl bg-[#fff0e8] px-4 py-2.5 text-sm font-semibold text-[#9a6251] disabled:opacity-40"
             >
-              →
+              Wyczyść tydzień
             </button>
           </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {[
+            ["Zaplanowane", `${entries.length}/21`, "posiłków"],
+            ["Kalorie", weekSummary.calories, "kcal łącznie"],
+            ["Białko", `${weekSummary.protein} g`, "łącznie"],
+            ["Koszt", `${weekSummary.cost} zł`, "szacunkowo"],
+            ["Czas", `${weekSummary.time} min`, "gotowania"],
+          ].map(([label, value, hint]) => (
+            <article
+              key={label}
+              className="rounded-2xl border border-[#e1ddd4] bg-white p-4 shadow-sm"
+            >
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#8a948e]">
+                {label}
+              </p>
+              <p className="mt-2 font-serif text-3xl font-semibold">{value}</p>
+              <p className="mt-1 text-xs text-[#7a857e]">{hint}</p>
+            </article>
+          ))}
         </div>
 
         <div className="mt-7 overflow-x-auto pb-3 sm:mt-10">
@@ -354,12 +448,19 @@ export function MealPlanner({
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e1ddd4] bg-white p-4">
-          <p className="text-sm text-[#68736b]">
-            {isLoading
-              ? "Wczytuję plan..."
-              : `${entries.length} z 21 posiłków zaplanowanych`}
-            {!isSignedIn && " · plan zapisuje się na tym urządzeniu"}
-          </p>
+          <div>
+            <p className="text-sm text-[#68736b]">
+              {isLoading
+                ? "Wczytuję plan..."
+                : `${entries.length} z 21 posiłków zaplanowanych`}
+              {!isSignedIn && " · plan zapisuje się na tym urządzeniu"}
+            </p>
+            {plannerMessage && (
+              <p className="mt-1 text-xs font-semibold text-[#356248]">
+                {plannerMessage}
+              </p>
+            )}
+          </div>
           {missingIngredients.length > 0 && (
             <button
               onClick={() => onAddToShoppingList(missingIngredients)}

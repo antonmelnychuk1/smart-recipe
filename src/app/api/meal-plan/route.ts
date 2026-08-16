@@ -53,6 +53,10 @@ const actionSchema = z.discriminatedUnion("action", [
     day: z.number().int().min(0).max(6),
     mealType: z.enum(["breakfast", "lunch", "dinner"]),
   }),
+  z.object({
+    action: z.literal("clear-week"),
+    weekStart: z.string().date(),
+  }),
 ]);
 
 async function getUserId() {
@@ -103,6 +107,13 @@ export async function POST(request: Request) {
   }
 
   const data = body.data;
+  if (data.action === "clear-week") {
+    await prisma.mealPlan.deleteMany({
+      where: { userId, weekStart: parseWeekStart(data.weekStart) },
+    });
+    return Response.json({ ok: true });
+  }
+
   const key = {
     userId,
     weekStart: parseWeekStart(data.weekStart),
