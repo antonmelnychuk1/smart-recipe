@@ -33,6 +33,28 @@ export default async function SettingsPage() {
           </Link>
         </header>
 
+        <section className="mt-6 rounded-[1.7rem] border border-[#ced9cf] bg-[#f8fbf7] p-4 shadow-sm sm:mt-10 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+                Aplikacja na telefonie
+              </p>
+              <h2 className="mt-1 font-serif text-2xl font-semibold">
+                Dodaj SmartRecipe do ekranu głównego
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-[#68736b]">
+                Na iPhone użyj przycisku udostępniania w Safari i wybierz
+                „Dodaj do ekranu początkowego”. Na Androidzie wybierz menu
+                przeglądarki i „Zainstaluj aplikację” albo „Dodaj do ekranu
+                głównego”.
+              </p>
+            </div>
+            <span className="grid size-12 place-items-center rounded-2xl bg-[#2f684f] text-2xl text-white">
+              🍳
+            </span>
+          </div>
+        </section>
+
         <AccountSettings />
       </div>
     </main>

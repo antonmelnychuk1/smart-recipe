@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SmartRecipe">
+  <rect width="512" height="512" fill="#2f684f"/>
+  <circle cx="256" cy="256" r="210" fill="#2f684f"/>
+  <path d="M333 116c-95 10-172 86-182 181-4 38 8 70 31 93 23 23 55 35 93 31 95-10 171-87 181-182 4-38-8-70-31-93-23-23-54-34-92-30Z" fill="#fffdf8"/>
+  <path d="M165 374c56-101 133-165 225-194" fill="none" stroke="#2f684f" stroke-width="34" stroke-linecap="round"/>
+  <path d="M191 240c43 9 76 30 99 64" fill="none" stroke="#2f684f" stroke-width="28" stroke-linecap="round"/>
+  <path d="M143 409c-29 33-56 50-81 52" fill="none" stroke="#d26849" stroke-width="36" stroke-linecap="round"/>
+</svg>
