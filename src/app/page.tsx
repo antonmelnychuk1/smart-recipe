@@ -1506,9 +1506,14 @@ export default function Home() {
     <main className="min-h-screen overflow-hidden bg-[#f7f4ed] text-[#25322b]">
       <nav className="relative z-40 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8 sm:py-6">
         <a href="#" className="flex items-center gap-2 text-lg font-bold">
-          <span className="grid size-9 place-items-center rounded-xl bg-[#2f684f] text-white">
-            <Icon name="leaf" />
-          </span>
+          <Image
+            src="/smart-recipe-icon.svg"
+            alt="SmartRecipe logo"
+            width={38}
+            height={38}
+            priority
+            className="size-9 rounded-xl object-contain sm:size-10"
+          />
           Smart<span className="-ml-2 text-[#dc704d]">Recipe</span>
         </a>
         <div className="hidden items-center gap-7 text-sm font-medium text-[#667168] sm:flex">
