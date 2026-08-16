@@ -1809,17 +1809,17 @@ export default function Home() {
       )}
 
       {session?.user && (
-        <section className="mx-auto max-w-7xl px-4 pt-6 sm:px-8 sm:pt-8">
-          <div className="rounded-[1.7rem] border border-[#dfe4dc] bg-white/85 p-4 shadow-[0_18px_60px_rgba(53,68,58,0.08)] backdrop-blur sm:rounded-[2rem] sm:p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-8 sm:pt-6">
+          <div className="rounded-2xl border border-[#dfe4dc] bg-white/85 p-3 shadow-[0_12px_36px_rgba(53,68,58,0.07)] backdrop-blur sm:p-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#d26849]">
                   Panel użytkownika
                 </p>
-                <h2 className="mt-1 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+                <h2 className="mt-0.5 font-serif text-2xl font-semibold tracking-tight sm:text-3xl">
                   Cześć, {session.user.name}
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#68736b]">
+                <p className="mt-1 hidden max-w-2xl text-xs leading-5 text-[#68736b] sm:block">
                   Szybki podgląd Twojej kuchni: limity, zakupy, spiżarnia i
                   ostatnie przepisy w jednym miejscu.
                 </p>
@@ -1827,53 +1827,53 @@ export default function Home() {
               <div className="flex flex-wrap gap-2">
                 <a
                   href="#generator"
-                  className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#275b44]"
+                  className="rounded-xl bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#275b44]"
                 >
                   Generuj przepis
                 </a>
                 <a
                   href="#my-kitchen"
-                  className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
+                  className="rounded-xl border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
                 >
                   Moja kuchnia
                 </a>
                 <Link
                   href="/recipes"
-                  className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
+                  className="rounded-xl border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
                 >
                   Zapisane
                 </Link>
               </div>
             </div>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
               {dashboardCards.map((card) => (
                 <a
                   key={card.label}
                   href={card.href}
-                  className="rounded-2xl border border-[#ebe7dd] bg-[#fbfaf6] p-4 transition hover:-translate-y-0.5 hover:border-[#cfdacf] hover:bg-white"
+                  className="rounded-xl border border-[#ebe7dd] bg-[#fbfaf6] p-3 transition hover:-translate-y-0.5 hover:border-[#cfdacf] hover:bg-white"
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#829087]">
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-[#829087]">
                     {card.label}
                   </p>
-                  <p className="mt-2 font-serif text-3xl font-semibold text-[#25322b]">
+                  <p className="mt-1 font-serif text-2xl font-semibold leading-none text-[#25322b] sm:text-3xl">
                     {card.value}
                   </p>
-                  <p className="mt-1 text-xs leading-5 text-[#748078]">
+                  <p className="mt-1 line-clamp-1 text-[0.7rem] leading-4 text-[#748078]">
                     {card.hint}
                   </p>
                 </a>
               ))}
             </div>
 
-            <div className="mt-5 grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="rounded-2xl bg-[#eef6ef] p-4">
+            <div className="mt-2 grid gap-2 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="rounded-xl bg-[#eef6ef] p-3">
                 <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-[#365a46]">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-[#365a46]">
                       Aktywność
                     </p>
-                    <p className="mt-1 text-xs leading-5 text-[#68736b]">
+                    <p className="mt-0.5 truncate text-xs leading-5 text-[#68736b]">
                       {latestHistoryEntry
                         ? `Ostatnio: ${latestHistoryEntry.ingredients.join(", ")}`
                         : "Nie masz jeszcze historii generowania."}
@@ -1881,7 +1881,7 @@ export default function Home() {
                   </div>
                   <Link
                     href="/recipes/history"
-                    className="shrink-0 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-[#365a46] shadow-sm"
+                    className="shrink-0 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-[#365a46] shadow-sm"
                   >
                     Historia
                   </Link>
@@ -1889,7 +1889,7 @@ export default function Home() {
                 {latestFavorite && (
                   <button
                     onClick={() => openRecipe(latestFavorite)}
-                    className="mt-3 w-full rounded-xl bg-white px-3 py-3 text-left text-sm font-semibold text-[#25322b] shadow-sm transition hover:bg-[#f9fbf8]"
+                    className="mt-2 w-full truncate rounded-lg bg-white px-3 py-2 text-left text-xs font-semibold text-[#25322b] shadow-sm transition hover:bg-[#f9fbf8]"
                   >
                     Ostatnio zapisany:{" "}
                     <span className="text-[#d26849]">{latestFavorite.title}</span>
@@ -1897,23 +1897,23 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="rounded-2xl bg-[#fff5df] p-4">
-                <p className="text-sm font-semibold text-[#795d2f]">
+              <div className="rounded-xl bg-[#fff5df] p-3">
+                <p className="text-xs font-semibold text-[#795d2f]">
                   Wykorzystanie limitu
                 </p>
                 {currentGenerationUsage?.unlimited || isAdmin ? (
-                  <p className="mt-2 text-sm leading-6 text-[#795d2f]">
+                  <p className="mt-1 text-xs leading-5 text-[#795d2f]">
                     Masz konto administratora, więc generowanie jest bez limitu.
                   </p>
                 ) : (
                   <>
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
                       <div
                         className="h-full rounded-full bg-[#d66a49]"
                         style={{ width: `${usagePercent}%` }}
                       />
                     </div>
-                    <p className="mt-2 text-xs leading-5 text-[#795d2f]">
+                    <p className="mt-1 text-xs leading-5 text-[#795d2f]">
                       {currentGenerationUsage
                         ? `Wykorzystano ${
                             currentGenerationUsage.limit -
