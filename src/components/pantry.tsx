@@ -451,7 +451,7 @@ export function Pantry({
             return (
               <div
                 key={item.id}
-                className={`flex min-w-0 items-center justify-between gap-3 rounded-2xl border p-3 ${
+                className={`flex min-w-0 flex-col gap-3 rounded-2xl border p-3 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between ${
                   isExpired
                     ? "border-[#e6b9ae] bg-[#fff3ef]"
                     : isUrgent
@@ -483,10 +483,11 @@ export function Pantry({
                     )}
                   </span>
                 </button>
-                <div className="flex shrink-0 items-center gap-1">
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
                   {(isExpired || isUrgent) && (
                     <button
                       onClick={() => onAddToShoppingList([item.label])}
+                      aria-label={`Dodaj ${item.label} do listy zakupów`}
                       className="rounded-lg px-2 py-2 text-[11px] font-semibold text-[#8d6840] transition hover:bg-[#fff4de]"
                     >
                       Na zakupy
@@ -494,6 +495,7 @@ export function Pantry({
                   )}
                   <button
                     onClick={() => startEditing(item)}
+                    aria-label={`Edytuj ${item.label} w spiżarni`}
                     className="rounded-lg px-2 py-2 text-[11px] font-semibold text-[#59675f] transition hover:bg-[#edf1ec]"
                   >
                     Edytuj

@@ -60,14 +60,14 @@ export function AdminUserActions({
       </button>
       {open && (
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-[#18241e]/60 p-4 text-left backdrop-blur-sm"
+          className="modal-safe-area fixed inset-0 z-50 grid place-items-center bg-[#18241e]/60 text-left backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label={`Zarządzaj kontem ${userName}`}
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-2xl sm:p-6"
+            className="modal-panel-safe w-full max-w-md overflow-y-auto rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-2xl sm:p-6"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">

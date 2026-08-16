@@ -513,14 +513,14 @@ export function MealPlanner({
 
       {selection && (
         <div
-          className="fixed inset-0 z-[55] grid place-items-center bg-[#18241e]/60 p-4 backdrop-blur-sm"
+          className="modal-safe-area fixed inset-0 z-[55] grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label="Wybierz przepis"
           onClick={() => setSelection(null)}
         >
           <div
-            className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-8"
+            className="modal-panel-safe w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-8"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">

@@ -436,6 +436,7 @@ export function SavedRecipesLibrary({
                   {item.isPublic && (
                     <button
                       onClick={() => copyLink(item)}
+                      aria-label={`Kopiuj publiczny link do ${item.recipe.title}`}
                       className="rounded-xl bg-[#edf1ec] px-3 py-2 text-xs font-semibold text-[#356248]"
                     >
                       Kopiuj link
@@ -444,6 +445,11 @@ export function SavedRecipesLibrary({
                   <button
                     disabled={pendingId === item.id}
                     onClick={() => setPublic(item, !item.isPublic)}
+                    aria-label={
+                      item.isPublic
+                        ? `Ukryj przepis ${item.recipe.title}`
+                        : `Udostępnij przepis ${item.recipe.title}`
+                    }
                     className="rounded-xl border border-[#d8d7d0] px-3 py-2 text-xs font-semibold disabled:opacity-40"
                   >
                     {item.isPublic ? "Ukryj" : "Udostępnij"}
@@ -451,6 +457,7 @@ export function SavedRecipesLibrary({
                   <button
                     disabled={pendingId === item.id}
                     onClick={() => remove(item)}
+                    aria-label={`Usuń zapisany przepis ${item.recipe.title}`}
                     className="ml-auto px-2 py-2 text-xs font-semibold text-[#a45c45] disabled:opacity-40"
                   >
                     Usuń

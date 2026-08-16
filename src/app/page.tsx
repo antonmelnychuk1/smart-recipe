@@ -2494,7 +2494,11 @@ export default function Home() {
                 </span>
                 <button
                   onClick={() => toggleFavorite(recipe)}
-                  aria-label="Dodaj do ulubionych"
+                  aria-label={
+                    isFavorite(recipe)
+                      ? `Usuń ${recipe.title} z ulubionych`
+                      : `Dodaj ${recipe.title} do ulubionych`
+                  }
                   className={`absolute right-4 top-4 grid size-10 place-items-center rounded-full backdrop-blur transition ${
                     isFavorite(recipe)
                       ? "bg-[#d9684c] text-white"
@@ -2505,13 +2509,15 @@ export default function Home() {
                 </button>
               </div>
               <div className="p-4 sm:p-6">
-                <div className="flex gap-4 text-xs font-medium text-[#78837c]">
+                <div className="flex min-w-0 gap-3 overflow-x-auto pb-1 text-xs font-medium text-[#78837c] sm:gap-4 sm:overflow-visible sm:pb-0">
                   <span className="flex items-center gap-1.5">
                     <Icon name="clock" /> {recipe.time} min
                   </span>
-                  <span>{recipe.difficulty}</span>
-                  <span>{recipe.calories} kcal</span>
-                  {recipe.estimatedCost && <span>ok. {recipe.estimatedCost} zł</span>}
+                  <span className="shrink-0">{recipe.difficulty}</span>
+                  <span className="shrink-0">{recipe.calories} kcal</span>
+                  {recipe.estimatedCost && (
+                    <span className="shrink-0">ok. {recipe.estimatedCost} zł</span>
+                  )}
                 </div>
                 <h3 className="break-anywhere mt-4 font-serif text-2xl font-semibold">
                   {recipe.title}
@@ -3127,21 +3133,23 @@ export default function Home() {
               </div>
               <button
                 onClick={() => setSelectedRecipe(null)}
-                aria-label="Zamknij"
+                aria-label={`Zamknij przepis ${selectedRecipe.title}`}
                 className="absolute right-5 top-5 grid size-10 shrink-0 place-items-center rounded-full bg-[#eeeae2] text-xl"
               >
                 ×
               </button>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3 rounded-2xl bg-[#edf2ed] p-4 text-sm sm:grid-cols-5">
-              <span>{selectedRecipe.time} min</span>
-              <span>{selectedRecipe.calories} kcal</span>
-              <span>B: {selectedRecipe.protein} g</span>
-              <span>W: {selectedRecipe.carbs} g</span>
-              <span>T: {selectedRecipe.fat} g</span>
+            <div className="mt-6 grid grid-cols-2 gap-2 rounded-2xl bg-[#edf2ed] p-3 text-sm sm:grid-cols-5 sm:gap-3 sm:p-4">
+              <span className="min-w-0 truncate">{selectedRecipe.time} min</span>
+              <span className="min-w-0 truncate">{selectedRecipe.calories} kcal</span>
+              <span className="min-w-0 truncate">B: {selectedRecipe.protein} g</span>
+              <span className="min-w-0 truncate">W: {selectedRecipe.carbs} g</span>
+              <span className="min-w-0 truncate">T: {selectedRecipe.fat} g</span>
               {selectedRecipe.estimatedCost && (
-                <span>ok. {selectedRecipe.estimatedCost} zł / 2 porcje</span>
+                <span className="min-w-0 truncate">
+                  ok. {selectedRecipe.estimatedCost} zł / 2 porcje
+                </span>
               )}
             </div>
 
@@ -3343,11 +3351,11 @@ export default function Home() {
         >
           <div className="modal-panel-safe-tall w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-8">
             <div className="flex items-start justify-between gap-4">
-              <div>
+              <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
                   Krok {cookingStep + 1} z {selectedRecipe.steps.length}
                 </p>
-                <h2 className="mt-2 font-serif text-3xl font-semibold">
+                <h2 className="break-anywhere mt-2 font-serif text-3xl font-semibold">
                   {selectedRecipe.title}
                 </h2>
               </div>
