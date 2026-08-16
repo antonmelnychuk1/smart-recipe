@@ -112,6 +112,17 @@ export default async function RecipePage({ params }: RecipePageProps) {
     ["Węglowodany", `${recipe.carbs} g`],
     ["Tłuszcz", `${recipe.fat} g`],
   ];
+  const summary = [
+    ["Czas", `${recipe.time} min`, "przygotowanie"],
+    [
+      "Koszt",
+      recipe.estimatedCost ? `ok. ${recipe.estimatedCost} zł` : "brak danych",
+      "szacunek",
+    ],
+    ["Dopasowanie", `${recipe.match}%`, "do składników"],
+    ["Porcje", "2", "bazowa ilość"],
+  ];
+  const missingCount = recipe.missing.length;
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Recipe",
@@ -138,28 +149,28 @@ export default async function RecipePage({ params }: RecipePageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f4ed] px-4 py-5 text-[#25322b] sm:px-8 sm:py-10">
+    <main className="min-h-screen bg-[#f7f4ed] px-4 py-4 text-[#25322b] sm:px-8 sm:py-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="mx-auto mb-4 flex max-w-6xl flex-wrap items-center justify-between gap-3">
+      <div className="mx-auto mb-4 flex max-w-6xl flex-wrap items-center justify-between gap-2">
         <Link
           href="/recipes"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-4 text-sm font-semibold text-[#365a46] shadow-sm transition hover:bg-[#f4f7f3]"
+          className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-3 text-sm font-semibold text-[#365a46] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
         >
           ← Wróć do zapisanych
         </Link>
         <Link
           href="/"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-4 text-sm font-semibold text-[#365a46] shadow-sm transition hover:bg-[#f4f7f3]"
+          className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-3 text-sm font-semibold text-[#365a46] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
         >
           Strona główna
         </Link>
       </div>
-      <article className="mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-[#dedbd2] bg-[#fffdf8] shadow-xl">
+      <article className="mx-auto max-w-6xl overflow-hidden rounded-[1.6rem] border border-[#dedbd2] bg-[#fffdf8] shadow-xl sm:rounded-[2rem]">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="relative min-h-72 bg-[#edf2ed] sm:min-h-96 lg:min-h-full">
+          <div className="relative min-h-64 bg-[#edf2ed] sm:min-h-96 lg:min-h-full">
             {recipe.image ? (
               <>
                 <Image
@@ -170,37 +181,47 @@ export default async function RecipePage({ params }: RecipePageProps) {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
                 <a
                   href={recipe.image.sourceUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="absolute bottom-4 left-5 rounded-full bg-black/45 px-3 py-1.5 text-xs font-medium text-white backdrop-blur hover:underline"
+                  className="absolute bottom-4 left-4 rounded-full bg-black/45 px-3 py-1.5 text-xs font-medium text-white backdrop-blur hover:underline sm:left-5"
                 >
                   Zdjęcie: {recipe.image.photographer} · Pexels
                 </a>
               </>
             ) : (
-              <div className="grid min-h-72 place-items-center text-8xl sm:min-h-96">
+              <div className="grid min-h-64 place-items-center text-8xl sm:min-h-96">
                 {recipe.emoji}
               </div>
             )}
+            <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+              <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#356248] backdrop-blur">
+                {savedRecipe.isPublic ? "Publiczny" : "Prywatny"}
+              </span>
+              {missingCount > 0 && (
+                <span className="rounded-full bg-[#fff0e8]/95 px-3 py-1.5 text-xs font-bold text-[#a45c45] backdrop-blur">
+                  {missingCount} do dokupienia
+                </span>
+              )}
+            </div>
           </div>
 
-          <div className="p-5 sm:p-8 lg:p-10">
+          <div className="p-5 sm:p-7 lg:p-9">
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full bg-[#e8efe9] px-3 py-1.5 text-xs font-bold text-[#356248]">
-                {savedRecipe.isPublic ? "Publiczny przepis" : "Prywatny podgląd"}
+                SmartRecipe
               </span>
               <span className="rounded-full bg-[#fff0e8] px-3 py-1.5 text-xs font-bold text-[#a45c45]">
                 {recipe.difficulty}
               </span>
             </div>
 
-            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-              SmartRecipe
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+              Szczegóły przepisu
             </p>
-            <h1 className="break-anywhere mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="break-anywhere mt-2 font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
               {recipe.title}
             </h1>
             <p className="mt-4 text-base leading-7 text-[#68736b]">
@@ -210,23 +231,19 @@ export default async function RecipePage({ params }: RecipePageProps) {
               Udostępnia: {savedRecipe.user.name}
             </p>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              {[
-                ["Czas", `${recipe.time} min`],
-                ["Koszt", recipe.estimatedCost ? `ok. ${recipe.estimatedCost} zł` : "brak danych"],
-                ["Dopasowanie", `${recipe.match}%`],
-                ["Porcje", "2"],
-              ].map(([label, value]) => (
+            <div className="mt-6 grid grid-cols-2 gap-2 sm:gap-3">
+              {summary.map(([label, value, hint]) => (
                 <div
                   key={label}
-                  className="rounded-2xl border border-[#e7e2d8] bg-white p-4"
+                  className="rounded-2xl border border-[#e7e2d8] bg-white p-3 sm:p-4"
                 >
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#929a94]">
                     {label}
                   </p>
-                  <p className="mt-1 font-serif text-2xl font-semibold">
+                  <p className="mt-1 font-serif text-xl font-semibold sm:text-2xl">
                     {value}
                   </p>
+                  <p className="mt-0.5 text-[0.68rem] text-[#929a94]">{hint}</p>
                 </div>
               ))}
             </div>
@@ -236,16 +253,16 @@ export default async function RecipePage({ params }: RecipePageProps) {
               <CopyButton
                 text={recipeText(recipe, "ingredients")}
                 idleLabel="Kopiuj składniki"
-                className="rounded-xl border border-[#ccd7cf] bg-white px-5 py-3 text-sm font-semibold text-[#356248] transition hover:bg-[#f4f7f3]"
+                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               />
               <CopyButton
                 text={recipeText(recipe, "steps")}
                 idleLabel="Kopiuj instrukcje"
-                className="rounded-xl border border-[#ccd7cf] bg-white px-5 py-3 text-sm font-semibold text-[#356248] transition hover:bg-[#f4f7f3]"
+                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               />
               <Link
                 href="/"
-                className="rounded-xl border border-[#ccd7cf] bg-white px-5 py-3 text-sm font-semibold text-[#356248] transition hover:bg-[#f4f7f3]"
+                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               >
                 Otwórz aplikację
               </Link>
@@ -253,11 +270,22 @@ export default async function RecipePage({ params }: RecipePageProps) {
           </div>
         </div>
 
-        <div className="grid gap-5 border-t border-[#e8e2d8] p-5 sm:p-8 lg:grid-cols-[1fr_1.35fr] lg:p-10">
+        <div className="grid gap-5 border-t border-[#e8e2d8] bg-[#fbf8f1] p-4 sm:p-7 lg:grid-cols-[0.95fr_1.35fr] lg:p-9">
           <aside className="space-y-5">
-            <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-white p-5">
-              <h2 className="font-serif text-2xl font-semibold">Wartości odżywcze</h2>
-              <p className="mt-1 text-xs text-[#7a857e]">Szacunek na 1 porcję</p>
+            <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-white p-4 shadow-sm sm:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="font-serif text-2xl font-semibold">
+                    Wartości odżywcze
+                  </h2>
+                  <p className="mt-1 text-xs text-[#7a857e]">
+                    Szacunek na 1 porcję
+                  </p>
+                </div>
+                <span className="rounded-full bg-[#eef6ef] px-3 py-1 text-xs font-bold text-[#356248]">
+                  makro
+                </span>
+              </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 {nutrition.map(([label, value]) => (
                   <div key={label} className="rounded-xl bg-[#f5f7f2] p-3">
@@ -272,12 +300,22 @@ export default async function RecipePage({ params }: RecipePageProps) {
               </div>
             </section>
 
-            <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-white p-5">
-              <h2 className="font-serif text-2xl font-semibold">Składniki</h2>
+            <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-white p-4 shadow-sm sm:p-5">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-serif text-2xl font-semibold">Składniki</h2>
+                <span className="text-xs font-semibold text-[#7a857e]">
+                  {recipe.ingredients.length} pozycji
+                </span>
+              </div>
               <ul className="mt-4 space-y-2 text-sm leading-6 text-[#59675f]">
-                {recipe.ingredients.map((ingredient) => (
-                  <li key={ingredient} className="flex gap-2">
-                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-[#d26849]" />
+                {recipe.ingredients.map((ingredient, index) => (
+                  <li
+                    key={ingredient}
+                    className="flex gap-3 rounded-xl bg-[#fbfaf6] p-3"
+                  >
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[#e8efe9] text-[0.65rem] font-bold text-[#356248]">
+                      {index + 1}
+                    </span>
                     <span className="break-anywhere">{ingredient}</span>
                   </li>
                 ))}
@@ -285,10 +323,19 @@ export default async function RecipePage({ params }: RecipePageProps) {
             </section>
 
             {recipe.missing.length > 0 && (
-              <section className="rounded-[1.5rem] border border-[#f0d8c7] bg-[#fff8f4] p-5">
-                <h2 className="font-serif text-2xl font-semibold">
-                  Do dokupienia
-                </h2>
+              <section className="rounded-[1.5rem] border border-[#f0d8c7] bg-[#fff8f4] p-4 shadow-sm sm:p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="font-serif text-2xl font-semibold">
+                    Do dokupienia
+                  </h2>
+                  <span className="text-xs font-semibold text-[#a45c45]">
+                    {missingCount}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs leading-5 text-[#9b6a58]">
+                  Same nazwy produktów — bez gramów i łyżek, żeby lista zakupów
+                  była praktyczna.
+                </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {recipe.missing.map((item) => (
                     <span
@@ -304,13 +351,28 @@ export default async function RecipePage({ params }: RecipePageProps) {
           </aside>
 
           <div className="space-y-5">
-            <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-white p-5">
-              <h2 className="font-serif text-2xl font-semibold">
-                Przygotowanie
-              </h2>
-              <ol className="mt-5 space-y-4 text-sm leading-6 text-[#59675f]">
+            <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-white p-4 shadow-sm sm:p-5">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <h2 className="font-serif text-2xl font-semibold">
+                    Przygotowanie
+                  </h2>
+                  <p className="mt-1 text-xs text-[#7a857e]">
+                    {recipe.steps.length} kroków · około {recipe.time} min
+                  </p>
+                </div>
+                <CopyButton
+                  text={recipeText(recipe, "steps")}
+                  idleLabel="Kopiuj kroki"
+                  className="rounded-xl bg-[#eef6ef] px-3 py-2 text-xs font-semibold text-[#356248] transition hover:bg-[#e3efe5]"
+                />
+              </div>
+              <ol className="mt-5 space-y-3 text-sm leading-6 text-[#59675f]">
                 {recipe.steps.map((step, index) => (
-                  <li key={step} className="flex gap-3">
+                  <li
+                    key={step}
+                    className="flex gap-3 rounded-2xl border border-[#eeeae2] bg-[#fffdf8] p-4"
+                  >
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#dce9df] text-xs font-bold text-[#356248]">
                       {index + 1}
                     </span>
@@ -321,10 +383,15 @@ export default async function RecipePage({ params }: RecipePageProps) {
             </section>
 
             {recipe.substitutions && recipe.substitutions.length > 0 && (
-              <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-[#f8fbf7] p-5">
-                <h2 className="font-serif text-2xl font-semibold">
-                  Zamienniki
-                </h2>
+              <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-[#f8fbf7] p-4 shadow-sm sm:p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="font-serif text-2xl font-semibold">
+                    Zamienniki
+                  </h2>
+                  <span className="text-xs font-semibold text-[#7a857e]">
+                    {recipe.substitutions.length}
+                  </span>
+                </div>
                 <div className="mt-4 space-y-3">
                   {recipe.substitutions.map((item) => (
                     <div
