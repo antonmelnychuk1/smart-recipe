@@ -350,6 +350,27 @@ function Icon({ name }: { name: "spark" | "clock" | "heart" | "leaf" }) {
   );
 }
 
+function RecipeCardSkeleton() {
+  return (
+    <article className="overflow-hidden rounded-[1.7rem] border border-[#e2dfd6] bg-white shadow-sm">
+      <div className="h-48 animate-pulse bg-[#e7e4dc]" />
+      <div className="space-y-4 p-4 sm:p-6">
+        <div className="h-4 w-1/2 animate-pulse rounded-full bg-[#e7e4dc]" />
+        <div className="h-7 w-4/5 animate-pulse rounded-full bg-[#e7e4dc]" />
+        <div className="space-y-2">
+          <div className="h-3 animate-pulse rounded-full bg-[#eeeae2]" />
+          <div className="h-3 w-2/3 animate-pulse rounded-full bg-[#eeeae2]" />
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="h-12 animate-pulse rounded-xl bg-[#f1eee7]" />
+          <div className="h-12 animate-pulse rounded-xl bg-[#f1eee7]" />
+          <div className="h-12 animate-pulse rounded-xl bg-[#f1eee7]" />
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function Home() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [ingredients, setIngredients] = useState(["jajka", "ryż", "kurczak"]);
@@ -728,6 +749,7 @@ export default function Home() {
       ),
     [generated, generatedRecipes, maxTime, sampleRecipes],
   );
+  const generationInProgress = isLoading || desiredDishLoading;
   const groupedShoppingList = useMemo(
     () =>
       groupShoppingItems(
@@ -2226,6 +2248,15 @@ export default function Home() {
               )}
             </p>
           )}
+          {isLoading && !error && (
+            <div className="mt-4 rounded-xl border border-[#efd5ab] bg-[#fff8e9] px-4 py-3 text-sm text-[#795d2f]">
+              <p className="font-semibold">AI gotuje propozycje...</p>
+              <p className="mt-1 text-xs leading-5">
+                Tworzymy 3 przepisy z proporcjami, wartościami odżywczymi i
+                zdjęciami z Pexels.
+              </p>
+            </div>
+          )}
           {currentGenerationUsage &&
             !currentGenerationUsage.unlimited &&
             !error && (
@@ -2350,6 +2381,14 @@ export default function Home() {
                 {desiredDishError}
               </p>
             )}
+            {desiredDishLoading && !desiredDishError && (
+              <div className="mt-3 rounded-xl border border-[#efd5ab] bg-[#fff8e9] px-4 py-3 text-sm text-[#795d2f]">
+                <p className="font-semibold">Tworzymy warianty dania...</p>
+                <p className="mt-1 text-xs leading-5">
+                  Za chwilę pojawią się 3 różne propozycje przepisu.
+                </p>
+              </div>
+            )}
           </form>
         </div>
       </section>
@@ -2358,14 +2397,18 @@ export default function Home() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-              {generationMode === "dish"
+              {generationInProgress
+                ? "AI gotuje"
+                : generationMode === "dish"
                 ? "Przepis na Twoje życzenie"
                 : generated
                   ? "Dopasowane dla Ciebie"
                   : "Przykładowe inspiracje"}
             </p>
             <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-              {generationMode === "dish"
+              {generationInProgress
+                ? "Przygotowujemy 3 propozycje"
+                : generationMode === "dish"
                 ? `${visibleRecipes.length} warianty wybranego dania`
                 : generated
                 ? `${visibleRecipes.length} pomysły na dzisiaj`
@@ -2373,14 +2416,44 @@ export default function Home() {
             </h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-[#748078]">
-            {generationMode === "dish"
+            {generationInProgress
+              ? "To może chwilę potrwać — dobieramy składniki, proporcje, kroki i zdjęcia."
+              : generationMode === "dish"
               ? "Wybierz najlepszy z trzech wariantów. Każdy zawiera pełną listę produktów, instrukcję i wartości odżywcze."
               : "Procent dopasowania pokazuje, ile potrzebnych produktów już masz. Brakujące składniki łatwo przeniesiesz później na listę zakupów."}
           </p>
         </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span
+            className={`rounded-full px-3 py-1.5 text-xs font-bold ${
+              generationInProgress
+                ? "bg-[#fff5df] text-[#9c6a16]"
+                : generated
+                  ? "bg-[#e8efe9] text-[#356248]"
+                  : "bg-[#edf1ec] text-[#536159]"
+            }`}
+          >
+            {generationInProgress
+              ? "Generowanie w toku"
+              : generated
+                ? "Wyniki gotowe"
+                : "Tryb demo"}
+          </span>
+          {currentGenerationUsage && !currentGenerationUsage.unlimited && (
+            <span className="rounded-full bg-[#f6f3ec] px-3 py-1.5 text-xs font-bold text-[#68736b]">
+              Limit: {currentGenerationUsage.remaining}/
+              {currentGenerationUsage.limit}
+            </span>
+          )}
+        </div>
 
         <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-3">
-          {visibleRecipes.map((recipe, index) => (
+          {generationInProgress
+            ? Array.from({ length: 3 }).map((_, index) => (
+                <RecipeCardSkeleton key={index} />
+              ))
+            : visibleRecipes.length > 0
+              ? visibleRecipes.map((recipe, index) => (
             <article
               key={recipe.title}
               className="group min-w-0 overflow-hidden rounded-[1.7rem] border border-[#e2dfd6] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
@@ -2531,7 +2604,17 @@ export default function Home() {
                 </button>
               </div>
             </article>
-          ))}
+              ))
+              : (
+                <div className="rounded-[1.7rem] border border-dashed border-[#cfcec7] bg-white/70 p-8 text-center lg:col-span-3">
+                  <p className="font-serif text-2xl font-semibold">
+                    Brak przepisów dla wybranych filtrów
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[#7a857e]">
+                    Zwiększ maksymalny czas albo wygeneruj nowe propozycje.
+                  </p>
+                </div>
+              )}
         </div>
       </section>
 
