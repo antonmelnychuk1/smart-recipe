@@ -754,6 +754,58 @@ export default function Home() {
     ["Plan", mealPlanCount, "posiłki w tygodniu"],
     ["Feedback", feedbackCount, "oceny przepisów"],
   ];
+  const usagePercent =
+    currentGenerationUsage && !currentGenerationUsage.unlimited
+      ? Math.round(
+          ((currentGenerationUsage.limit - currentGenerationUsage.remaining) /
+            currentGenerationUsage.limit) *
+            100,
+        )
+      : 0;
+  const latestHistoryEntry = history[0];
+  const latestFavorite = favorites[0];
+  const dashboardCards = [
+    {
+      label: "Dzisiejszy limit",
+      value:
+        currentGenerationUsage?.unlimited || isAdmin
+          ? "bez limitu"
+          : currentGenerationUsage
+            ? `${currentGenerationUsage.remaining}/${currentGenerationUsage.limit}`
+            : `${dailyGenerationLimit}/${dailyGenerationLimit}`,
+      hint:
+        currentGenerationUsage?.unlimited || isAdmin
+          ? "konto administratora"
+          : "pozostałe generowania",
+      href: "#generator",
+    },
+    {
+      label: "Lista zakupów",
+      value: pendingShoppingCount,
+      hint:
+        pendingShoppingCount === 1
+          ? "produkt do kupienia"
+          : "produktów do kupienia",
+      href: "#my-kitchen",
+    },
+    {
+      label: "Spiżarnia",
+      value: pantryItems.length,
+      hint:
+        expiredPantryItems.length > 0
+          ? `${expiredPantryItems.length} po terminie`
+          : expiringPantryItems.length > 0
+            ? `${expiringPantryItems.length} z krótką datą`
+            : "produkty w domu",
+      href: "#my-kitchen",
+    },
+    {
+      label: "Plan tygodnia",
+      value: mealPlanCount,
+      hint: mealPlanCount === 1 ? "zaplanowany posiłek" : "zaplanowanych posiłków",
+      href: "#meal-planner",
+    },
+  ];
   const handleMealPlanEntriesChange = useCallback((count: number) => {
     setMealPlanCount(count);
   }, []);
@@ -1756,7 +1808,131 @@ export default function Home() {
         </div>
       )}
 
-      <section className="relative mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20">
+      {session?.user && (
+        <section className="mx-auto max-w-7xl px-4 pt-6 sm:px-8 sm:pt-8">
+          <div className="rounded-[1.7rem] border border-[#dfe4dc] bg-white/85 p-4 shadow-[0_18px_60px_rgba(53,68,58,0.08)] backdrop-blur sm:rounded-[2rem] sm:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+                  Panel użytkownika
+                </p>
+                <h2 className="mt-1 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+                  Cześć, {session.user.name}
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-[#68736b]">
+                  Szybki podgląd Twojej kuchni: limity, zakupy, spiżarnia i
+                  ostatnie przepisy w jednym miejscu.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href="#generator"
+                  className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#275b44]"
+                >
+                  Generuj przepis
+                </a>
+                <a
+                  href="#my-kitchen"
+                  className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
+                >
+                  Moja kuchnia
+                </a>
+                <Link
+                  href="/recipes"
+                  className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
+                >
+                  Zapisane
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {dashboardCards.map((card) => (
+                <a
+                  key={card.label}
+                  href={card.href}
+                  className="rounded-2xl border border-[#ebe7dd] bg-[#fbfaf6] p-4 transition hover:-translate-y-0.5 hover:border-[#cfdacf] hover:bg-white"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#829087]">
+                    {card.label}
+                  </p>
+                  <p className="mt-2 font-serif text-3xl font-semibold text-[#25322b]">
+                    {card.value}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-[#748078]">
+                    {card.hint}
+                  </p>
+                </a>
+              ))}
+            </div>
+
+            <div className="mt-5 grid gap-3 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="rounded-2xl bg-[#eef6ef] p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-[#365a46]">
+                      Aktywność
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-[#68736b]">
+                      {latestHistoryEntry
+                        ? `Ostatnio: ${latestHistoryEntry.ingredients.join(", ")}`
+                        : "Nie masz jeszcze historii generowania."}
+                    </p>
+                  </div>
+                  <Link
+                    href="/recipes/history"
+                    className="shrink-0 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-[#365a46] shadow-sm"
+                  >
+                    Historia
+                  </Link>
+                </div>
+                {latestFavorite && (
+                  <button
+                    onClick={() => openRecipe(latestFavorite)}
+                    className="mt-3 w-full rounded-xl bg-white px-3 py-3 text-left text-sm font-semibold text-[#25322b] shadow-sm transition hover:bg-[#f9fbf8]"
+                  >
+                    Ostatnio zapisany:{" "}
+                    <span className="text-[#d26849]">{latestFavorite.title}</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="rounded-2xl bg-[#fff5df] p-4">
+                <p className="text-sm font-semibold text-[#795d2f]">
+                  Wykorzystanie limitu
+                </p>
+                {currentGenerationUsage?.unlimited || isAdmin ? (
+                  <p className="mt-2 text-sm leading-6 text-[#795d2f]">
+                    Masz konto administratora, więc generowanie jest bez limitu.
+                  </p>
+                ) : (
+                  <>
+                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
+                      <div
+                        className="h-full rounded-full bg-[#d66a49]"
+                        style={{ width: `${usagePercent}%` }}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-[#795d2f]">
+                      {currentGenerationUsage
+                        ? `Wykorzystano ${
+                            currentGenerationUsage.limit -
+                            currentGenerationUsage.remaining
+                          } z ${currentGenerationUsage.limit}.`
+                        : "Limit zacznie się liczyć po pierwszym generowaniu."}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section
+        id="generator"
+        className="relative mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20"
+      >
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#d8dfd7] bg-white/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#48705c] sm:mb-5 sm:px-4">
