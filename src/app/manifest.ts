@@ -19,7 +19,7 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "any",
       },
       {
-        src: "/smart-recipe-maskable.svg",
+        src: "/smart-recipe-icon.svg",
         sizes: "any",
         type: "image/svg+xml",
         purpose: "maskable",
