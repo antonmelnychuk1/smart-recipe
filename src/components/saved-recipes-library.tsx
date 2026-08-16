@@ -294,7 +294,7 @@ export function SavedRecipesLibrary({
                 <div className="mt-5 flex flex-wrap gap-2 border-t border-[#eeeae2] pt-4">
                   <Link
                     href={`/recipes/${item.id}`}
-                    className="rounded-xl bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white"
+                    className="inline-flex h-9 items-center justify-center rounded-xl bg-[#2f684f] px-3 text-xs font-semibold text-white"
                   >
                     Otwórz
                   </Link>

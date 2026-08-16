@@ -143,6 +143,20 @@ export default async function RecipePage({ params }: RecipePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
+      <div className="mx-auto mb-4 flex max-w-6xl flex-wrap items-center justify-between gap-3">
+        <Link
+          href="/recipes"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-4 text-sm font-semibold text-[#365a46] shadow-sm transition hover:bg-[#f4f7f3]"
+        >
+          ← Wróć do zapisanych
+        </Link>
+        <Link
+          href="/"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-4 text-sm font-semibold text-[#365a46] shadow-sm transition hover:bg-[#f4f7f3]"
+        >
+          Strona główna
+        </Link>
+      </div>
       <article className="mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-[#dedbd2] bg-[#fffdf8] shadow-xl">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
           <div className="relative min-h-72 bg-[#edf2ed] sm:min-h-96 lg:min-h-full">
