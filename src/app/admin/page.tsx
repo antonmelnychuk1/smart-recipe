@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AdminUserActions } from "@/components/admin-user-actions";
+import { AdminUsersPanel } from "@/components/admin-users-panel";
 import { getCurrentAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import type { Recipe } from "@/lib/recipe-types";
@@ -204,6 +204,45 @@ export default async function AdminPage() {
   const activeToday = users.filter(
     (user) => (usageByUser.get(user.id)?.today ?? 0) > 0,
   ).length;
+  const usersAtLimit = users.filter((user) => {
+    const usage = usageByUser.get(user.id);
+    return (
+      user.role !== "admin" &&
+      Boolean(usage) &&
+      usage!.today >= user.dailyLimit
+    );
+  }).length;
+  const adminUsers = users.map((user) => {
+    const usage = usageByUser.get(user.id) ?? {
+      total: 0,
+      today: 0,
+      lastActivity: null,
+    };
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      banned: user.banned,
+      banReason: user.banReason,
+      dailyLimit: user.dailyLimit,
+      emailVerified: user.emailVerified,
+      createdAt: user.createdAt.toISOString(),
+      usage: {
+        total: usage.total,
+        today: usage.today,
+        lastActivity: usage.lastActivity?.toISOString() ?? null,
+      },
+      counts: {
+        favorites: user._count.favorites,
+        searches: user._count.searches,
+        shoppingItems: user._count.shoppingItems,
+        mealPlans: user._count.mealPlans,
+        feedbacks: user._count.feedbacks,
+      },
+    };
+  });
   const feedbackCountByType = new Map(
     feedbackRows.map((row) => [row.feedback, row._count._all]),
   );
@@ -269,7 +308,7 @@ export default async function AdminPage() {
             ["Generowania łącznie", totalGenerations],
             ["Generowania dzisiaj", todayGenerations],
             ["Aktywni dzisiaj", activeToday],
-            ["Generowania gości", guestGenerations],
+            ["Przy limicie", usersAtLimit],
           ].map(([label, value]) => (
             <article
               key={label}
@@ -283,11 +322,12 @@ export default async function AdminPage() {
           ))}
         </section>
 
-        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[
             ["Ulubione przepisy", totalFavorites],
             ["Zaplanowane posiłki", totalMealPlans],
             ["Oceny przepisów", totalFeedback],
+            ["Generowania gości", guestGenerations],
             [
               "Średnio na użytkownika",
               users.length
@@ -495,240 +535,11 @@ export default async function AdminPage() {
           </article>
         </section>
 
-        <section className="mt-6 overflow-hidden rounded-[1.7rem] border border-[#dedbd2] bg-white shadow-sm sm:mt-10">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ebe8e0] px-6 py-5">
-            <div>
-              <h2 className="font-serif text-2xl font-semibold">
-                Wszyscy użytkownicy
-              </h2>
-              <p className="mt-1 text-sm text-[#7a857e]">
-                Limity można ustawiać indywidualnie. Administratorzy generują
-                bez limitu.
-              </p>
-            </div>
-            <span className="rounded-full bg-[#e8efe9] px-3 py-1.5 text-xs font-bold text-[#356248]">
-              {users.length} kont
-            </span>
-          </div>
-
-          <div className="grid gap-3 p-3 2xl:hidden sm:p-4 lg:grid-cols-2">
-            {users.map((user) => {
-              const usage = usageByUser.get(user.id) ?? {
-                total: 0,
-                today: 0,
-                lastActivity: null,
-              };
-
-              return (
-                <article
-                  key={user.id}
-                  className="rounded-[1.35rem] border border-[#ebe8e0] bg-[#fffdf8] p-4 shadow-sm sm:p-5"
-                >
-                  <div className="min-w-0">
-                    <div className="flex min-w-0 items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold">
-                          {user.name || "Bez nazwy"}
-                        </p>
-                        <p className="mt-1 break-all text-xs text-[#7a857e]">
-                          {user.email}
-                        </p>
-                      </div>
-                      <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8a948e] ring-1 ring-[#e3e0d7]">
-                        konto
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                        user.role === "admin"
-                          ? "bg-[#253d31] text-white"
-                          : "bg-[#edf1ec] text-[#536159]"
-                      }`}
-                    >
-                      {user.role}
-                    </span>
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                        user.banned
-                          ? "bg-[#fff0e8] text-[#a45c45]"
-                          : "bg-[#e8efe9] text-[#356248]"
-                      }`}
-                      title={user.banReason ?? undefined}
-                    >
-                      {user.banned ? "zablokowany" : "aktywny"}
-                    </span>
-                    {emailVerificationEnabled && !user.emailVerified && (
-                      <span className="rounded-full bg-[#fff0e8] px-2.5 py-1 text-xs font-bold text-[#a45c45]">
-                        e-mail niezweryfikowany
-                      </span>
-                    )}
-                  </div>
-
-                  <dl className="mt-4 grid grid-cols-2 gap-2 text-sm min-[520px]:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-                    {[
-                      [
-                        "Dzisiaj",
-                        user.role === "admin"
-                          ? "bez limitu"
-                          : `${usage.today}/${user.dailyLimit}`,
-                      ],
-                      ["Łącznie", usage.total],
-                      ["Ulubione", user._count.favorites],
-                      ["Historia", user._count.searches],
-                      ["Feedback", user._count.feedbacks],
-                      ["Plan", user._count.mealPlans],
-                      ["Aktywność", formatDate(usage.lastActivity)],
-                      ["Rejestracja", formatDate(user.createdAt)],
-                    ].map(([label, value]) => (
-                      <div
-                        key={label}
-                        className="min-w-0 rounded-xl bg-white p-3 ring-1 ring-[#eeeae2]"
-                      >
-                        <dt className="text-[10px] font-bold uppercase tracking-wider text-[#929a94]">
-                          {label}
-                        </dt>
-                        <dd
-                          className={`mt-1 text-xs font-semibold ${
-                            label === "Dzisiaj" &&
-                            user.role !== "admin" &&
-                            usage.today >= user.dailyLimit
-                              ? "text-[#b04f3a]"
-                              : "text-[#4f5e56]"
-                          }`}
-                        >
-                          {value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-
-                  <div className="mt-4">
-                    <AdminUserActions
-                      userId={user.id}
-                      userName={user.name}
-                      role={user.role}
-                      banned={user.banned}
-                      dailyLimit={user.dailyLimit}
-                      isCurrentAdmin={user.id === admin.id}
-                    />
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-
-          <div className="hidden overflow-x-auto 2xl:block">
-            <table className="w-full min-w-[1400px] border-collapse text-left text-sm">
-              <thead className="bg-[#faf8f3] text-xs uppercase tracking-wider text-[#7b857f]">
-                <tr>
-                  <th className="px-6 py-4">Użytkownik</th>
-                  <th className="px-4 py-4">Rola</th>
-                  <th className="px-4 py-4">Status</th>
-                  <th className="px-4 py-4">Dzisiaj</th>
-                  <th className="px-4 py-4">Łącznie</th>
-                  <th className="px-4 py-4">Ulubione</th>
-                  <th className="px-4 py-4">Historia</th>
-                  <th className="px-4 py-4">Feedback</th>
-                  <th className="px-4 py-4">Plan</th>
-                  <th className="px-4 py-4">Ostatnia aktywność</th>
-                  <th className="px-6 py-4">Rejestracja</th>
-                  <th className="sticky right-0 z-10 bg-[#faf8f3] px-6 py-4 text-right shadow-[-8px_0_12px_-12px_rgba(37,50,43,0.45)]">
-                    Akcje
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => {
-                  const usage = usageByUser.get(user.id) ?? {
-                    total: 0,
-                    today: 0,
-                    lastActivity: null,
-                  };
-
-                  return (
-                    <tr
-                      key={user.id}
-                      className="group border-t border-[#efede7] align-top hover:bg-[#fcfbf8]"
-                    >
-                      <td className="px-6 py-4">
-                        <p className="font-semibold">{user.name}</p>
-                        <p className="mt-1 text-xs text-[#7a857e]">
-                          {user.email}
-                        </p>
-                        {emailVerificationEnabled && !user.emailVerified && (
-                          <span className="mt-2 inline-block rounded-full bg-[#fff0e8] px-2 py-0.5 text-[10px] font-bold text-[#a45c45]">
-                            e-mail niezweryfikowany
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-4">
-                        <span
-                          className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold ${
-                            user.role === "admin"
-                              ? "bg-[#253d31] text-white"
-                              : "bg-[#edf1ec] text-[#536159]"
-                          }`}
-                        >
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span
-                          className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold ${
-                            user.banned
-                              ? "bg-[#fff0e8] text-[#a45c45]"
-                              : "bg-[#e8efe9] text-[#356248]"
-                          }`}
-                          title={user.banReason ?? undefined}
-                        >
-                          {user.banned ? "zablokowany" : "aktywny"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span
-                          className={`whitespace-nowrap ${
-                            user.role !== "admin" &&
-                            usage.today >= user.dailyLimit
-                              ? "font-bold text-[#b04f3a]"
-                              : "font-semibold text-[#365a46]"
-                          }`}
-                        >
-                          {user.role === "admin"
-                            ? "bez limitu"
-                            : `${usage.today}/${user.dailyLimit}`}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 font-semibold">{usage.total}</td>
-                      <td className="px-4 py-4">{user._count.favorites}</td>
-                      <td className="px-4 py-4">{user._count.searches}</td>
-                      <td className="px-4 py-4">{user._count.feedbacks}</td>
-                      <td className="px-4 py-4">{user._count.mealPlans}</td>
-                      <td className="px-4 py-4 text-xs text-[#68736b]">
-                        {formatDate(usage.lastActivity)}
-                      </td>
-                      <td className="px-6 py-4 text-xs text-[#68736b]">
-                        {formatDate(user.createdAt)}
-                      </td>
-                      <td className="sticky right-0 z-10 bg-white px-6 py-4 text-right shadow-[-8px_0_12px_-12px_rgba(37,50,43,0.45)] group-hover:bg-[#fcfbf8]">
-                        <AdminUserActions
-                          userId={user.id}
-                          userName={user.name}
-                          role={user.role}
-                          banned={user.banned}
-                          dailyLimit={user.dailyLimit}
-                          isCurrentAdmin={user.id === admin.id}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <AdminUsersPanel
+          users={adminUsers}
+          currentAdminId={admin.id}
+          emailVerificationEnabled={emailVerificationEnabled}
+        />
 
         <p className="mt-5 text-xs leading-5 text-[#879089]">
           „Łącznie” obejmuje udane generowania zapisane w tabeli limitów.
