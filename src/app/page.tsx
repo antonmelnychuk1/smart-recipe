@@ -153,6 +153,7 @@ const storageKeys = {
   shopping: "smart-recipe:shopping",
   pantry: "smart-recipe:pantry",
   feedback: "smart-recipe:feedback",
+  restoreHistory: "smart-recipe:restore-history",
 };
 
 const feedbackOptions: {
@@ -494,6 +495,22 @@ export default function Home() {
     const timeout = window.setTimeout(() => setToast(null), 2600);
     return () => window.clearTimeout(timeout);
   }, [toast]);
+
+  useEffect(() => {
+    if (!storageLoaded) return;
+
+    const stored = window.localStorage.getItem(storageKeys.restoreHistory);
+    if (!stored) return;
+
+    window.localStorage.removeItem(storageKeys.restoreHistory);
+
+    try {
+      const entry = JSON.parse(stored) as SearchHistoryEntry;
+      restoreHistory(entry);
+    } catch {
+      // Niepoprawny zapis ignorujemy — historia nadal zostaje w bazie.
+    }
+  }, [storageLoaded]);
 
   useEffect(() => {
     if (!cookingMode || !cookingTimerRunning || cookingTimerSeconds <= 0) {
@@ -1166,7 +1183,7 @@ export default function Home() {
             recipes: data.recipes!,
           },
           ...current,
-        ].slice(0, 10),
+        ].slice(0, 50),
       );
       if (session?.user) {
         void saveKitchenAction({
@@ -1270,7 +1287,7 @@ export default function Home() {
         maxTime: Number(desiredDishMaxTime),
         recipes: data.recipes,
       };
-      setHistory((current) => [historyEntry, ...current].slice(0, 10));
+      setHistory((current) => [historyEntry, ...current].slice(0, 50));
       if (session?.user) {
         void saveKitchenAction({
           action: "history.add",
@@ -1358,9 +1375,17 @@ export default function Home() {
             Planer
           </a>
           {session?.user && (
-            <Link className="transition hover:text-[#25322b]" href="/recipes">
-              Zapisane
-            </Link>
+            <>
+              <Link className="transition hover:text-[#25322b]" href="/recipes">
+                Zapisane
+              </Link>
+              <Link
+                className="transition hover:text-[#25322b]"
+                href="/recipes/history"
+              >
+                Historia
+              </Link>
+            </>
           )}
           {sessionPending ? (
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
@@ -1438,7 +1463,12 @@ export default function Home() {
               ["Przepisy", "#results"],
               ["Planer posiłków", "#meal-planner"],
               ["Moja kuchnia", "#my-kitchen"],
-              ...(session?.user ? [["Zapisane przepisy", "/recipes"]] : []),
+              ...(session?.user
+                ? [
+                    ["Zapisane przepisy", "/recipes"],
+                    ["Historia przepisów", "/recipes/history"],
+                  ]
+                : []),
             ].map(([label, href]) => (
               <Link
                 key={href}
@@ -2185,21 +2215,31 @@ export default function Home() {
             </article>
 
             <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="font-serif text-2xl font-semibold">Historia</h3>
-                {history.length > 0 && (
-                  <button
-                    onClick={() => {
-                      setHistory([]);
-                      if (session?.user) {
-                        void saveKitchenAction({ action: "history.clear" });
-                      }
-                    }}
-                    className="text-xs font-semibold text-[#9a6251] hover:underline"
-                  >
-                    Wyczyść
-                  </button>
-                )}
+                <div className="flex items-center gap-3">
+                  {session?.user && history.length > 0 && (
+                    <Link
+                      href="/recipes/history"
+                      className="text-xs font-semibold text-[#356248] hover:underline"
+                    >
+                      Cała historia
+                    </Link>
+                  )}
+                  {history.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setHistory([]);
+                        if (session?.user) {
+                          void saveKitchenAction({ action: "history.clear" });
+                        }
+                      }}
+                      className="text-xs font-semibold text-[#9a6251] hover:underline"
+                    >
+                      Wyczyść
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="mt-5 space-y-3">
                 {history.length > 0 ? (

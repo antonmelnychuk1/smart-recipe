@@ -1,35 +1,42 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  SavedRecipesLibrary,
-  type SavedRecipeListItem,
-} from "@/components/saved-recipes-library";
+import { RecipeHistoryLibrary } from "@/components/recipe-history-library";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { Recipe } from "@/lib/recipe-types";
+import type { Recipe, SearchHistoryEntry } from "@/lib/recipe-types";
 
 export const dynamic = "force-dynamic";
 
-export default async function SavedRecipesPage() {
+export default async function RecipeHistoryPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/");
 
-  const records = await prisma.favorite.findMany({
+  const records = await prisma.searchHistory.findMany({
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
+    take: 50,
     select: {
       id: true,
-      isPublic: true,
+      mode: true,
+      query: true,
+      ingredients: true,
+      diet: true,
+      maxTime: true,
+      recipes: true,
       createdAt: true,
-      recipe: true,
     },
   });
-  const recipes: SavedRecipeListItem[] = records.map((record) => ({
+
+  const entries: SearchHistoryEntry[] = records.map((record) => ({
     id: record.id,
-    isPublic: record.isPublic,
     createdAt: record.createdAt.toISOString(),
-    recipe: record.recipe as Recipe,
+    mode: record.mode === "dish" ? "dish" : "ingredients",
+    query: record.query,
+    ingredients: record.ingredients,
+    diet: record.diet,
+    maxTime: record.maxTime,
+    recipes: record.recipes as Recipe[],
   }));
 
   return (
@@ -41,18 +48,19 @@ export default async function SavedRecipesPage() {
               SmartRecipe
             </p>
             <h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-              Zapisane przepisy
+              Historia przepisów
             </h1>
             <p className="mt-2 text-sm leading-6 text-[#748078]">
-              Wyszukuj, filtruj i zarządzaj swoimi ulubionymi przepisami.
+              Przeglądaj wcześniejsze generowania, filtruj wyniki i wracaj do
+              przepisów jednym kliknięciem.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
-              href="/recipes/history"
+              href="/recipes"
               className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold shadow-sm"
             >
-              Historia
+              Zapisane
             </Link>
             <Link
               href="/"
@@ -63,7 +71,7 @@ export default async function SavedRecipesPage() {
           </div>
         </header>
 
-        <SavedRecipesLibrary initialItems={recipes} />
+        <RecipeHistoryLibrary initialEntries={entries} />
       </div>
     </main>
   );

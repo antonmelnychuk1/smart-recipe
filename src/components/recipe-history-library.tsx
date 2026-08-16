@@ -1,0 +1,232 @@
+"use client";
+
+import Image from "next/image";
+import { useMemo, useState } from "react";
+import type { SearchHistoryEntry } from "@/lib/recipe-types";
+
+type RecipeHistoryLibraryProps = {
+  initialEntries: SearchHistoryEntry[];
+};
+
+function formatDate(date: string) {
+  return new Intl.DateTimeFormat("pl-PL", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date));
+}
+
+function entryTitle(entry: SearchHistoryEntry) {
+  return entry.mode === "dish" && entry.query
+    ? `Danie: ${entry.query}`
+    : entry.ingredients.join(", ");
+}
+
+export function RecipeHistoryLibrary({
+  initialEntries,
+}: RecipeHistoryLibraryProps) {
+  const [search, setSearch] = useState("");
+  const [mode, setMode] = useState("all");
+  const [diet, setDiet] = useState("all");
+  const [maxTime, setMaxTime] = useState("all");
+  const [sort, setSort] = useState("newest");
+
+  const diets = useMemo(
+    () => [...new Set(initialEntries.map((entry) => entry.diet))].sort(),
+    [initialEntries],
+  );
+
+  const visibleEntries = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase("pl");
+    const timeLimit = maxTime === "all" ? null : Number(maxTime);
+
+    return initialEntries
+      .filter((entry) => {
+        const recipesText = entry.recipes
+          .flatMap((recipe) => [
+            recipe.title,
+            recipe.description,
+            ...recipe.ingredients,
+            ...recipe.missing,
+          ])
+          .join(" ")
+          .toLocaleLowerCase("pl");
+
+        return (
+          (!query ||
+            entryTitle(entry).toLocaleLowerCase("pl").includes(query) ||
+            recipesText.includes(query)) &&
+          (mode === "all" || entry.mode === mode) &&
+          (diet === "all" || entry.diet === diet) &&
+          (timeLimit === null || entry.maxTime === 0 || entry.maxTime <= timeLimit)
+        );
+      })
+      .sort((first, second) => {
+        if (sort === "oldest") {
+          return (
+            new Date(first.createdAt).getTime() -
+            new Date(second.createdAt).getTime()
+          );
+        }
+        if (sort === "recipes") {
+          return second.recipes.length - first.recipes.length;
+        }
+        return (
+          new Date(second.createdAt).getTime() -
+          new Date(first.createdAt).getTime()
+        );
+      });
+  }, [diet, initialEntries, maxTime, mode, search, sort]);
+
+  function resetFilters() {
+    setSearch("");
+    setMode("all");
+    setDiet("all");
+    setMaxTime("all");
+    setSort("newest");
+  }
+
+  function restore(entry: SearchHistoryEntry) {
+    window.localStorage.setItem(
+      "smart-recipe:restore-history",
+      JSON.stringify(entry),
+    );
+    window.location.assign("/#results");
+  }
+
+  return (
+    <>
+      <div className="mt-7 grid gap-3 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-sm sm:grid-cols-2 sm:p-4 lg:grid-cols-6">
+        <input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Szukaj po daniu, składniku albo opisie"
+          className="h-11 rounded-xl border border-[#dedfd9] px-3 text-sm outline-none focus:border-[#71927e] sm:col-span-2"
+        />
+        <select
+          value={mode}
+          onChange={(event) => setMode(event.target.value)}
+          className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
+        >
+          <option value="all">Wszystkie typy</option>
+          <option value="ingredients">Ze składników</option>
+          <option value="dish">Po nazwie dania</option>
+        </select>
+        <select
+          value={diet}
+          onChange={(event) => setDiet(event.target.value)}
+          className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
+        >
+          <option value="all">Każda dieta</option>
+          {diets.map((option) => (
+            <option key={option}>{option}</option>
+          ))}
+        </select>
+        <select
+          value={maxTime}
+          onChange={(event) => setMaxTime(event.target.value)}
+          className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
+        >
+          <option value="all">Dowolny czas</option>
+          <option value="15">do 15 min</option>
+          <option value="30">do 30 min</option>
+          <option value="45">do 45 min</option>
+          <option value="60">do 60 min</option>
+        </select>
+        <select
+          value={sort}
+          onChange={(event) => setSort(event.target.value)}
+          className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
+        >
+          <option value="newest">Najnowsze</option>
+          <option value="oldest">Najstarsze</option>
+          <option value="recipes">Najwięcej przepisów</option>
+        </select>
+        <button
+          onClick={resetFilters}
+          className="h-11 rounded-xl border border-[#d8d7d0] px-3 text-sm font-semibold text-[#59675f] transition hover:bg-[#f6f3ec]"
+        >
+          Reset
+        </button>
+      </div>
+
+      <div className="mt-4 text-xs text-[#7a857e]">
+        {visibleEntries.length} z {initialEntries.length} wpisów historii
+      </div>
+
+      {visibleEntries.length > 0 ? (
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          {visibleEntries.map((entry) => (
+            <article
+              key={entry.id}
+              className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-sm sm:p-5"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <span className="rounded-full bg-[#eef2ec] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#356248]">
+                    {entry.mode === "dish" ? "Danie" : "Składniki"}
+                  </span>
+                  <h2 className="mt-3 break-anywhere font-serif text-2xl font-semibold">
+                    {entryTitle(entry)}
+                  </h2>
+                  <p className="mt-1 text-xs text-[#7a857e]">
+                    {formatDate(entry.createdAt)} · {entry.diet}
+                    {entry.maxTime > 0 ? ` · do ${entry.maxTime} min` : ""}
+                  </p>
+                </div>
+                <button
+                  onClick={() => restore(entry)}
+                  className="rounded-xl bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white"
+                >
+                  Otwórz wyniki
+                </button>
+              </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                {entry.recipes.map((recipe) => (
+                  <div
+                    key={recipe.title}
+                    className="overflow-hidden rounded-2xl border border-[#eeeae2] bg-[#fffdf8]"
+                  >
+                    <div className="relative grid h-24 place-items-center bg-[#edf2ed]">
+                      {recipe.image ? (
+                        <Image
+                          src={recipe.image.url}
+                          alt={recipe.image.alt}
+                          fill
+                          sizes="(max-width: 768px) 33vw, 220px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span className="text-4xl">{recipe.emoji}</span>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <p className="line-clamp-2 text-sm font-semibold">
+                        {recipe.title}
+                      </p>
+                      <p className="mt-1 text-xs text-[#7a857e]">
+                        {recipe.time} min · {recipe.calories} kcal
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-4 rounded-[1.7rem] border border-dashed border-[#cfcec7] bg-white/60 p-10 text-center">
+          <p className="font-serif text-2xl font-semibold">
+            Brak pasującej historii
+          </p>
+          <p className="mt-2 text-sm text-[#7a857e]">
+            Zmień filtry albo wygeneruj nowe przepisy w aplikacji.
+          </p>
+        </div>
+      )}
+    </>
+  );
+}

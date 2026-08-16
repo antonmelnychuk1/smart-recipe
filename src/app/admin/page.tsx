@@ -555,7 +555,7 @@ export default async function AdminPage() {
 
         <p className="mt-5 text-xs leading-5 text-[#879089]">
           „Łącznie” obejmuje udane generowania zapisane w tabeli limitów.
-          Historia pokazuje maksymalnie 10 ostatnich zapisanych wyszukiwań na
+          Historia pokazuje maksymalnie 50 ostatnich zapisanych wyszukiwań na
           konto.
         </p>
       </div>

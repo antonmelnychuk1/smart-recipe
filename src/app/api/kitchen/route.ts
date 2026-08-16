@@ -129,7 +129,7 @@ export async function GET() {
     prisma.searchHistory.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
-      take: 10,
+      take: 50,
     }),
     prisma.shoppingItem.findMany({
       where: { userId },
@@ -227,7 +227,7 @@ export async function POST(request: Request) {
         const oldEntries = await tx.searchHistory.findMany({
           where: { userId },
           orderBy: { createdAt: "desc" },
-          skip: 10,
+          skip: 50,
           select: { id: true },
         });
 
