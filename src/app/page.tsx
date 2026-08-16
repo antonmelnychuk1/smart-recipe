@@ -397,6 +397,7 @@ export default function Home() {
   const [cookingStep, setCookingStep] = useState(0);
   const [cookingTimerSeconds, setCookingTimerSeconds] = useState(0);
   const [cookingTimerRunning, setCookingTimerRunning] = useState(false);
+  const [cookingFinished, setCookingFinished] = useState(false);
   const [checkedCookingIngredients, setCheckedCookingIngredients] = useState<
     Record<string, boolean>
   >({});
@@ -860,6 +861,7 @@ export default function Home() {
     setCookingStep(0);
     setCookingTimerSeconds(0);
     setCookingTimerRunning(false);
+    setCookingFinished(false);
     setCheckedCookingIngredients({});
     setCheckedCookingSteps({});
     setSelectedRecipe(recipe);
@@ -869,9 +871,32 @@ export default function Home() {
     setCookingStep(0);
     setCookingTimerSeconds(0);
     setCookingTimerRunning(false);
+    setCookingFinished(false);
     setCheckedCookingIngredients({});
     setCheckedCookingSteps({});
     setCookingMode(true);
+  }
+
+  function closeCookingMode() {
+    if (
+      cookingTimerRunning &&
+      !window.confirm("Timer nadal działa. Zamknąć tryb gotowania?")
+    ) {
+      return;
+    }
+
+    setCookingMode(false);
+    setCookingTimerRunning(false);
+    setCookingFinished(false);
+  }
+
+  function finishCookingMode() {
+    setCheckedCookingSteps((current) => ({
+      ...current,
+      [cookingStep]: true,
+    }));
+    setCookingTimerRunning(false);
+    setCookingFinished(true);
   }
 
   function isFavorite(recipe: Recipe) {
@@ -3229,7 +3254,7 @@ export default function Home() {
           aria-modal="true"
           aria-label={`Tryb gotowania: ${selectedRecipe.title}`}
         >
-          <div className="modal-panel-safe-tall w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-5 shadow-2xl sm:p-8">
+          <div className="modal-panel-safe-tall w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
@@ -3240,12 +3265,35 @@ export default function Home() {
                 </h2>
               </div>
               <button
-                onClick={() => setCookingMode(false)}
+                onClick={closeCookingMode}
                 aria-label="Zamknij tryb gotowania"
                 className="grid size-10 place-items-center rounded-full bg-[#eeeae2] text-xl"
               >
                 ×
               </button>
+            </div>
+
+            <div className="mt-5">
+              <div className="mb-2 flex items-center justify-between text-xs font-semibold text-[#68736b]">
+                <span>
+                  Postęp: {Object.values(checkedCookingSteps).filter(Boolean).length}/
+                  {selectedRecipe.steps.length}
+                </span>
+                <span>
+                  {Math.round(
+                    ((cookingStep + 1) / selectedRecipe.steps.length) * 100,
+                  )}
+                  %
+                </span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-[#e5e2da]">
+                <div
+                  className="h-full rounded-full bg-[#d66a49] transition-all"
+                  style={{
+                    width: `${((cookingStep + 1) / selectedRecipe.steps.length) * 100}%`,
+                  }}
+                />
+              </div>
             </div>
 
             <div className="mt-6 rounded-2xl border border-[#dedbd2] bg-white p-4">
@@ -3307,7 +3355,7 @@ export default function Home() {
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#829087]">
                     Timer kuchenny
                   </p>
-                  <p className="mt-1 font-serif text-3xl font-semibold">
+                  <p className="mt-1 font-serif text-4xl font-semibold">
                     {formatTimer(cookingTimerSeconds)}
                   </p>
                 </div>
@@ -3319,6 +3367,17 @@ export default function Home() {
                     className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#356248]"
                   >
                     +1 min
+                  </button>
+                  <button
+                    onClick={() =>
+                      setCookingTimerSeconds((current) =>
+                        Math.max(0, current - 60),
+                      )
+                    }
+                    disabled={cookingTimerSeconds === 0}
+                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#356248] disabled:opacity-40"
+                  >
+                    -1 min
                   </button>
                   <button
                     onClick={() =>
@@ -3354,98 +3413,120 @@ export default function Home() {
               </div>
             </div>
 
-            {selectedRecipe.substitutions &&
-              selectedRecipe.substitutions.length > 0 && (
-                <details className="mt-3 rounded-2xl border border-[#dde7dc] bg-[#f6faf5] p-4">
-                  <summary className="cursor-pointer text-sm font-bold text-[#356248]">
-                    Pokaż zamienniki składników
-                  </summary>
-                  <div className="mt-3 space-y-2 text-sm text-[#59675f]">
-                    {selectedRecipe.substitutions.map((item) => (
-                      <p key={`${item.ingredient}-cooking`}>
-                        <span className="font-semibold text-[#35483e]">
-                          {item.ingredient}:
-                        </span>{" "}
-                        {item.substitutes.join(" / ")}
-                      </p>
-                    ))}
-                  </div>
-                </details>
-              )}
-
-            <div className="my-6 min-h-44 rounded-2xl bg-[#edf2ed] p-6 sm:p-8">
-              <div className="flex items-center justify-between gap-3">
-                <span className="grid size-10 place-items-center rounded-full bg-[#2f684f] text-sm font-bold text-white">
-                  {cookingStep + 1}
-                </span>
-                <button
-                  onClick={() =>
-                    setCheckedCookingSteps((current) => ({
-                      ...current,
-                      [cookingStep]: !current[cookingStep],
-                    }))
-                  }
-                  className={`rounded-xl px-3 py-2 text-xs font-semibold ${
-                    checkedCookingSteps[cookingStep]
-                      ? "bg-[#dfeae1] text-[#356248]"
-                      : "bg-white text-[#356248]"
-                  }`}
-                >
-                  {checkedCookingSteps[cookingStep] ? "✓ Zrobione" : "Odhacz krok"}
-                </button>
+            {cookingFinished ? (
+              <div className="my-6 rounded-[1.7rem] border border-[#dfeae1] bg-[#f4faf5] p-6 text-center sm:p-8">
+                <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#2f684f] text-2xl text-white">
+                  ✓
+                </div>
+                <h3 className="mt-4 font-serif text-3xl font-semibold">
+                  Gotowe!
+                </h3>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#68736b]">
+                  Możesz oznaczyć użyte produkty jako zużyte w spiżarni albo
+                  wrócić do przepisu bez zmian.
+                </p>
+                <div className="mt-5 flex flex-wrap justify-center gap-2">
+                  <button
+                    onClick={() => {
+                      consumeRecipePantryItems(selectedRecipe);
+                      closeCookingMode();
+                    }}
+                    className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-sm font-semibold text-white"
+                  >
+                    Oznacz składniki jako zużyte
+                  </button>
+                  <button
+                    onClick={closeCookingMode}
+                    className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248]"
+                  >
+                    Zamknij bez zmian
+                  </button>
+                </div>
               </div>
-              <p className="mt-5 font-serif text-2xl leading-9 text-[#25322b] sm:text-3xl sm:leading-10">
-                {selectedRecipe.steps[cookingStep]}
-              </p>
-            </div>
+            ) : (
+              <>
+                {selectedRecipe.substitutions &&
+                  selectedRecipe.substitutions.length > 0 && (
+                  <details className="mt-3 rounded-2xl border border-[#dde7dc] bg-[#f6faf5] p-4">
+                    <summary className="cursor-pointer text-sm font-bold text-[#356248]">
+                      Pokaż zamienniki składników
+                    </summary>
+                    <div className="mt-3 space-y-2 text-sm text-[#59675f]">
+                      {selectedRecipe.substitutions.map((item) => (
+                        <p key={`${item.ingredient}-cooking`}>
+                          <span className="font-semibold text-[#35483e]">
+                            {item.ingredient}:
+                          </span>{" "}
+                          {item.substitutes.join(" / ")}
+                        </p>
+                      ))}
+                    </div>
+                  </details>
+                  )}
 
-            <div className="h-2 overflow-hidden rounded-full bg-[#e5e2da]">
-              <div
-                className="h-full rounded-full bg-[#d66a49] transition-all"
-                style={{
-                  width: `${((cookingStep + 1) / selectedRecipe.steps.length) * 100}%`,
-                }}
-              />
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {selectedRecipe.steps.map((step, index) => (
-                <button
-                  key={step}
-                  onClick={() => setCookingStep(index)}
-                  aria-label={`Przejdź do kroku ${index + 1}`}
-                  className={`grid size-9 place-items-center rounded-full text-xs font-bold transition ${
-                    cookingStep === index
-                      ? "bg-[#d66a49] text-white"
-                      : checkedCookingSteps[index]
-                        ? "bg-[#dfeae1] text-[#356248]"
-                        : "bg-[#eeeae2] text-[#59675f]"
-                  }`}
-                >
-                  {checkedCookingSteps[index] ? "✓" : index + 1}
-                </button>
-              ))}
-            </div>
-            <div className="mt-5 flex justify-between gap-3">
+                <div className="my-6 min-h-44 rounded-2xl bg-[#edf2ed] p-6 sm:p-8">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="grid size-10 place-items-center rounded-full bg-[#2f684f] text-sm font-bold text-white">
+                      {cookingStep + 1}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCheckedCookingSteps((current) => ({
+                          ...current,
+                          [cookingStep]: !current[cookingStep],
+                        }))
+                      }
+                      className={`rounded-xl px-3 py-2 text-xs font-semibold ${
+                        checkedCookingSteps[cookingStep]
+                          ? "bg-[#dfeae1] text-[#356248]"
+                          : "bg-white text-[#356248]"
+                      }`}
+                    >
+                      {checkedCookingSteps[cookingStep]
+                        ? "✓ Zrobione"
+                        : "Odhacz krok"}
+                    </button>
+                  </div>
+                  <p className="mt-5 font-serif text-2xl leading-9 text-[#25322b] sm:text-3xl sm:leading-10">
+                    {selectedRecipe.steps[cookingStep]}
+                  </p>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {selectedRecipe.steps.map((step, index) => (
+                    <button
+                      key={step}
+                      onClick={() => setCookingStep(index)}
+                      aria-label={`Przejdź do kroku ${index + 1}`}
+                      className={`grid size-9 place-items-center rounded-full text-xs font-bold transition ${
+                        cookingStep === index
+                          ? "bg-[#d66a49] text-white"
+                          : checkedCookingSteps[index]
+                            ? "bg-[#dfeae1] text-[#356248]"
+                            : "bg-[#eeeae2] text-[#59675f]"
+                      }`}
+                    >
+                      {checkedCookingSteps[index] ? "✓" : index + 1}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {!cookingFinished && (
+            <div className="sticky bottom-0 -mx-4 mt-5 flex justify-between gap-3 border-t border-[#e6e1d7] bg-[#fffdf8]/95 px-4 py-3 backdrop-blur sm:-mx-8 sm:px-8">
               <button
                 disabled={cookingStep === 0}
                 onClick={() =>
                   setCookingStep((current) => Math.max(0, current - 1))
                 }
-                className="h-12 rounded-xl border border-[#ccd7cf] px-5 text-sm font-semibold text-[#356248] disabled:opacity-30"
+                className="h-12 flex-1 rounded-xl border border-[#ccd7cf] px-5 text-sm font-semibold text-[#356248] disabled:opacity-30"
               >
                 ← Poprzedni
               </button>
               {cookingStep === selectedRecipe.steps.length - 1 ? (
                 <button
-                  onClick={() => {
-                    setCheckedCookingSteps((current) => ({
-                      ...current,
-                      [cookingStep]: true,
-                    }));
-                    setCookingMode(false);
-                    consumeRecipePantryItems(selectedRecipe);
-                  }}
-                  className="h-12 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
+                  onClick={finishCookingMode}
+                  className="h-12 flex-1 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
                 >
                   Gotowe
                 </button>
@@ -3460,12 +3541,13 @@ export default function Home() {
                       Math.min(selectedRecipe.steps.length - 1, current + 1),
                     );
                   }}
-                  className="h-12 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
+                  className="h-12 flex-1 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
                 >
                   Następny →
                 </button>
               )}
             </div>
+            )}
           </div>
         </div>
       )}
