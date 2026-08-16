@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AdminUserActions } from "@/components/admin-user-actions";
 import { getCurrentAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
+import type { Recipe } from "@/lib/recipe-types";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,10 @@ const feedbackStyles: Record<string, string> = {
   bad_photo: "bg-[#edf1ec] text-[#536159]",
 };
 
+const negativeFeedbackValues = Object.keys(feedbackLabels).filter(
+  (feedback) => feedback !== "liked",
+);
+
 function startOfUtcDay() {
   const now = new Date();
   return new Date(
@@ -44,6 +49,29 @@ function formatDate(date: Date | null) {
   }).format(date);
 }
 
+function cleanIngredientName(value: string) {
+  return value
+    .toLocaleLowerCase("pl")
+    .replace(
+      /^\s*(\d+\s*\/\s*\d+|\d+(?:[.,]\d+)?)\s*(g|kg|ml|l|szt\.?|łyżeczki?|łyżka stołowa|łyżki stołowe|łyżek stołowych)?\s+/i,
+      "",
+    )
+    .replace(/^(danie:\s*)/i, "")
+    .trim();
+}
+
+function addCount(map: Map<string, number>, key: string, value = 1) {
+  const normalized = key.trim();
+  if (!normalized) return;
+  map.set(normalized, (map.get(normalized) ?? 0) + value);
+}
+
+function topEntries(map: Map<string, number>, limit = 6) {
+  return [...map.entries()]
+    .sort((first, second) => second[1] - first[1])
+    .slice(0, limit);
+}
+
 export default async function AdminPage() {
   const admin = await getCurrentAdmin();
   if (!admin) redirect("/");
@@ -57,6 +85,8 @@ export default async function AdminPage() {
     totalFeedback,
     feedbackRows,
     recentFeedback,
+    recentSearches,
+    negativeFeedback,
   ] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
@@ -112,6 +142,29 @@ export default async function AdminPage() {
         },
       },
     }),
+    prisma.searchHistory.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 200,
+      select: {
+        id: true,
+        mode: true,
+        query: true,
+        ingredients: true,
+        diet: true,
+        maxTime: true,
+        recipes: true,
+        createdAt: true,
+      },
+    }),
+    prisma.recipeFeedback.findMany({
+      where: { feedback: { in: negativeFeedbackValues } },
+      orderBy: { updatedAt: "desc" },
+      take: 200,
+      select: {
+        recipeTitle: true,
+        feedback: true,
+      },
+    }),
   ]);
 
   const usageByUser = new Map<
@@ -154,6 +207,38 @@ export default async function AdminPage() {
   const feedbackCountByType = new Map(
     feedbackRows.map((row) => [row.feedback, row._count._all]),
   );
+  const searchCounts = new Map<string, number>();
+  const ingredientCounts = new Map<string, number>();
+  const recipeCounts = new Map<string, number>();
+  const problemRecipeCounts = new Map<string, number>();
+
+  for (const entry of recentSearches) {
+    const searchLabel =
+      entry.mode === "dish" && entry.query
+        ? `Danie: ${entry.query}`
+        : entry.ingredients.join(", ");
+    addCount(searchCounts, searchLabel);
+
+    for (const ingredient of entry.ingredients) {
+      const cleanIngredient = cleanIngredientName(ingredient);
+      if (cleanIngredient && !cleanIngredient.startsWith("danie:")) {
+        addCount(ingredientCounts, cleanIngredient);
+      }
+    }
+
+    for (const recipe of entry.recipes as Recipe[]) {
+      addCount(recipeCounts, recipe.title);
+    }
+  }
+
+  for (const row of negativeFeedback) {
+    addCount(problemRecipeCounts, row.recipeTitle);
+  }
+
+  const topSearches = topEntries(searchCounts, 5);
+  const topIngredients = topEntries(ingredientCounts, 8);
+  const topRecipes = topEntries(recipeCounts, 5);
+  const problemRecipes = topEntries(problemRecipeCounts, 5);
 
   return (
     <main className="min-h-screen bg-[#f7f4ed] px-4 py-5 text-[#25322b] sm:px-8 sm:py-8">
@@ -313,6 +398,98 @@ export default async function AdminPage() {
                     </span>
                   </div>
                 ))
+              )}
+            </div>
+          </article>
+        </section>
+
+        <section className="mt-6 rounded-[1.7rem] border border-[#dedbd2] bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
+                Trendy
+              </p>
+              <h2 className="mt-1 font-serif text-2xl font-semibold">
+                Co użytkownicy generują najczęściej
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-[#7a857e]">
+                Dane z ostatnich zapisanych wyszukiwań i ocen pomagają szybko
+                zobaczyć, czego ludzie szukają i gdzie przepisy wymagają
+                poprawy.
+              </p>
+            </div>
+            <span className="rounded-full bg-[#eef2ec] px-3 py-1.5 text-xs font-bold text-[#356248]">
+              {recentSearches.length} wpisów historii
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-4">
+            {[
+              ["Najczęstsze zapytania", topSearches],
+              ["Najczęstsze składniki", topIngredients],
+              ["Najczęściej generowane przepisy", topRecipes],
+              ["Przepisy do poprawy", problemRecipes],
+            ].map(([title, rows]) => (
+              <article
+                key={title as string}
+                className="rounded-2xl border border-[#eeeae2] bg-[#fffdf8] p-4"
+              >
+                <h3 className="text-sm font-bold text-[#365a46]">
+                  {title as string}
+                </h3>
+                <div className="mt-4 space-y-2">
+                  {(rows as [string, number][]).length > 0 ? (
+                    (rows as [string, number][]).map(([label, count], index) => (
+                      <div
+                        key={label}
+                        className="flex items-start justify-between gap-3 rounded-xl bg-white p-3 ring-1 ring-[#eeeae2]"
+                      >
+                        <div className="min-w-0">
+                          <p className="break-anywhere text-sm font-semibold">
+                            {index + 1}. {label}
+                          </p>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-[#eef2ec] px-2 py-1 text-xs font-bold text-[#356248]">
+                          {count}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="rounded-xl bg-white p-3 text-sm leading-6 text-[#7a857e] ring-1 ring-[#eeeae2]">
+                      Brak danych.
+                    </p>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <article className="mt-4 rounded-2xl border border-[#eeeae2] bg-[#faf8f3] p-4">
+            <h3 className="text-sm font-bold text-[#365a46]">
+              Najnowsze wyszukiwania
+            </h3>
+            <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+              {recentSearches.slice(0, 6).length > 0 ? (
+                recentSearches.slice(0, 6).map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="rounded-xl bg-white p-3 ring-1 ring-[#eeeae2]"
+                  >
+                    <p className="break-anywhere text-sm font-semibold">
+                      {entry.mode === "dish" && entry.query
+                        ? `Danie: ${entry.query}`
+                        : entry.ingredients.join(", ")}
+                    </p>
+                    <p className="mt-1 text-xs text-[#7a857e]">
+                      {formatDate(entry.createdAt)} · {entry.diet}
+                      {entry.maxTime > 0 ? ` · do ${entry.maxTime} min` : ""}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="rounded-xl bg-white p-3 text-sm leading-6 text-[#7a857e] ring-1 ring-[#eeeae2]">
+                  Brak zapisanej historii wyszukiwań.
+                </p>
               )}
             </div>
           </article>
