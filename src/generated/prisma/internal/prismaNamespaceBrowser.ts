@@ -182,7 +182,9 @@ export type SearchHistoryScalarFieldEnum = (typeof SearchHistoryScalarFieldEnum)
 export const ShoppingItemScalarFieldEnum = {
   id: 'id',
   label: 'label',
+  checked: 'checked',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   userId: 'userId'
 } as const
 

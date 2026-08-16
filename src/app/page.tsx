@@ -12,6 +12,7 @@ import type {
   Recipe,
   RecipeFeedback,
   SearchHistoryEntry,
+  ShoppingListItem,
 } from "@/lib/recipe-types";
 import { sampleRecipes as initialSampleRecipes } from "@/lib/sample-recipes";
 
@@ -260,6 +261,42 @@ function groupShoppingItems(items: string[]) {
   }, []);
 }
 
+function normalizeStoredShoppingList(value: unknown): ShoppingListItem[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (typeof item === "string") {
+        const label = normalizeShoppingItem(item);
+        return label
+          ? { id: crypto.randomUUID(), label, checked: false }
+          : null;
+      }
+
+      if (
+        item &&
+        typeof item === "object" &&
+        "label" in item &&
+        typeof item.label === "string"
+      ) {
+        return {
+          id:
+            "id" in item && typeof item.id === "string"
+              ? item.id
+              : crypto.randomUUID(),
+          label: normalizeShoppingItem(item.label),
+          checked:
+            "checked" in item && typeof item.checked === "boolean"
+              ? item.checked
+              : false,
+        };
+      }
+
+      return null;
+    })
+    .filter((item): item is ShoppingListItem => Boolean(item?.label));
+}
+
 function formatShoppingListForClipboard(
   groups: ReturnType<typeof groupShoppingItems>,
 ) {
@@ -338,7 +375,7 @@ export default function Home() {
   const [sharePending, setSharePending] = useState(false);
   const [favorites, setFavorites] = useState<Recipe[]>([]);
   const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
-  const [shoppingList, setShoppingList] = useState<string[]>([]);
+  const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [shoppingInput, setShoppingInput] = useState("");
   const [recipeFeedback, setRecipeFeedback] = useState<
     Record<string, RecipeFeedback>
@@ -452,7 +489,9 @@ export default function Home() {
     const initialization = window.setTimeout(() => {
       setFavorites(readStoredValue(storageKeys.favorites, []));
       setHistory(readStoredValue(storageKeys.history, []));
-      setShoppingList(readStoredValue(storageKeys.shopping, []));
+      setShoppingList(
+        normalizeStoredShoppingList(readStoredValue(storageKeys.shopping, [])),
+      );
       setRecipeFeedback(readStoredValue(storageKeys.feedback, {}));
       setPantryItems(readStoredValue(storageKeys.pantry, []));
       setStorageLoaded(true);
@@ -536,7 +575,7 @@ export default function Home() {
       const remote = (await response.json()) as {
         favorites: Recipe[];
         history: SearchHistoryEntry[];
-        shoppingList: string[];
+        shoppingList: ShoppingListItem[];
         pantryItems: PantryItem[];
         feedback: Record<string, RecipeFeedback>;
       };
@@ -574,10 +613,19 @@ export default function Home() {
             ? [
                 saveKitchenAction({
                   action: "shopping.add",
-                  items: shoppingList,
+                  items: shoppingList.map((item) => item.label),
                 }),
               ]
             : []),
+          ...shoppingList
+            .filter((item) => item.checked)
+            .map((item) =>
+              saveKitchenAction({
+                action: "shopping.toggle",
+                label: item.label,
+                checked: true,
+              }),
+            ),
           ...pantryItems.map((item) =>
             saveKitchenAction({
               action: "pantry.upsert",
@@ -675,9 +723,23 @@ export default function Home() {
     [generated, generatedRecipes, maxTime, sampleRecipes],
   );
   const groupedShoppingList = useMemo(
-    () => groupShoppingItems(shoppingList),
+    () =>
+      groupShoppingItems(
+        shoppingList
+          .filter((item) => !item.checked)
+          .map((item) => item.label),
+      ),
     [shoppingList],
   );
+  const groupedBoughtShoppingList = useMemo(
+    () =>
+      groupShoppingItems(
+        shoppingList.filter((item) => item.checked).map((item) => item.label),
+      ),
+    [shoppingList],
+  );
+  const pendingShoppingCount = shoppingList.filter((item) => !item.checked).length;
+  const boughtShoppingCount = shoppingList.length - pendingShoppingCount;
   const feedbackCount = Object.keys(recipeFeedback).length;
   const generatedRecipeCount = history.reduce(
     (sum, entry) => sum + entry.recipes.length,
@@ -688,7 +750,7 @@ export default function Home() {
     ["Ulubione", favorites.length, "zapisane inspiracje"],
     ["Historia", history.length, "ostatnie wyszukiwania"],
     ["Spiżarnia", pantryItems.length, "produkty w domu"],
-    ["Zakupy", shoppingList.length, "produkty do kupienia"],
+    ["Zakupy", pendingShoppingCount, "produkty do kupienia"],
     ["Plan", mealPlanCount, "posiłki w tygodniu"],
     ["Feedback", feedbackCount, "oceny przepisów"],
   ];
@@ -880,22 +942,34 @@ export default function Home() {
       (item) =>
         !shoppingList.some(
           (savedItem) =>
-            savedItem.toLocaleLowerCase("pl") ===
+            savedItem.label.toLocaleLowerCase("pl") ===
             item.toLocaleLowerCase("pl"),
         ),
     );
 
-    setShoppingList((current) => [
-      ...current,
-      ...newItems.filter(
-        (item) =>
-          !current.some(
-            (savedItem) =>
-              savedItem.toLocaleLowerCase("pl") ===
-              item.toLocaleLowerCase("pl"),
-          ),
-      ),
-    ]);
+    setShoppingList((current) => {
+      const reactivated = current.map((savedItem) =>
+        cleanedItems.some(
+          (item) =>
+            item.toLocaleLowerCase("pl") ===
+            savedItem.label.toLocaleLowerCase("pl"),
+        )
+          ? { ...savedItem, checked: false }
+          : savedItem,
+      );
+      const freshItems = newItems
+        .filter(
+          (item) =>
+            !current.some(
+              (savedItem) =>
+                savedItem.label.toLocaleLowerCase("pl") ===
+                item.toLocaleLowerCase("pl"),
+            ),
+        )
+        .map((label) => ({ id: crypto.randomUUID(), label, checked: false }));
+
+      return [...reactivated, ...freshItems];
+    });
 
     setToast(
       newItems.length === 0
@@ -935,12 +1009,27 @@ export default function Home() {
 
   function removeShoppingItem(item: string) {
     setShoppingList((current) =>
-      current.filter((savedItem) => savedItem !== item),
+      current.filter((savedItem) => savedItem.label !== item),
     );
     if (session?.user) {
       void saveKitchenAction({
         action: "shopping.remove",
         label: item,
+      });
+    }
+  }
+
+  function toggleShoppingItem(item: string, checked: boolean) {
+    setShoppingList((current) =>
+      current.map((savedItem) =>
+        savedItem.label === item ? { ...savedItem, checked } : savedItem,
+      ),
+    );
+    if (session?.user) {
+      void saveKitchenAction({
+        action: "shopping.toggle",
+        label: item,
+        checked,
       });
     }
   }
@@ -978,11 +1067,69 @@ export default function Home() {
     );
   }
 
+  function clearBoughtShoppingItems() {
+    const boughtItems = shoppingList.filter((item) => item.checked);
+    if (boughtItems.length === 0) return;
+
+    setShoppingList((current) => current.filter((item) => !item.checked));
+    if (session?.user) {
+      void saveKitchenAction({ action: "shopping.clear-checked" });
+    }
+    setToast(
+      boughtItems.length === 1
+        ? "Usunięto 1 kupiony produkt."
+        : `Usunięto ${boughtItems.length} kupionych produktów.`,
+    );
+  }
+
+  function moveBoughtShoppingItemsToPantry() {
+    const boughtItems = shoppingList.filter((item) => item.checked);
+    if (boughtItems.length === 0) return;
+
+    const pantryLabels = new Set(
+      pantryItems.map((item) => item.label.toLocaleLowerCase("pl")),
+    );
+    const itemsToAdd = boughtItems
+      .map((item) => normalizeShoppingItem(item.label))
+      .filter(
+        (label) => label && !pantryLabels.has(label.toLocaleLowerCase("pl")),
+      );
+
+    setPantryItems((current) => [
+      ...itemsToAdd.map((label) => ({
+        id: crypto.randomUUID(),
+        label,
+        quantity: "1 szt.",
+        expiresAt: null,
+      })),
+      ...current,
+    ]);
+    setShoppingList((current) => current.filter((item) => !item.checked));
+
+    if (session?.user) {
+      for (const label of itemsToAdd) {
+        void saveKitchenAction({
+          action: "pantry.upsert",
+          label,
+          quantity: "1 szt.",
+          expiresAt: null,
+        });
+      }
+      void saveKitchenAction({ action: "shopping.clear-checked" });
+    }
+
+    setToast(
+      itemsToAdd.length === 0
+        ? "Kupione produkty były już w spiżarni. Usunięto je z listy."
+        : `Przeniesiono ${itemsToAdd.length} produktów do spiżarni.`,
+    );
+  }
+
   function isOnShoppingList(item: string) {
     const normalizedItem = normalizeShoppingItem(item);
     return shoppingList.some(
       (savedItem) =>
-        savedItem.toLocaleLowerCase("pl") ===
+        savedItem.label.toLocaleLowerCase("pl") ===
         normalizedItem.toLocaleLowerCase("pl"),
     );
   }
@@ -2281,13 +2428,30 @@ export default function Home() {
                   Lista zakupów
                 </h3>
                 {shoppingList.length > 0 && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={copyShoppingList}
+                      disabled={pendingShoppingCount === 0}
                       className="rounded-full bg-[#edf3ee] px-3 py-1.5 text-xs font-semibold text-[#356248] transition hover:bg-[#dfece2]"
                     >
                       Kopiuj
                     </button>
+                    {boughtShoppingCount > 0 && (
+                      <>
+                        <button
+                          onClick={moveBoughtShoppingItemsToPantry}
+                          className="rounded-full bg-[#2f684f] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#275b44]"
+                        >
+                          Kupione do spiżarni
+                        </button>
+                        <button
+                          onClick={clearBoughtShoppingItems}
+                          className="rounded-full bg-[#fff0e8] px-3 py-1.5 text-xs font-semibold text-[#9a6251] transition hover:bg-[#ffe3d7]"
+                        >
+                          Usuń kupione
+                        </button>
+                      </>
+                    )}
                     <button
                       onClick={() => {
                         setShoppingList([]);
@@ -2322,42 +2486,126 @@ export default function Home() {
               </form>
               <div className="mt-5 space-y-4">
                 {shoppingList.length > 0 ? (
-                  groupedShoppingList.map((group) => (
-                    <div key={group.name}>
-                      <div className="mb-2 flex items-center justify-between gap-3 px-1">
+                  <>
+                    <div className="rounded-2xl border border-[#eeeae2] bg-[#fffdf8] p-3">
+                      <div className="mb-3 flex items-center justify-between gap-3 px-1">
                         <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#7a857e]">
-                          {group.name}
+                          Do kupienia
                         </p>
                         <span className="rounded-full bg-[#edf3ee] px-2 py-0.5 text-[11px] font-bold text-[#356248]">
-                          {group.items.length}
+                          {pendingShoppingCount}
                         </span>
                       </div>
-                      <div className="space-y-2">
-                        {group.items.map((item) => (
-                          <div
-                            key={item}
-                            className="flex items-center gap-3 rounded-xl bg-[#faf8f3] p-3 text-sm transition hover:bg-[#f2eee5]"
-                          >
-                            <input
-                              type="checkbox"
-                              aria-label={`Oznacz ${item} jako kupione`}
-                              onChange={() => removeShoppingItem(item)}
-                              className="size-4 shrink-0 accent-[#356248]"
-                            />
-                            <span className="break-anywhere min-w-0 flex-1">
-                              {item}
-                            </span>
-                            <button
-                              onClick={() => moveShoppingItemToPantry(item)}
-                              className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
-                            >
-                              Do spiżarni
-                            </button>
-                          </div>
-                        ))}
-                      </div>
+                      {pendingShoppingCount > 0 ? (
+                        <div className="space-y-4">
+                          {groupedShoppingList.map((group) => (
+                            <div key={group.name}>
+                              <div className="mb-2 flex items-center justify-between gap-3 px-1">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#9aa29d]">
+                                  {group.name}
+                                </p>
+                                <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-[#7a857e]">
+                                  {group.items.length}
+                                </span>
+                              </div>
+                              <div className="space-y-2">
+                                {group.items.map((item) => (
+                                  <div
+                                    key={item}
+                                    className="flex items-center gap-3 rounded-xl bg-[#faf8f3] p-3 text-sm transition hover:bg-[#f2eee5]"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      aria-label={`Oznacz ${item} jako kupione`}
+                                      checked={false}
+                                      onChange={(event) =>
+                                        toggleShoppingItem(
+                                          item,
+                                          event.currentTarget.checked,
+                                        )
+                                      }
+                                      className="size-4 shrink-0 accent-[#356248]"
+                                    />
+                                    <span className="break-anywhere min-w-0 flex-1">
+                                      {item}
+                                    </span>
+                                    <button
+                                      onClick={() => moveShoppingItemToPantry(item)}
+                                      className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
+                                    >
+                                      Do spiżarni
+                                    </button>
+                                    <button
+                                      onClick={() => removeShoppingItem(item)}
+                                      className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#9a6251] transition hover:bg-[#fff0e8]"
+                                    >
+                                      Usuń
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
+                          Wszystko z listy jest oznaczone jako kupione.
+                        </p>
+                      )}
                     </div>
-                  ))
+
+                    {boughtShoppingCount > 0 && (
+                      <div className="rounded-2xl border border-[#dfeae1] bg-[#f4faf5] p-3">
+                        <div className="mb-3 flex items-center justify-between gap-3 px-1">
+                          <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#356248]">
+                            Kupione
+                          </p>
+                          <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-[#356248]">
+                            {boughtShoppingCount}
+                          </span>
+                        </div>
+                        <div className="space-y-3">
+                          {groupedBoughtShoppingList.map((group) => (
+                            <div key={group.name}>
+                              <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#7a857e]">
+                                {group.name}
+                              </p>
+                              <div className="space-y-2">
+                                {group.items.map((item) => (
+                                  <div
+                                    key={item}
+                                    className="flex items-center gap-3 rounded-xl bg-white p-3 text-sm ring-1 ring-[#dfeae1]"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      aria-label={`Cofnij oznaczenie ${item}`}
+                                      checked
+                                      onChange={(event) =>
+                                        toggleShoppingItem(
+                                          item,
+                                          event.currentTarget.checked,
+                                        )
+                                      }
+                                      className="size-4 shrink-0 accent-[#356248]"
+                                    />
+                                    <span className="break-anywhere min-w-0 flex-1 text-[#65736a] line-through">
+                                      {item}
+                                    </span>
+                                    <button
+                                      onClick={() => moveShoppingItemToPantry(item)}
+                                      className="shrink-0 rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
+                                    >
+                                      Do spiżarni
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
                     Dodaj produkt ręcznie albo przenieś brakujące składniki z

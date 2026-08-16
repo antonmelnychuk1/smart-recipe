@@ -54,6 +54,12 @@ export type PantryItem = {
   expiresAt: string | null;
 };
 
+export type ShoppingListItem = {
+  id: string;
+  label: string;
+  checked: boolean;
+};
+
 export type MealType = "breakfast" | "lunch" | "dinner";
 
 export type MealPlanEntry = {

@@ -71,7 +71,15 @@ const actionSchema = z.discriminatedUnion("action", [
     label: z.string(),
   }),
   z.object({
+    action: z.literal("shopping.toggle"),
+    label: z.string(),
+    checked: z.boolean(),
+  }),
+  z.object({
     action: z.literal("shopping.clear"),
+  }),
+  z.object({
+    action: z.literal("shopping.clear-checked"),
   }),
   z.object({
     action: z.literal("pantry.upsert"),
@@ -133,7 +141,7 @@ export async function GET() {
     }),
     prisma.shoppingItem.findMany({
       where: { userId },
-      orderBy: { createdAt: "asc" },
+      orderBy: [{ checked: "asc" }, { createdAt: "asc" }],
     }),
     prisma.pantryItem.findMany({
       where: { userId },
@@ -162,7 +170,11 @@ export async function GET() {
       maxTime: entry.maxTime,
       recipes: entry.recipes as Recipe[],
     })),
-    shoppingList: shoppingItems.map((item) => item.label),
+    shoppingList: shoppingItems.map((item) => ({
+      id: item.id,
+      label: item.label,
+      checked: item.checked,
+    })),
     pantryItems: pantryItems.map((item) => ({
       id: item.id,
       label: item.label,
@@ -246,8 +258,8 @@ export async function POST(request: Request) {
         data.items.map((label) =>
           prisma.shoppingItem.upsert({
             where: { userId_label: { userId, label } },
-            create: { userId, label },
-            update: {},
+            create: { userId, label, checked: false },
+            update: { checked: false },
           }),
         ),
       );
@@ -257,8 +269,17 @@ export async function POST(request: Request) {
         where: { userId, label: data.label },
       });
       break;
+    case "shopping.toggle":
+      await prisma.shoppingItem.updateMany({
+        where: { userId, label: data.label },
+        data: { checked: data.checked },
+      });
+      break;
     case "shopping.clear":
       await prisma.shoppingItem.deleteMany({ where: { userId } });
+      break;
+    case "shopping.clear-checked":
+      await prisma.shoppingItem.deleteMany({ where: { userId, checked: true } });
       break;
     case "pantry.upsert":
       await prisma.pantryItem.upsert({

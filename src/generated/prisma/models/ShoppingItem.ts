@@ -27,21 +27,27 @@ export type AggregateShoppingItem = {
 export type ShoppingItemMinAggregateOutputType = {
   id: string | null
   label: string | null
+  checked: boolean | null
   createdAt: Date | null
+  updatedAt: Date | null
   userId: string | null
 }
 
 export type ShoppingItemMaxAggregateOutputType = {
   id: string | null
   label: string | null
+  checked: boolean | null
   createdAt: Date | null
+  updatedAt: Date | null
   userId: string | null
 }
 
 export type ShoppingItemCountAggregateOutputType = {
   id: number
   label: number
+  checked: number
   createdAt: number
+  updatedAt: number
   userId: number
   _all: number
 }
@@ -50,21 +56,27 @@ export type ShoppingItemCountAggregateOutputType = {
 export type ShoppingItemMinAggregateInputType = {
   id?: true
   label?: true
+  checked?: true
   createdAt?: true
+  updatedAt?: true
   userId?: true
 }
 
 export type ShoppingItemMaxAggregateInputType = {
   id?: true
   label?: true
+  checked?: true
   createdAt?: true
+  updatedAt?: true
   userId?: true
 }
 
 export type ShoppingItemCountAggregateInputType = {
   id?: true
   label?: true
+  checked?: true
   createdAt?: true
+  updatedAt?: true
   userId?: true
   _all?: true
 }
@@ -144,7 +156,9 @@ export type ShoppingItemGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type ShoppingItemGroupByOutputType = {
   id: string
   label: string
+  checked: boolean
   createdAt: Date
+  updatedAt: Date
   userId: string
   _count: ShoppingItemCountAggregateOutputType | null
   _min: ShoppingItemMinAggregateOutputType | null
@@ -172,7 +186,9 @@ export type ShoppingItemWhereInput = {
   NOT?: Prisma.ShoppingItemWhereInput | Prisma.ShoppingItemWhereInput[]
   id?: Prisma.StringFilter<"ShoppingItem"> | string
   label?: Prisma.StringFilter<"ShoppingItem"> | string
+  checked?: Prisma.BoolFilter<"ShoppingItem"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ShoppingItem"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ShoppingItem"> | Date | string
   userId?: Prisma.StringFilter<"ShoppingItem"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -180,7 +196,9 @@ export type ShoppingItemWhereInput = {
 export type ShoppingItemOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  checked?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
@@ -192,7 +210,9 @@ export type ShoppingItemWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ShoppingItemWhereInput[]
   NOT?: Prisma.ShoppingItemWhereInput | Prisma.ShoppingItemWhereInput[]
   label?: Prisma.StringFilter<"ShoppingItem"> | string
+  checked?: Prisma.BoolFilter<"ShoppingItem"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ShoppingItem"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ShoppingItem"> | Date | string
   userId?: Prisma.StringFilter<"ShoppingItem"> | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId_label">
@@ -200,7 +220,9 @@ export type ShoppingItemWhereUniqueInput = Prisma.AtLeast<{
 export type ShoppingItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  checked?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   _count?: Prisma.ShoppingItemCountOrderByAggregateInput
   _max?: Prisma.ShoppingItemMaxOrderByAggregateInput
@@ -213,55 +235,71 @@ export type ShoppingItemScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ShoppingItemScalarWhereWithAggregatesInput | Prisma.ShoppingItemScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ShoppingItem"> | string
   label?: Prisma.StringWithAggregatesFilter<"ShoppingItem"> | string
+  checked?: Prisma.BoolWithAggregatesFilter<"ShoppingItem"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ShoppingItem"> | Date | string
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ShoppingItem"> | Date | string
   userId?: Prisma.StringWithAggregatesFilter<"ShoppingItem"> | string
 }
 
 export type ShoppingItemCreateInput = {
   id?: string
   label: string
+  checked?: boolean
   createdAt?: Date | string
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutShoppingItemsInput
 }
 
 export type ShoppingItemUncheckedCreateInput = {
   id?: string
   label: string
+  checked?: boolean
   createdAt?: Date | string
+  updatedAt?: Date | string
   userId: string
 }
 
 export type ShoppingItemUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
+  checked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutShoppingItemsNestedInput
 }
 
 export type ShoppingItemUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
+  checked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ShoppingItemCreateManyInput = {
   id?: string
   label: string
+  checked?: boolean
   createdAt?: Date | string
+  updatedAt?: Date | string
   userId: string
 }
 
 export type ShoppingItemUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
+  checked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShoppingItemUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
+  checked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -283,21 +321,27 @@ export type ShoppingItemUserIdLabelCompoundUniqueInput = {
 export type ShoppingItemCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  checked?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
 export type ShoppingItemMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  checked?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
 export type ShoppingItemMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  checked?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
 }
 
@@ -346,13 +390,17 @@ export type ShoppingItemUncheckedUpdateManyWithoutUserNestedInput = {
 export type ShoppingItemCreateWithoutUserInput = {
   id?: string
   label: string
+  checked?: boolean
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShoppingItemUncheckedCreateWithoutUserInput = {
   id?: string
   label: string
+  checked?: boolean
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShoppingItemCreateOrConnectWithoutUserInput = {
@@ -387,32 +435,42 @@ export type ShoppingItemScalarWhereInput = {
   NOT?: Prisma.ShoppingItemScalarWhereInput | Prisma.ShoppingItemScalarWhereInput[]
   id?: Prisma.StringFilter<"ShoppingItem"> | string
   label?: Prisma.StringFilter<"ShoppingItem"> | string
+  checked?: Prisma.BoolFilter<"ShoppingItem"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ShoppingItem"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"ShoppingItem"> | Date | string
   userId?: Prisma.StringFilter<"ShoppingItem"> | string
 }
 
 export type ShoppingItemCreateManyUserInput = {
   id?: string
   label: string
+  checked?: boolean
   createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type ShoppingItemUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
+  checked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShoppingItemUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
+  checked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ShoppingItemUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   label?: Prisma.StringFieldUpdateOperationsInput | string
+  checked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -420,7 +478,9 @@ export type ShoppingItemUncheckedUpdateManyWithoutUserInput = {
 export type ShoppingItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
+  checked?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shoppingItem"]>
@@ -428,7 +488,9 @@ export type ShoppingItemSelect<ExtArgs extends runtime.Types.Extensions.Internal
 export type ShoppingItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
+  checked?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shoppingItem"]>
@@ -436,7 +498,9 @@ export type ShoppingItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 export type ShoppingItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   label?: boolean
+  checked?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   userId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shoppingItem"]>
@@ -444,11 +508,13 @@ export type ShoppingItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type ShoppingItemSelectScalar = {
   id?: boolean
   label?: boolean
+  checked?: boolean
   createdAt?: boolean
+  updatedAt?: boolean
   userId?: boolean
 }
 
-export type ShoppingItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "createdAt" | "userId", ExtArgs["result"]["shoppingItem"]>
+export type ShoppingItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "label" | "checked" | "createdAt" | "updatedAt" | "userId", ExtArgs["result"]["shoppingItem"]>
 export type ShoppingItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -467,7 +533,9 @@ export type $ShoppingItemPayload<ExtArgs extends runtime.Types.Extensions.Intern
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     label: string
+    checked: boolean
     createdAt: Date
+    updatedAt: Date
     userId: string
   }, ExtArgs["result"]["shoppingItem"]>
   composites: {}
@@ -895,7 +963,9 @@ export interface Prisma__ShoppingItemClient<T, Null = never, ExtArgs extends run
 export interface ShoppingItemFieldRefs {
   readonly id: Prisma.FieldRef<"ShoppingItem", 'String'>
   readonly label: Prisma.FieldRef<"ShoppingItem", 'String'>
+  readonly checked: Prisma.FieldRef<"ShoppingItem", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"ShoppingItem", 'DateTime'>
+  readonly updatedAt: Prisma.FieldRef<"ShoppingItem", 'DateTime'>
   readonly userId: Prisma.FieldRef<"ShoppingItem", 'String'>
 }
     
