@@ -7,6 +7,12 @@ import { AuthDialog } from "@/components/auth-dialog";
 import { MealPlanner } from "@/components/meal-planner";
 import { Pantry } from "@/components/pantry";
 import { authClient } from "@/lib/auth-client";
+import {
+  formatOptionLabel,
+  homeCopy,
+  languageOptions,
+  type AppLanguage,
+} from "@/lib/i18n";
 import type {
   PantryItem,
   Recipe,
@@ -155,6 +161,7 @@ const storageKeys = {
   pantry: "smart-recipe:pantry",
   feedback: "smart-recipe:feedback",
   restoreHistory: "smart-recipe:restore-history",
+  language: "smart-recipe:language",
 };
 
 const feedbackOptions: {
@@ -371,8 +378,45 @@ function RecipeCardSkeleton() {
   );
 }
 
+function LanguageSwitcher({
+  language,
+  onChange,
+  compact = false,
+}: {
+  language: AppLanguage;
+  onChange: (language: AppLanguage) => void;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      aria-label={homeCopy[language].nav.language}
+      className={`inline-flex rounded-full border border-[#d9d7cd] bg-white p-1 shadow-sm ${
+        compact ? "w-full justify-between" : ""
+      }`}
+    >
+      {languageOptions.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          onClick={() => onChange(option.value)}
+          aria-pressed={language === option.value}
+          className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
+            language === option.value
+              ? "bg-[#2f684f] text-white"
+              : "text-[#667168] hover:bg-[#f3f6f2] hover:text-[#25322b]"
+          } ${compact ? "flex-1" : ""}`}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
+  const [language, setLanguage] = useState<AppLanguage>("pl");
+  const [languageLoaded, setLanguageLoaded] = useState(false);
   const [ingredients, setIngredients] = useState(["jajka", "ryż", "kurczak"]);
   const [input, setInput] = useState("");
   const [diet, setDiet] = useState("Bez ograniczeń");
@@ -460,6 +504,37 @@ export default function Home() {
     (item) => item.expiresAt !== null && daysUntilExpiry(item.expiresAt) < 0,
   );
   const modalOpen = Boolean(selectedRecipe) || cookingMode || authOpen;
+  const copy = homeCopy[language];
+
+  function changeLanguage(nextLanguage: AppLanguage) {
+    setLanguage(nextLanguage);
+    setLanguageLoaded(true);
+  }
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const storedLanguage = window.localStorage.getItem(storageKeys.language);
+      const nextLanguage =
+        storedLanguage === "pl" || storedLanguage === "en"
+          ? storedLanguage
+          : window.navigator.language.toLocaleLowerCase().startsWith("en")
+            ? "en"
+            : "pl";
+
+      setLanguage(nextLanguage);
+      setLanguageLoaded(true);
+      document.documentElement.lang = nextLanguage;
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (!languageLoaded) return;
+
+    window.localStorage.setItem(storageKeys.language, language);
+    document.documentElement.lang = language;
+  }, [language, languageLoaded]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1479,6 +1554,7 @@ export default function Home() {
           diet,
           maxTime: Number(maxTime),
           maxBudget: Number(maxBudget),
+          language,
           calorieTarget,
           proteinTarget,
           cookingGoal,
@@ -1501,7 +1577,7 @@ export default function Home() {
       }
 
       if (!response.ok || !data.recipes) {
-        throw new Error(data.error ?? "Nie udało się wygenerować przepisów.");
+        throw new Error(data.error ?? copy.generator.fallbackError);
       }
 
       setGeneratedRecipes(data.recipes);
@@ -1544,7 +1620,7 @@ export default function Home() {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Nie udało się wygenerować przepisów.",
+          : copy.generator.fallbackError,
       );
     } finally {
       setIsLoading(false);
@@ -1588,6 +1664,7 @@ export default function Home() {
           diet: desiredDishDiet,
           maxTime: Number(desiredDishMaxTime),
           maxBudget: Number(desiredDishBudget),
+          language,
           calorieTarget,
           proteinTarget,
           cookingGoal,
@@ -1608,7 +1685,7 @@ export default function Home() {
       if (data.usage) setGenerationUsage(data.usage);
 
       if (!response.ok || !data.recipes) {
-        throw new Error(data.error ?? "Nie udało się przygotować przepisu.");
+        throw new Error(data.error ?? copy.dish.fallbackError);
       }
 
       setGeneratedRecipes(data.recipes);
@@ -1619,7 +1696,7 @@ export default function Home() {
         createdAt: new Date().toISOString(),
         mode: "dish",
         query: dish,
-        ingredients: [`Danie: ${dish}`],
+        ingredients: [`${copy.dish.historyPrefix} ${dish}`],
         diet: desiredDishDiet,
         maxTime: Number(desiredDishMaxTime),
         recipes: data.recipes,
@@ -1647,7 +1724,7 @@ export default function Home() {
       setDesiredDishError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Nie udało się przygotować przepisu.",
+          : copy.dish.fallbackError,
       );
     } finally {
       setDesiredDishLoading(false);
@@ -1708,27 +1785,28 @@ export default function Home() {
         </a>
         <div className="hidden items-center gap-7 text-sm font-medium text-[#667168] sm:flex">
           <a className="transition hover:text-[#25322b]" href="#how">
-            Jak to działa?
+            {copy.nav.how}
           </a>
           <a className="transition hover:text-[#25322b]" href="#results">
-            Przepisy
+            {copy.nav.recipes}
           </a>
           <a className="transition hover:text-[#25322b]" href="#meal-planner">
-            Planer
+            {copy.nav.planner}
           </a>
           {session?.user && (
             <>
               <Link className="transition hover:text-[#25322b]" href="/recipes">
-                Zapisane
+                {copy.nav.saved}
               </Link>
               <Link
                 className="transition hover:text-[#25322b]"
                 href="/recipes/history"
               >
-                Historia
+                {copy.nav.history}
               </Link>
             </>
           )}
+          <LanguageSwitcher language={language} onChange={changeLanguage} />
           {sessionPending ? (
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
           ) : session?.user ? (
@@ -1738,7 +1816,7 @@ export default function Home() {
                   href="/admin"
                   className="rounded-full bg-[#253d31] px-4 py-2 text-white"
                 >
-                  Admin
+                  {copy.nav.admin}
                 </a>
               )}
               <a
@@ -1754,7 +1832,7 @@ export default function Home() {
                 }}
                 className="text-xs text-[#7a857e] hover:text-[#2f684f]"
               >
-                Wyloguj
+                {copy.nav.logout}
               </button>
             </div>
           ) : (
@@ -1762,13 +1840,13 @@ export default function Home() {
               onClick={() => setAuthOpen(true)}
               className="rounded-full border border-[#d9d7cd] bg-white px-4 py-2 text-[#33433a] shadow-sm"
             >
-              Zaloguj się
+              {copy.nav.login}
             </button>
           )}
         </div>
         <button
           type="button"
-          aria-label={mobileMenuOpen ? "Zamknij menu" : "Otwórz menu"}
+          aria-label={mobileMenuOpen ? copy.nav.closeMenu : copy.nav.openMenu}
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-navigation"
           onClick={() => setMobileMenuOpen((current) => !current)}
@@ -1801,14 +1879,14 @@ export default function Home() {
         >
           <div className="grid gap-1 text-sm font-semibold text-[#536159]">
             {[
-              ["Jak to działa?", "#how"],
-              ["Przepisy", "#results"],
-              ["Planer posiłków", "#meal-planner"],
-              ["Moja kuchnia", "#my-kitchen"],
+              [copy.nav.how, "#how"],
+              [copy.nav.recipes, "#results"],
+              [copy.nav.planner, "#meal-planner"],
+              [copy.nav.kitchen, "#my-kitchen"],
               ...(session?.user
                 ? [
-                    ["Zapisane przepisy", "/recipes"],
-                    ["Historia przepisów", "/recipes/history"],
+                    [copy.nav.savedRecipes, "/recipes"],
+                    [copy.nav.recipeHistory, "/recipes/history"],
                   ]
                 : []),
             ].map(([label, href]) => (
@@ -1824,6 +1902,13 @@ export default function Home() {
           </div>
 
           <div className="mt-2 border-t border-[#ebe8e0] pt-3">
+            <div className="mb-3">
+              <LanguageSwitcher
+                language={language}
+                onChange={changeLanguage}
+                compact
+              />
+            </div>
             {sessionPending ? (
               <div className="h-11 animate-pulse rounded-xl bg-[#eeeae2]" />
             ) : session?.user ? (
@@ -1840,14 +1925,14 @@ export default function Home() {
                   href="/settings"
                   className="rounded-xl bg-[#f3f6f2] px-4 py-3 text-sm font-semibold text-[#356248]"
                 >
-                  Ustawienia konta
+                  {copy.nav.accountSettings}
                 </a>
                 {isAdmin && (
                   <a
                     href="/admin"
                     className="rounded-xl bg-[#253d31] px-4 py-3 text-sm font-semibold text-white"
                   >
-                    Panel administratora
+                    {copy.nav.adminPanel}
                   </a>
                 )}
                 <button
@@ -1858,7 +1943,7 @@ export default function Home() {
                   }}
                   className="rounded-xl px-4 py-3 text-left text-sm font-semibold text-[#a45c45]"
                 >
-                  Wyloguj się
+                  {copy.nav.logoutFull}
                 </button>
               </div>
             ) : (
@@ -1869,7 +1954,7 @@ export default function Home() {
                 }}
                 className="h-11 w-full rounded-xl bg-[#2f684f] text-sm font-semibold text-white"
               >
-                Zaloguj się lub utwórz konto
+                {copy.nav.loginOrCreate}
               </button>
             )}
           </div>
@@ -2076,15 +2161,16 @@ export default function Home() {
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#d8dfd7] bg-white/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#48705c] sm:mb-5 sm:px-4">
-            <Icon name="spark" /> Mniej marnowania, więcej smaku
+            <Icon name="spark" /> {copy.hero.badge}
           </div>
           <h1 className="font-serif text-5xl font-semibold leading-[1.02] tracking-[-0.04em] text-[#203128] sm:text-7xl">
-            Co dziś ugotujemy
-            <span className="block italic text-[#d66a49]">z tego, co masz?</span>
+            {copy.hero.title}
+            <span className="block italic text-[#d66a49]">
+              {copy.hero.titleAccent}
+            </span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[#68736b] sm:mt-6 sm:text-lg">
-            Wpisz produkty ze swojej kuchni. Znajdziemy dla nich pyszne
-            zastosowanie i podpowiemy, czego ewentualnie brakuje.
+            {copy.hero.description}
           </p>
         </div>
 
@@ -2093,7 +2179,7 @@ export default function Home() {
           className="mx-auto mt-7 max-w-4xl rounded-3xl border border-white bg-white/90 p-3 shadow-[0_24px_80px_rgba(53,68,58,0.13)] sm:mt-10 sm:rounded-[2rem] sm:p-7"
         >
           <label className="mb-2 block text-sm font-semibold text-[#35483e]">
-            Twoje składniki
+            {copy.generator.ingredientsLabel}
           </label>
           <div className="flex min-h-16 flex-wrap items-center gap-2 rounded-2xl border border-[#dedfd9] bg-[#fbfaf6] p-2.5 focus-within:border-[#71927e] focus-within:ring-4 focus-within:ring-[#71927e]/10">
             {ingredients.map((ingredient) => (
@@ -2104,7 +2190,7 @@ export default function Home() {
                 {ingredient}
                 <button
                   type="button"
-                  aria-label={`Usuń ${ingredient}`}
+                  aria-label={`${copy.generator.removeIngredient} ${ingredient}`}
                   className="text-[#71847a] hover:text-[#273d32]"
                   onClick={() =>
                     setIngredients((current) =>
@@ -2126,12 +2212,12 @@ export default function Home() {
                 }
               }}
               className="min-w-36 flex-1 bg-transparent px-2 py-2 text-sm outline-none placeholder:text-[#a3aaa5]"
-              placeholder="Dodaj produkt..."
+              placeholder={copy.generator.addProduct}
             />
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#828a84]">
-            <span>Podpowiedzi:</span>
+            <span>{copy.generator.suggestions}</span>
             {suggestions
               .filter((item) => !ingredients.includes(item))
               .map((item) => (
@@ -2148,31 +2234,35 @@ export default function Home() {
 
           <div className="mt-4 grid gap-3 border-t border-[#eeece5] pt-4 sm:mt-6 sm:grid-cols-2 sm:gap-4 sm:pt-6 lg:grid-cols-[1fr_1fr_1fr_auto]">
             <label className="text-sm font-semibold text-[#35483e]">
-              Dieta
+              {copy.generator.diet}
               <select
                 value={diet}
                 onChange={(event) => setDiet(event.target.value)}
                 className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
               >
                 {dietOptions.map((option) => (
-                  <option key={option}>{option}</option>
+                  <option key={option} value={option}>
+                    {copy.options.diets[option as keyof typeof copy.options.diets]}
+                  </option>
                 ))}
               </select>
             </label>
             <label className="text-sm font-semibold text-[#35483e]">
-              Budżet na 2 porcje
+              {copy.generator.budget}
               <select
                 value={maxBudget}
                 onChange={(event) => setMaxBudget(event.target.value)}
                 className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
               >
                 {budgetOptions.map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {formatOptionLabel(language, "budget", value, label)}
+                  </option>
                 ))}
               </select>
             </label>
             <label className="text-sm font-semibold text-[#35483e]">
-              Maksymalny czas
+              {copy.generator.maxTime}
               <select
                 value={maxTime}
                 onChange={(event) => setMaxTime(event.target.value)}
@@ -2180,7 +2270,7 @@ export default function Home() {
               >
                 {timeOptions.map(([value, label]) => (
                   <option key={value} value={value}>
-                    {label}
+                    {formatOptionLabel(language, "time", value, label)}
                   </option>
                 ))}
               </select>
@@ -2190,7 +2280,7 @@ export default function Home() {
               className="mt-auto flex h-12 items-center justify-center gap-2 rounded-xl bg-[#2f684f] px-6 font-semibold text-white shadow-lg shadow-[#2f684f]/20 transition hover:-translate-y-0.5 hover:bg-[#275b44] disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Icon name="spark" />{" "}
-              {isLoading ? "AI gotuje..." : "Generuj przepisy"}
+              {isLoading ? copy.generator.generating : copy.generator.generate}
             </button>
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#f3f6f2] px-4 py-3 text-xs text-[#617068]">
@@ -2199,13 +2289,13 @@ export default function Home() {
                 <>
                   {isAdmin ? (
                     <strong className="text-[#365a46]">
-                      Konto administratora — generowanie bez limitu.
+                      {copy.generator.adminLimit}
                     </strong>
                   ) : (
                     <>
-                      Twoje konto obejmuje{" "}
+                      {copy.generator.accountLimitPrefix}{" "}
                       <strong className="text-[#365a46]">
-                        {accountDailyLimit} generowań dziennie
+                        {accountDailyLimit} {copy.generator.accountLimitSuffix}
                       </strong>
                       .
                     </>
@@ -2213,9 +2303,9 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  Bez konta otrzymujesz{" "}
+                  {copy.generator.guestLimitPrefix}{" "}
                   <strong className="text-[#365a46]">
-                    3 generowania dziennie
+                    3 {copy.generator.guestLimitSuffix}
                   </strong>
                   .
                 </>
@@ -2227,7 +2317,7 @@ export default function Home() {
                 onClick={() => setAuthOpen(true)}
                 className="font-semibold text-[#2f684f] hover:underline"
               >
-                Załóż konto — zwiększ limit do 20
+                {copy.generator.createAccount}
               </button>
             )}
           </div>
@@ -2239,8 +2329,8 @@ export default function Home() {
               {error}
               {generationUsage?.remaining === 0 && (
                 <span className="mt-1 block text-xs">
-                  Limit odnowi się{" "}
-                  {new Intl.DateTimeFormat("pl-PL", {
+                  {copy.generator.resetAt}{" "}
+                  {new Intl.DateTimeFormat(language === "pl" ? "pl-PL" : "en-US", {
                     weekday: "long",
                     hour: "2-digit",
                     minute: "2-digit",
@@ -2252,10 +2342,9 @@ export default function Home() {
           )}
           {isLoading && !error && (
             <div className="mt-4 rounded-xl border border-[#efd5ab] bg-[#fff8e9] px-4 py-3 text-sm text-[#795d2f]">
-              <p className="font-semibold">AI gotuje propozycje...</p>
+              <p className="font-semibold">{copy.generator.loadingTitle}</p>
               <p className="mt-1 text-xs leading-5">
-                Tworzymy 3 przepisy z proporcjami, wartościami odżywczymi i
-                zdjęciami z Pexels.
+                {copy.generator.loadingText}
               </p>
             </div>
           )}
@@ -2263,12 +2352,12 @@ export default function Home() {
             !currentGenerationUsage.unlimited &&
             !error && (
             <p className="mt-4 text-center text-xs text-[#7a857e]">
-              Pozostało dziś:{" "}
+              {copy.generator.remainingToday}{" "}
               <strong className="text-[#466453]">
                 {currentGenerationUsage.remaining}/
                 {currentGenerationUsage.limit}
               </strong>{" "}
-              generowań
+              {copy.generator.generations}
             </p>
           )}
         </form>
@@ -2276,11 +2365,7 @@ export default function Home() {
 
       <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
         <div className="max-w-7xl mx-auto grid gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
-          {[
-            ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
-            ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie."],
-            ["03", "Gotuj bez resztek", "Wybierz pomysł i wykorzystaj produkty do końca."],
-          ].map(([number, title, text]) => (
+          {copy.how.map(([number, title, text]) => (
             <div key={number} className="flex items-start gap-4 text-left">
               <span className="font-serif text-3xl italic text-[#d46c4c]">{number}</span>
               <div>
@@ -2296,14 +2381,13 @@ export default function Home() {
         <div className="mx-auto max-w-7xl grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-              Masz ochotę na konkretne danie?
+              {copy.dish.eyebrow}
             </p>
             <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-              Wpisz, co chcesz ugotować
+              {copy.dish.title}
             </h2>
             <p className="mt-3 max-w-lg text-sm leading-6 text-[#68736b] sm:text-base">
-              Napisz „pancakes”, „gulasz” albo dokładniej: „wegańskie curry z
-              ciecierzycą”. Otrzymasz pełny przepis dla dwóch osób.
+              {copy.dish.description}
             </p>
           </div>
 
@@ -2312,43 +2396,47 @@ export default function Home() {
             className="rounded-3xl border border-white bg-white/90 p-3 shadow-[0_18px_60px_rgba(53,68,58,0.10)] sm:p-5"
           >
             <label className="text-sm font-semibold text-[#35483e]">
-              Nazwa lub opis dania
+              {copy.dish.label}
               <input
                 id="desired-dish"
                 value={desiredDish}
                 onChange={(event) => setDesiredDish(event.target.value)}
                 maxLength={120}
                 className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e]"
-                placeholder="np. puszyste pancakes z owocami"
+                placeholder={copy.dish.placeholder}
               />
             </label>
             <div className="mt-3 grid gap-3 border-t border-[#eeece5] pt-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
               <label className="text-sm font-semibold text-[#35483e]">
-                Dieta
+                {copy.generator.diet}
                 <select
                   value={desiredDishDiet}
                   onChange={(event) => setDesiredDishDiet(event.target.value)}
                   className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
                 >
                   {dietOptions.map((option) => (
-                    <option key={option}>{option}</option>
+                    <option key={option} value={option}>
+                      {copy.options.diets[option as keyof typeof copy.options.diets]}
+                    </option>
                   ))}
                 </select>
               </label>
               <label className="text-sm font-semibold text-[#35483e]">
-                Budżet na 2 porcje
+                {copy.generator.budget}
                 <select
                   value={desiredDishBudget}
                   onChange={(event) => setDesiredDishBudget(event.target.value)}
                   className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
                 >
                   {budgetOptions.map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
+                    <option key={value} value={value}>
+                      {formatOptionLabel(language, "budget", value, label)}
+                    </option>
                   ))}
                 </select>
               </label>
               <label className="text-sm font-semibold text-[#35483e]">
-                Maksymalny czas
+                {copy.generator.maxTime}
                 <select
                   value={desiredDishMaxTime}
                   onChange={(event) =>
@@ -2358,7 +2446,7 @@ export default function Home() {
                 >
                   {timeOptions.map(([value, label]) => (
                     <option key={value} value={value}>
-                      {label}
+                      {formatOptionLabel(language, "time", value, label)}
                     </option>
                   ))}
                 </select>
@@ -2368,12 +2456,11 @@ export default function Home() {
                 className="mt-auto flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#d66a49] px-5 font-semibold text-white shadow-lg shadow-[#d66a49]/20 transition hover:-translate-y-0.5 hover:bg-[#c35d3e] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon name="spark" />
-                {desiredDishLoading ? "AI gotuje..." : "Stwórz przepis"}
+                {desiredDishLoading ? copy.dish.creating : copy.dish.create}
               </button>
             </div>
             <p className="mt-3 text-xs text-[#7a857e]">
-              Ten generator ma własne ustawienia. Obowiązuje wspólny dzienny
-              limit generowania.
+              {copy.dish.note}
             </p>
             {desiredDishError && (
               <p
@@ -2385,9 +2472,9 @@ export default function Home() {
             )}
             {desiredDishLoading && !desiredDishError && (
               <div className="mt-3 rounded-xl border border-[#efd5ab] bg-[#fff8e9] px-4 py-3 text-sm text-[#795d2f]">
-                <p className="font-semibold">Tworzymy warianty dania...</p>
+                <p className="font-semibold">{copy.dish.loadingTitle}</p>
                 <p className="mt-1 text-xs leading-5">
-                  Za chwilę pojawią się 3 różne propozycje przepisu.
+                  {copy.dish.loadingText}
                 </p>
               </div>
             )}
@@ -2400,29 +2487,29 @@ export default function Home() {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
               {generationInProgress
-                ? "AI gotuje"
+                ? copy.results.cooking
                 : generationMode === "dish"
-                ? "Przepis na Twoje życzenie"
+                ? copy.results.requestedDish
                 : generated
-                  ? "Dopasowane dla Ciebie"
-                  : "Przykładowe inspiracje"}
+                  ? copy.results.matched
+                  : copy.results.demo}
             </p>
             <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
               {generationInProgress
-                ? "Przygotowujemy 3 propozycje"
+                ? copy.results.preparing
                 : generationMode === "dish"
-                ? `${visibleRecipes.length} warianty wybranego dania`
+                ? `${visibleRecipes.length} ${copy.results.variants}`
                 : generated
-                ? `${visibleRecipes.length} pomysły na dzisiaj`
-                : "Tak mogą wyglądać wyniki"}
+                ? `${visibleRecipes.length} ${copy.results.ideas}`
+                : copy.results.demoTitle}
             </h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-[#748078]">
             {generationInProgress
-              ? "To może chwilę potrwać — dobieramy składniki, proporcje, kroki i zdjęcia."
+              ? copy.results.cookingText
               : generationMode === "dish"
-              ? "Wybierz najlepszy z trzech wariantów. Każdy zawiera pełną listę produktów, instrukcję i wartości odżywcze."
-              : "Procent dopasowania pokazuje, ile potrzebnych produktów już masz. Brakujące składniki łatwo przeniesiesz później na listę zakupów."}
+              ? copy.results.dishText
+              : copy.results.defaultText}
           </p>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -2436,14 +2523,14 @@ export default function Home() {
             }`}
           >
             {generationInProgress
-              ? "Generowanie w toku"
+              ? copy.results.inProgress
               : generated
-                ? "Wyniki gotowe"
-                : "Tryb demo"}
+                ? copy.results.ready
+                : copy.results.demoMode}
           </span>
           {currentGenerationUsage && !currentGenerationUsage.unlimited && (
             <span className="rounded-full bg-[#f6f3ec] px-3 py-1.5 text-xs font-bold text-[#68736b]">
-              Limit: {currentGenerationUsage.remaining}/
+              {copy.results.limit} {currentGenerationUsage.remaining}/
               {currentGenerationUsage.limit}
             </span>
           )}
@@ -2479,7 +2566,7 @@ export default function Home() {
                       rel="noreferrer"
                       className="absolute bottom-3 left-4 max-w-[75%] truncate text-[10px] font-medium text-white/90 hover:text-white hover:underline"
                     >
-                      Fot. {recipe.image.photographer} · Pexels
+                      {copy.results.photo} {recipe.image.photographer} · Pexels
                     </a>
                   </>
                 ) : (
@@ -2489,15 +2576,15 @@ export default function Home() {
                 )}
                 <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#356248] backdrop-blur">
                   {generationMode === "dish"
-                    ? "Pełny przepis"
-                    : `${recipe.match}% dopasowania`}
+                    ? copy.results.fullRecipe
+                    : `${recipe.match}% ${copy.results.match}`}
                 </span>
                 <button
                   onClick={() => toggleFavorite(recipe)}
                   aria-label={
                     isFavorite(recipe)
-                      ? `Usuń ${recipe.title} z ulubionych`
-                      : `Dodaj ${recipe.title} do ulubionych`
+                      ? `${copy.results.removeFavorite}: ${recipe.title}`
+                      : `${copy.results.addFavorite}: ${recipe.title}`
                   }
                   className={`absolute right-4 top-4 grid size-10 place-items-center rounded-full backdrop-blur transition ${
                     isFavorite(recipe)
@@ -2516,7 +2603,9 @@ export default function Home() {
                   <span className="shrink-0">{recipe.difficulty}</span>
                   <span className="shrink-0">{recipe.calories} kcal</span>
                   {recipe.estimatedCost && (
-                    <span className="shrink-0">ok. {recipe.estimatedCost} zł</span>
+                    <span className="shrink-0">
+                      {copy.results.approx} {recipe.estimatedCost} zł
+                    </span>
                   )}
                 </div>
                 <h3 className="break-anywhere mt-4 font-serif text-2xl font-semibold">
@@ -2547,7 +2636,7 @@ export default function Home() {
                 </div>
                 <div className="mt-5 border-t border-[#eeeae2] pt-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-[#829087]">
-                    Brakuje
+                    {copy.results.missing}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {recipe.missing.length > 0 ? (
@@ -2571,7 +2660,7 @@ export default function Home() {
                       })
                     ) : (
                       <span className="text-sm text-[#4f765e]">
-                        Masz wszystko!
+                        {copy.results.haveEverything}
                       </span>
                     )}
                   </div>
@@ -2582,15 +2671,15 @@ export default function Home() {
                       className="mt-3 rounded-lg px-2 py-1 text-xs font-semibold text-[#a45c45] transition hover:bg-[#fff0e8] disabled:text-[#6e8376]"
                     >
                       {recipe.missing.every(isOnShoppingList)
-                        ? "✓ Wszystkie są na liście"
-                        : "Dodaj wszystkie brakujące"}
+                        ? copy.results.allOnList
+                        : copy.results.addAllMissing}
                     </button>
                   )}
                 </div>
                 {recipe.substitutions && recipe.substitutions.length > 0 && (
                   <div className="mt-4 rounded-2xl bg-[#f8f4ec] p-3">
                     <p className="text-xs font-semibold uppercase tracking-wider text-[#829087]">
-                      Zamienniki
+                      {copy.results.substitutions}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-[#59675f]">
                       {recipe.substitutions[0].ingredient}:{" "}
@@ -2598,8 +2687,8 @@ export default function Home() {
                     </p>
                     {recipe.substitutions.length > 1 && (
                       <p className="mt-1 text-xs text-[#7a857e]">
-                        +{recipe.substitutions.length - 1} więcej w szczegółach
-                        przepisu
+                        +{recipe.substitutions.length - 1}{" "}
+                        {copy.results.moreInDetails}
                       </p>
                     )}
                   </div>
@@ -2608,7 +2697,7 @@ export default function Home() {
                   onClick={() => openRecipe(recipe)}
                   className="mt-6 w-full rounded-xl border border-[#ccd7cf] py-3 text-sm font-semibold text-[#356248] transition hover:bg-[#edf3ee]"
                 >
-                  Zobacz przepis
+                  {copy.results.viewRecipe}
                 </button>
               </div>
             </article>
@@ -2616,10 +2705,10 @@ export default function Home() {
               : (
                 <div className="rounded-[1.7rem] border border-dashed border-[#cfcec7] bg-white/70 p-8 text-center lg:col-span-3">
                   <p className="font-serif text-2xl font-semibold">
-                    Brak przepisów dla wybranych filtrów
+                    {copy.results.noRecipes}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-[#7a857e]">
-                    Zwiększ maksymalny czas albo wygeneruj nowe propozycje.
+                    {copy.results.noRecipesHint}
                   </p>
                 </div>
               )}
@@ -2642,22 +2731,22 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-              Twój zapisany kącik
+              {copy.kitchen.eyebrow}
             </p>
             <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-5xl">
-              Moja kuchnia
+              {copy.kitchen.title}
             </h2>
             <p className="mt-2 text-sm leading-6 text-[#748078] sm:mt-3 sm:text-base sm:leading-7">
               {session?.user
-                ? "Twoje dane są zapisane na koncie i dostępne po ponownym zalogowaniu."
-                : "Dane są teraz lokalne. Zaloguj się, aby zapisać je na koncie i synchronizować."}
+                ? copy.kitchen.signedIn
+                : copy.kitchen.local}
             </p>
             {!session?.user && (
               <button
                 onClick={() => setAuthOpen(true)}
                 className="mt-5 rounded-xl bg-[#2f684f] px-5 py-3 text-sm font-semibold text-white"
               >
-                Zaloguj się lub utwórz konto
+                {copy.kitchen.login}
               </button>
             )}
           </div>
@@ -2698,7 +2787,9 @@ export default function Home() {
           <div className="mt-4 grid gap-3 sm:mt-6 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             <article className="min-w-0 rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <h3 className="font-serif text-2xl font-semibold">Ulubione</h3>
+                <h3 className="font-serif text-2xl font-semibold">
+                  {copy.kitchen.favorites}
+                </h3>
                 <span className="rounded-full bg-[#f7eee8] px-3 py-1 text-xs font-bold text-[#a45c45]">
                   {favorites.length}
                 </span>
@@ -2736,7 +2827,7 @@ export default function Home() {
                       </button>
                       <button
                         onClick={() => toggleFavorite(recipe)}
-                        aria-label={`Usuń ${recipe.title} z ulubionych`}
+                        aria-label={`${copy.results.removeFavorite}: ${recipe.title}`}
                         className="text-xl text-[#d26849]"
                       >
                         ×
@@ -2745,7 +2836,7 @@ export default function Home() {
                   ))
                 ) : (
                   <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
-                    Kliknij serce przy przepisie, a znajdziesz go tutaj.
+                    {copy.kitchen.emptyFavorites}
                   </p>
                 )}
               </div>
@@ -2753,14 +2844,16 @@ export default function Home() {
 
             <article className="min-w-0 rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="font-serif text-2xl font-semibold">Historia</h3>
+                <h3 className="font-serif text-2xl font-semibold">
+                  {copy.kitchen.history}
+                </h3>
                 <div className="flex items-center gap-3">
                   {session?.user && history.length > 0 && (
                     <Link
                       href="/recipes/history"
                       className="text-xs font-semibold text-[#356248] hover:underline"
                     >
-                      Cała historia
+                      {copy.kitchen.fullHistory}
                     </Link>
                   )}
                   {history.length > 0 && (
@@ -2773,7 +2866,7 @@ export default function Home() {
                       }}
                       className="text-xs font-semibold text-[#9a6251] hover:underline"
                     >
-                      Wyczyść
+                      {copy.kitchen.clear}
                     </button>
                   )}
                 </div>
@@ -3663,14 +3756,14 @@ export default function Home() {
       )}
 
       <footer className="bg-[#23362c] px-4 py-6 text-center text-sm text-[#b8c3bc] sm:px-5 sm:py-8">
-        SmartRecipe · Gotuj sprytniej, marnuj mniej.{" "}
+        {copy.footer.text}{" "}
         <a
           href="https://www.pexels.com"
           target="_blank"
           rel="noreferrer"
           className="underline decoration-white/30 underline-offset-4 hover:text-white"
         >
-          Photos provided by Pexels
+          {copy.footer.pexels}
         </a>
       </footer>
     </main>

@@ -17,6 +17,7 @@ const ingredientsRequestSchema = z.object({
   diet: z.string().trim().min(1).max(60),
   maxTime: z.number().int().min(0).max(240),
   maxBudget: z.number().int().min(0).max(1000),
+  language: z.enum(["pl", "en"]).default("pl"),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
   cookingGoal: z
@@ -34,6 +35,7 @@ const dishRequestSchema = z.object({
   diet: z.string().trim().min(1).max(60),
   maxTime: z.number().int().min(0).max(240),
   maxBudget: z.number().int().min(0).max(1000),
+  language: z.enum(["pl", "en"]).default("pl"),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
   cookingGoal: z
@@ -51,7 +53,16 @@ const recipeSchema = z.object({
   title: z.string(),
   description: z.string(),
   time: z.number().int(),
-  difficulty: z.enum(["Bardzo łatwy", "Łatwy", "Średni", "Trudny"]),
+  difficulty: z.enum([
+    "Bardzo łatwy",
+    "Łatwy",
+    "Średni",
+    "Trudny",
+    "Very easy",
+    "Easy",
+    "Medium",
+    "Hard",
+  ]),
   calories: z.number().int(),
   protein: z.number().int(),
   carbs: z.number().int(),
@@ -114,40 +125,102 @@ export async function POST(request: Request) {
   const requestData = parsedRequest.data;
   const isDishMode = requestData.mode === "dish";
   const { diet, maxTime } = requestData;
+  const language = requestData.language;
+  const isEnglish = language === "en";
+  const dietLabels: Record<string, string> = {
+    "Bez ograniczeń": isEnglish ? "No restrictions" : "Bez ograniczeń",
+    Wegetariańska: isEnglish ? "Vegetarian" : "Wegetariańska",
+    Wegańska: isEnglish ? "Vegan" : "Wegańska",
+    Pescetariańska: isEnglish ? "Pescetarian" : "Pescetariańska",
+    Bezglutenowa: isEnglish ? "Gluten-free" : "Bezglutenowa",
+    "Bez laktozy": isEnglish ? "Lactose-free" : "Bez laktozy",
+    Ketogeniczna: isEnglish ? "Keto" : "Ketogeniczna",
+    Niskowęglowodanowa: isEnglish ? "Low-carb" : "Niskowęglowodanowa",
+    Śródziemnomorska: isEnglish ? "Mediterranean" : "Śródziemnomorska",
+    Wysokobiałkowa: isEnglish ? "High-protein" : "Wysokobiałkowa",
+  };
+  const localizedDiet = dietLabels[diet] ?? diet;
   const budgetRequirement =
     requestData.maxBudget === 0
-      ? "Bez ograniczeń budżetowych"
-      : `Maksymalnie ${requestData.maxBudget} zł za 2 porcje`;
+      ? isEnglish
+        ? "No budget limit"
+        : "Bez ograniczeń budżetowych"
+      : isEnglish
+        ? `Maximum ${requestData.maxBudget} PLN for 2 servings`
+        : `Maksymalnie ${requestData.maxBudget} zł za 2 porcje`;
   const goalLabels: Record<typeof requestData.cookingGoal, string> = {
-    balanced: "zbalansowany posiłek",
-    quick: "jak najszybsze przygotowanie",
-    cheap: "jak najniższy koszt",
-    healthy: "zdrowszy, lekki skład",
-    high_protein: "wysoka zawartość białka",
-    use_pantry: "maksymalne wykorzystanie produktów użytkownika",
+    balanced: isEnglish ? "a balanced meal" : "zbalansowany posiłek",
+    quick: isEnglish
+      ? "the fastest possible preparation"
+      : "jak najszybsze przygotowanie",
+    cheap: isEnglish ? "the lowest possible cost" : "jak najniższy koszt",
+    healthy: isEnglish
+      ? "a healthier, lighter composition"
+      : "zdrowszy, lekki skład",
+    high_protein: isEnglish
+      ? "high protein content"
+      : "wysoka zawartość białka",
+    use_pantry: isEnglish
+      ? "maximum use of the user's products"
+      : "maksymalne wykorzystanie produktów użytkownika",
   };
-  const cookingGoalRequirement = `Priorytet użytkownika: ${
-    goalLabels[requestData.cookingGoal]
-  }.`;
+  const cookingGoalRequirement = isEnglish
+    ? `User priority: ${goalLabels[requestData.cookingGoal]}.`
+    : `Priorytet użytkownika: ${goalLabels[requestData.cookingGoal]}.`;
   const excludedRequirement =
     requestData.excludedIngredients.length > 0
-      ? `Produkty wykluczone, alergie lub nielubiane składniki: ${requestData.excludedIngredients.join(", ")}. Nie używaj ich w składnikach, missing, krokach ani zamiennikach.`
-      : "Brak dodatkowych wykluczeń i nielubianych składników.";
-  const nutritionGoals = `Dzienne cele użytkownika: ${
-    requestData.calorieTarget ? `${requestData.calorieTarget} kcal` : "brak celu kalorii"
-  }, ${requestData.proteinTarget ? `${requestData.proteinTarget} g białka` : "brak celu białka"}.`;
+      ? isEnglish
+        ? `Excluded products, allergies or disliked ingredients: ${requestData.excludedIngredients.join(", ")}. Do not use them in ingredients, missing, steps or substitutions.`
+        : `Produkty wykluczone, alergie lub nielubiane składniki: ${requestData.excludedIngredients.join(", ")}. Nie używaj ich w składnikach, missing, krokach ani zamiennikach.`
+      : isEnglish
+        ? "No additional exclusions or disliked ingredients."
+        : "Brak dodatkowych wykluczeń i nielubianych składników.";
+  const nutritionGoals = isEnglish
+    ? `User daily goals: ${
+        requestData.calorieTarget
+          ? `${requestData.calorieTarget} kcal`
+          : "no calorie target"
+      }, ${
+        requestData.proteinTarget
+          ? `${requestData.proteinTarget} g protein`
+          : "no protein target"
+      }.`
+    : `Dzienne cele użytkownika: ${
+        requestData.calorieTarget
+          ? `${requestData.calorieTarget} kcal`
+          : "brak celu kalorii"
+      }, ${
+        requestData.proteinTarget
+          ? `${requestData.proteinTarget} g białka`
+          : "brak celu białka"
+      }.`;
   const timeRequirement =
     maxTime === 0
-      ? "Bez ograniczeń czasowych"
-      : `Maksymalnie ${maxTime} minut`;
+      ? isEnglish
+        ? "No time limit"
+        : "Bez ograniczeń czasowych"
+      : isEnglish
+        ? `Maximum ${maxTime} minutes`
+        : `Maksymalnie ${maxTime} minut`;
   let responseSchema;
   let requestPrompt;
 
   if (requestData.mode === "dish") {
     responseSchema = dishResponseSchema;
-    requestPrompt = `Przygotuj dokładnie 3 różne przepisy lub warianty dania opisanego przez użytkownika: ${requestData.dish}.
+    requestPrompt = isEnglish
+      ? `Prepare exactly 3 different recipes or variants of the dish described by the user: ${requestData.dish}.
 
-Dieta: ${diet}
+Diet: ${localizedDiet}
+Preparation time: ${timeRequirement}
+Budget: ${budgetRequirement}
+${cookingGoalRequirement}
+${excludedRequirement}
+${nutritionGoals}
+
+Each variant must clearly differ in ingredients, flavor or preparation method while still matching the requested dish. Fit all suggestions to the diet and time requirements. For each recipe provide a complete ingredient list with amounts for 2 servings and 4–8 specific steps. The missing field must contain only clean product names to buy, without amounts or units, and match must be 0.`
+      : `Przygotuj dokładnie 3 różne przepisy lub warianty dania opisanego przez użytkownika: ${requestData.dish}.
+
+Dieta: ${localizedDiet}
 Czas przygotowania: ${timeRequirement}
 Budżet: ${budgetRequirement}
 ${cookingGoalRequirement}
@@ -157,13 +230,28 @@ ${nutritionGoals}
 Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tylko czyste nazwy produktów do kupienia bez ilości i jednostek, a pole match ustaw na 0.`;
   } else {
     responseSchema = ingredientsResponseSchema;
-    requestPrompt = `Wygeneruj dokładnie 3 różne przepisy.
+    requestPrompt = isEnglish
+      ? `Generate exactly 3 different recipes.
+
+Available ingredients: ${requestData.ingredients.join(", ")}
+Products close to expiry that should be used first: ${
+          requestData.priorityIngredients?.join(", ") || "none"
+        }
+Diet: ${localizedDiet}
+Preparation time: ${timeRequirement}
+Budget: ${budgetRequirement}
+${cookingGoalRequirement}
+${excludedRequirement}
+${nutritionGoals}
+
+Each recipe must meet the time requirement, follow the diet, use as many available ingredients as possible and require at most 4 missing products. If close-to-expiry products were provided, use them in as many suggestions as possible. Provide a complete ingredient list with amounts for 2 servings, 3–7 specific steps and one matching emoji. The match field is the percentage of recipe ingredients the user already has.`
+      : `Wygeneruj dokładnie 3 różne przepisy.
 
 Dostępne składniki: ${requestData.ingredients.join(", ")}
 Produkty z krótką datą ważności, które należy wykorzystać w pierwszej kolejności: ${
-      requestData.priorityIngredients?.join(", ") || "brak"
-    }
-Dieta: ${diet}
+          requestData.priorityIngredients?.join(", ") || "brak"
+        }
+Dieta: ${localizedDiet}
 Czas przygotowania: ${timeRequirement}
 Budżet: ${budgetRequirement}
 ${cookingGoalRequirement}
@@ -172,6 +260,44 @@ ${nutritionGoals}
 
 Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Jeśli podano produkty z krótką datą ważności, wykorzystaj je w możliwie wielu propozycjach. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
   }
+  const systemPrompt = isEnglish
+    ? "You are an experienced chef and dietitian. Create safe, realistic recipes in English. Nutrition estimates are for one serving. Do not claim that a dish is safe for people with allergies. Basic pantry products such as water, salt, pepper and a small amount of oil can be included in recipe ingredients, but do not add them to the missing shopping list."
+    : "Jesteś doświadczonym kucharzem i dietetykiem. Tworzysz bezpieczne, realne przepisy po polsku. Szacunki wartości odżywczych dotyczą jednej porcji. Nie deklaruj, że danie jest bezpieczne dla alergika. Podstawowe produkty spiżarniane, takie jak woda, sól, pieprz i niewielka ilość oleju, mogą być w składnikach przepisu, ale nie dodawaj ich do listy brakujących zakupów.";
+  const generationRules = isEnglish
+    ? `Respond in English. The only exception is imageQuery, which must also be an English Pexels search phrase.
+
+The imageQuery field must contain an English phrase for finding a matching food photo in Pexels. Use 6–10 specific words describing the dish name, visible key ingredients, serving style and optionally angle or style. Do not use the words photo, image or photography. Do not add punctuation.
+
+Every item in ingredients MUST include an exact amount and unit for 2 servings. Use practical units: g, kg, ml, l, pcs, teaspoon or tablespoon. “Teaspoon” means a small tea spoon and “tablespoon” means a large spoon. Always write specifically “teaspoon” or “tablespoon”, never vague “spoons”. This also applies to oil, spices, salt and water — do not use “to taste”, “a little”, “as needed” or product names without amounts. Correct examples: “250 g all-purpose flour”, “2 pcs eggs”, “1 tablespoon olive oil”, “0.5 teaspoon salt”.
+
+The missing field is ONLY a shopping list. Each missing item must be a short product name without amounts, grams, ml, pieces, tablespoons or teaspoons. Correct: “parmesan”, “mixed vegetables”, “soy sauce”. Incorrect: “50 g parmesan”, “150 g mixed vegetables”, “2 tablespoons soy sauce”. Do not add water, salt, pepper or tiny amounts of basic oil to missing. If stock/broth is needed, do not treat it as one missing ingredient: in ingredients list the products for a simple stock or use water and spices, and in missing add only shop products needed to prepare it.
+
+In preparation steps, include the amount and unit the first time each ingredient is used, e.g. “Add 250 g flour and 300 ml milk”. Do not omit proportions in instructions.
+
+estimatedCost is a realistic total estimated ingredient cost for 2 servings in whole PLN. Respect the budget if provided. Nutrition goals are a hint for one meal, not whole-day values.
+
+substitutions must contain 2–5 practical swaps for ingredients users may want to replace or that are often problematic. Each item must mention the original recipe ingredient and 1–3 substitutes with short quantities, e.g. “150 g Greek yogurt” instead of “150 g sour cream”. Substitutes must fit the chosen diet and cannot break user restrictions.
+
+Example imageQuery values:
+- chicken rice egg bowl top view asian style plated food
+- creamy chicken spinach risotto
+- chicken rice omelette golden brown on pan close up`
+    : `Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęcia w Pexels. Użyj 6–10 konkretnych słów opisujących nazwę dania, najważniejsze widoczne składniki, sposób podania oraz opcjonalnie ujęcie lub styl. Nie używaj słów photo, image ani photography. Nie tłumacz frazy i nie dodawaj znaków interpunkcyjnych.
+
+Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka albo łyżka stołowa. „Łyżeczka” oznacza małą łyżeczkę do herbaty, a „łyżka stołowa” oznacza dużą łyżkę. Zawsze pisz konkretnie „łyżeczka” albo „łyżka stołowa”, nigdy samo niejasne „łyżki”. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka stołowa oliwy”, „0,5 łyżeczki soli”.
+
+Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing musi być krótką nazwą produktu bez ilości, gramów, ml, sztuk, łyżek i łyżeczek. Poprawnie: „parmezan”, „mieszanka warzyw”, „sos sojowy”. Niepoprawnie: „50 g parmezanu”, „150 g mieszanki warzyw”, „2 łyżki sosu sojowego”. Nie dodawaj do missing wody, soli, pieprzu ani drobnych ilości podstawowego oleju. Jeśli potrzebny jest bulion, nie traktuj go jako pojedynczego brakującego składnika: w ingredients podaj składniki do przygotowania prostego bulionu lub użyj wody i przypraw, a w missing podaj tylko produkty sklepowe potrzebne do jego przygotowania.
+
+W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
+
+Pole estimatedCost to realistyczny, całkowity szacowany koszt składników dla 2 porcji w pełnych złotych. Przestrzegaj budżetu, jeśli został podany. Cele żywieniowe traktuj jako wskazówkę dla jednego posiłku, nie jako wartości całego dnia.
+
+Pole substitutions ma zawierać 2–5 praktycznych zamienników dla składników, które użytkownik może chcieć podmienić lub które często są problematyczne. Każdy element ma wskazywać oryginalny składnik z przepisu oraz 1–3 zamienniki z krótką ilością, np. „150 g jogurtu greckiego” zamiast „150 g śmietany”. Zamienniki muszą pasować do wybranej diety i nie mogą łamać ograniczeń użytkownika.
+
+Przykładowy format imageQuery:
+- chicken rice egg bowl top view asian style plated food
+- creamy chicken spinach risotto
+- chicken rice omelette golden brown on pan close up`;
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const usage = await consumeGenerationLimit();
 
@@ -214,29 +340,13 @@ Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, w
       input: [
         {
           role: "system",
-          content:
-            "Jesteś doświadczonym kucharzem i dietetykiem. Tworzysz bezpieczne, realne przepisy po polsku. Szacunki wartości odżywczych dotyczą jednej porcji. Nie deklaruj, że danie jest bezpieczne dla alergika. Podstawowe produkty spiżarniane, takie jak woda, sól, pieprz i niewielka ilość oleju, mogą być w składnikach przepisu, ale nie dodawaj ich do listy brakujących zakupów.",
+          content: systemPrompt,
         },
         {
           role: "user",
           content: `${requestPrompt}
 
-Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęcia w Pexels. Użyj 6–10 konkretnych słów opisujących nazwę dania, najważniejsze widoczne składniki, sposób podania oraz opcjonalnie ujęcie lub styl. Nie używaj słów photo, image ani photography. Nie tłumacz frazy i nie dodawaj znaków interpunkcyjnych.
-
-Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka albo łyżka stołowa. „Łyżeczka” oznacza małą łyżeczkę do herbaty, a „łyżka stołowa” oznacza dużą łyżkę. Zawsze pisz konkretnie „łyżeczka” albo „łyżka stołowa”, nigdy samo niejasne „łyżki”. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka stołowa oliwy”, „0,5 łyżeczki soli”.
-
-Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing musi być krótką nazwą produktu bez ilości, gramów, ml, sztuk, łyżek i łyżeczek. Poprawnie: „parmezan”, „mieszanka warzyw”, „sos sojowy”. Niepoprawnie: „50 g parmezanu”, „150 g mieszanki warzyw”, „2 łyżki sosu sojowego”. Nie dodawaj do missing wody, soli, pieprzu ani drobnych ilości podstawowego oleju. Jeśli potrzebny jest bulion, nie traktuj go jako pojedynczego brakującego składnika: w ingredients podaj składniki do przygotowania prostego bulionu lub użyj wody i przypraw, a w missing podaj tylko produkty sklepowe potrzebne do jego przygotowania.
-
-W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
-
-Pole estimatedCost to realistyczny, całkowity szacowany koszt składników dla 2 porcji w pełnych złotych. Przestrzegaj budżetu, jeśli został podany. Cele żywieniowe traktuj jako wskazówkę dla jednego posiłku, nie jako wartości całego dnia.
-
-Pole substitutions ma zawierać 2–5 praktycznych zamienników dla składników, które użytkownik może chcieć podmienić lub które często są problematyczne. Każdy element ma wskazywać oryginalny składnik z przepisu oraz 1–3 zamienniki z krótką ilością, np. „150 g jogurtu greckiego” zamiast „150 g śmietany”. Zamienniki muszą pasować do wybranej diety i nie mogą łamać ograniczeń użytkownika.
-
-Przykładowy format imageQuery:
-- chicken rice egg bowl top view asian style plated food
-- creamy chicken spinach risotto
-- chicken rice omelette golden brown on pan close up`,
+${generationRules}`,
         },
       ],
       text: {
