@@ -20,7 +20,7 @@ import type {
   SearchHistoryEntry,
   ShoppingListItem,
 } from "@/lib/recipe-types";
-import { sampleRecipes as initialSampleRecipes } from "@/lib/sample-recipes";
+import { getSampleRecipes } from "@/lib/sample-recipes";
 
 const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
@@ -471,7 +471,7 @@ export default function Home() {
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [sampleRecipes, setSampleRecipes] =
-    useState<Recipe[]>(initialSampleRecipes);
+    useState<Recipe[]>(getSampleRecipes("pl"));
   const [generatedRecipes, setGeneratedRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [servings, setServings] = useState(2);
@@ -643,6 +643,7 @@ export default function Home() {
   function changeLanguage(nextLanguage: AppLanguage) {
     setLanguage(nextLanguage);
     setLanguageLoaded(true);
+    setSampleRecipes(getSampleRecipes(nextLanguage));
   }
 
   useEffect(() => {
@@ -656,6 +657,7 @@ export default function Home() {
             : "pl";
 
       setLanguage(nextLanguage);
+      setSampleRecipes(getSampleRecipes(nextLanguage));
       setLanguageLoaded(true);
       document.documentElement.lang = nextLanguage;
     }, 0);
@@ -673,7 +675,7 @@ export default function Home() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/sample-recipes?v=2")
+    fetch(`/api/sample-recipes?v=2&language=${language}`)
       .then((response) => {
         if (!response.ok) throw new Error("Sample photos request failed");
         return response.json() as Promise<{ recipes: Recipe[] }>;
@@ -688,7 +690,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     if (!modalOpen) return;
