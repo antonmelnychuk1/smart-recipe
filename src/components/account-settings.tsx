@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { PasswordInput } from "@/components/password-input";
 import { authClient } from "@/lib/auth-client";
 
 type AccountSession = {
@@ -428,34 +429,31 @@ export function AccountSettings() {
         <form onSubmit={changePassword} className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold sm:col-span-2">
             Obecne hasło
-            <input
+            <PasswordInput
               required
-              type="password"
               name="currentPassword"
               autoComplete="current-password"
-              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] px-4 font-normal outline-none focus:border-[#71927e]"
+              className="block h-12 w-full rounded-xl border border-[#dedfd9] px-4 font-normal outline-none focus:border-[#71927e]"
             />
           </label>
           <label className="text-sm font-semibold">
             Nowe hasło
-            <input
+            <PasswordInput
               required
               minLength={8}
-              type="password"
               name="newPassword"
               autoComplete="new-password"
-              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] px-4 font-normal outline-none focus:border-[#71927e]"
+              className="block h-12 w-full rounded-xl border border-[#dedfd9] px-4 font-normal outline-none focus:border-[#71927e]"
             />
           </label>
           <label className="text-sm font-semibold">
             Powtórz nowe hasło
-            <input
+            <PasswordInput
               required
               minLength={8}
-              type="password"
               name="repeatedPassword"
               autoComplete="new-password"
-              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] px-4 font-normal outline-none focus:border-[#71927e]"
+              className="block h-12 w-full rounded-xl border border-[#dedfd9] px-4 font-normal outline-none focus:border-[#71927e]"
             />
           </label>
           <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
@@ -548,12 +546,11 @@ export function AccountSettings() {
         <form onSubmit={deleteAccount} className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold text-[#704d47]">
             Hasło
-            <input
+            <PasswordInput
               required
-              type="password"
               name="password"
               autoComplete="current-password"
-              className="mt-2 block h-12 w-full rounded-xl border border-[#ddbdb6] bg-white px-4 font-normal outline-none"
+              className="block h-12 w-full rounded-xl border border-[#ddbdb6] bg-white px-4 font-normal outline-none"
             />
           </label>
           <label className="text-sm font-semibold text-[#704d47]">

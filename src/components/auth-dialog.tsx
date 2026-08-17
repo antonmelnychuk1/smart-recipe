@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { PasswordInput } from "@/components/password-input";
 
 const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
@@ -164,15 +165,14 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
           {mode !== "forgot" && (
             <label className="block text-sm font-semibold">
               Hasło
-              <input
+              <PasswordInput
                 required
                 minLength={8}
-                type="password"
                 name="password"
                 autoComplete={
                   mode === "login" ? "current-password" : "new-password"
                 }
-                className="mt-2 h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                className="h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
               />
             </label>
           )}

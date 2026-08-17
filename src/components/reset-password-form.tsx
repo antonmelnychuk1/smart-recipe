@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { PasswordInput } from "@/components/password-input";
 
 type ResetPasswordFormProps = {
   token: string;
@@ -73,26 +74,24 @@ export function ResetPasswordForm({
     <form onSubmit={submit} className="mt-7 space-y-4">
       <label className="block text-left text-sm font-semibold">
         Nowe hasło
-        <input
+        <PasswordInput
           required
           minLength={8}
-          type="password"
           name="password"
           autoComplete="new-password"
           disabled={!token || Boolean(message)}
-          className="mt-2 h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e] disabled:bg-[#f1eee7]"
+          className="h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e] disabled:bg-[#f1eee7]"
         />
       </label>
       <label className="block text-left text-sm font-semibold">
         Powtórz hasło
-        <input
+        <PasswordInput
           required
           minLength={8}
-          type="password"
           name="repeatedPassword"
           autoComplete="new-password"
           disabled={!token || Boolean(message)}
-          className="mt-2 h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e] disabled:bg-[#f1eee7]"
+          className="h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e] disabled:bg-[#f1eee7]"
         />
       </label>
 
