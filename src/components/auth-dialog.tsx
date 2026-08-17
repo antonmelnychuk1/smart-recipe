@@ -3,15 +3,102 @@
 import { FormEvent, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { PasswordInput } from "@/components/password-input";
+import type { AppLanguage } from "@/lib/i18n";
 
 const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
 
 type AuthDialogProps = {
   onClose: () => void;
+  language?: AppLanguage;
 };
 
-export function AuthDialog({ onClose }: AuthDialogProps) {
+const authCopy = {
+  pl: {
+    labels: {
+      login: "Logowanie",
+      register: "Rejestracja",
+      forgot: "Odzyskiwanie hasła",
+      close: "Zamknij",
+      name: "Imię",
+      email: "E-mail",
+      password: "Hasło",
+    },
+    titles: {
+      login: "Witaj ponownie",
+      register: "Utwórz konto",
+      forgot: "Odzyskaj hasło",
+    },
+    forgotText:
+      "Podaj e-mail konta, a wyślemy link do ustawienia nowego hasła.",
+    buttons: {
+      pending: "Chwileczkę...",
+      login: "Zaloguj się",
+      register: "Załóż konto",
+      forgot: "Wyślij link resetujący",
+      forgotPassword: "Nie pamiętasz hasła?",
+      toRegister: "Nie masz konta? Zarejestruj się",
+      toLogin: "Masz już konto? Zaloguj się",
+      backToLogin: "Wróć do logowania",
+    },
+    errors: {
+      resetFailed:
+        "Nie udało się wysłać linku resetującego. Spróbuj ponownie.",
+      userExists: "Konto z tym adresem już istnieje.",
+      invalidLogin: "Nieprawidłowy e-mail lub hasło.",
+      registerFailed: "Nie udało się utworzyć konta.",
+    },
+    messages: {
+      resetSent:
+        "Jeśli konto z tym adresem istnieje, wysłaliśmy link do ustawienia nowego hasła.",
+      registered:
+        "Konto zostało utworzone. Sprawdź skrzynkę i potwierdź adres e-mail.",
+    },
+  },
+  en: {
+    labels: {
+      login: "Login",
+      register: "Registration",
+      forgot: "Password recovery",
+      close: "Close",
+      name: "Name",
+      email: "E-mail",
+      password: "Password",
+    },
+    titles: {
+      login: "Welcome back",
+      register: "Create account",
+      forgot: "Recover password",
+    },
+    forgotText:
+      "Enter your account e-mail and we will send a link to set a new password.",
+    buttons: {
+      pending: "One moment...",
+      login: "Log in",
+      register: "Create account",
+      forgot: "Send reset link",
+      forgotPassword: "Forgot password?",
+      toRegister: "No account yet? Sign up",
+      toLogin: "Already have an account? Log in",
+      backToLogin: "Back to login",
+    },
+    errors: {
+      resetFailed: "Could not send the reset link. Try again.",
+      userExists: "An account with this e-mail already exists.",
+      invalidLogin: "Invalid e-mail or password.",
+      registerFailed: "Could not create the account.",
+    },
+    messages: {
+      resetSent:
+        "If an account with this e-mail exists, we sent a link to set a new password.",
+      registered:
+        "The account has been created. Check your inbox and confirm your e-mail address.",
+    },
+  },
+} as const;
+
+export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
+  const copy = authCopy[language];
   const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
@@ -45,13 +132,13 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       if (!response.ok) {
         setError(
           result?.error?.message ??
-            "Nie udało się wysłać linku resetującego. Spróbuj ponownie.",
+            copy.errors.resetFailed,
         );
         return;
       }
 
       setMessage(
-        "Jeśli konto z tym adresem istnieje, wysłaliśmy link do ustawienia nowego hasła.",
+        copy.messages.resetSent,
       );
       return;
     }
@@ -76,17 +163,17 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
     if (result.error) {
       setError(
         result.error.code === "USER_ALREADY_EXISTS"
-          ? "Konto z tym adresem już istnieje."
+          ? copy.errors.userExists
           : mode === "login"
-            ? "Nieprawidłowy e-mail lub hasło."
-            : result.error.message || "Nie udało się utworzyć konta.",
+            ? copy.errors.invalidLogin
+            : result.error.message || copy.errors.registerFailed,
       );
       return;
     }
 
     if (mode === "register" && emailVerificationEnabled) {
       setMessage(
-        "Konto zostało utworzone. Sprawdź skrzynkę i potwierdź adres e-mail.",
+        copy.messages.registered,
       );
       return;
     }
@@ -101,10 +188,10 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       aria-modal="true"
       aria-label={
         mode === "login"
-          ? "Logowanie"
+          ? copy.labels.login
           : mode === "register"
-            ? "Rejestracja"
-            : "Odzyskiwanie hasła"
+            ? copy.labels.register
+            : copy.labels.forgot
       }
       onClick={onClose}
     >
@@ -119,20 +206,20 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
             </p>
             <h2 className="mt-2 font-serif text-3xl font-semibold">
               {mode === "login"
-                ? "Witaj ponownie"
+                ? copy.titles.login
                 : mode === "register"
-                  ? "Utwórz konto"
-                  : "Odzyskaj hasło"}
+                  ? copy.titles.register
+                  : copy.titles.forgot}
             </h2>
             {mode === "forgot" && (
               <p className="mt-2 text-sm leading-6 text-[#68736b]">
-                Podaj e-mail konta, a wyślemy link do ustawienia nowego hasła.
+                {copy.forgotText}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            aria-label="Zamknij"
+            aria-label={copy.labels.close}
             className="grid size-9 place-items-center rounded-full bg-[#eeeae2] text-xl"
           >
             ×
@@ -142,7 +229,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
         <form onSubmit={submit} className="mt-7 space-y-4">
           {mode === "register" && (
             <label className="block text-sm font-semibold">
-              Imię
+              {copy.labels.name}
               <input
                 required
                 minLength={2}
@@ -153,7 +240,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
             </label>
           )}
           <label className="block text-sm font-semibold">
-            E-mail
+            {copy.labels.email}
             <input
               required
               type="email"
@@ -164,7 +251,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
           </label>
           {mode !== "forgot" && (
             <label className="block text-sm font-semibold">
-              Hasło
+              {copy.labels.password}
               <PasswordInput
                 required
                 minLength={8}
@@ -196,12 +283,12 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
             className="h-12 w-full rounded-xl bg-[#2f684f] font-semibold text-white disabled:opacity-50"
           >
             {isPending
-              ? "Chwileczkę..."
+              ? copy.buttons.pending
               : mode === "login"
-                ? "Zaloguj się"
+                ? copy.buttons.login
                 : mode === "register"
-                  ? "Załóż konto"
-                  : "Wyślij link resetujący"}
+                  ? copy.buttons.register
+                  : copy.buttons.forgot}
           </button>
         </form>
 
@@ -214,7 +301,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
             }}
             className="mt-4 w-full text-sm font-semibold text-[#2f684f] hover:text-[#244f3c]"
           >
-            Nie pamiętasz hasła?
+            {copy.buttons.forgotPassword}
           </button>
         )}
 
@@ -227,10 +314,10 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
           className="mt-5 w-full text-sm text-[#667168] hover:text-[#2f684f]"
         >
           {mode === "login"
-            ? "Nie masz konta? Zarejestruj się"
+            ? copy.buttons.toRegister
             : mode === "register"
-              ? "Masz już konto? Zaloguj się"
-              : "Wróć do logowania"}
+              ? copy.buttons.toLogin
+              : copy.buttons.backToLogin}
         </button>
       </div>
     </div>

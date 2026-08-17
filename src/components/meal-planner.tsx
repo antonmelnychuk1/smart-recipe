@@ -7,13 +7,100 @@ import type {
   MealType,
   Recipe,
 } from "@/lib/recipe-types";
+import type { AppLanguage } from "@/lib/i18n";
 
-const days = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Niedz"];
-const mealTypes: { key: MealType; label: string }[] = [
-  { key: "breakfast", label: "Śniadanie" },
-  { key: "lunch", label: "Obiad" },
-  { key: "dinner", label: "Kolacja" },
-];
+const plannerCopy = {
+  pl: {
+    days: ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Niedz"],
+    locale: "pl-PL",
+    meals: {
+      breakfast: "Śniadanie",
+      lunch: "Obiad",
+      dinner: "Kolacja",
+    },
+    eyebrow: "Zaplanuj z wyprzedzeniem",
+    title: "Plan posiłków",
+    description:
+      "Przypisz wygenerowane lub ulubione przepisy do wybranego dnia i pory posiłku.",
+    previousWeek: "Poprzedni tydzień",
+    nextWeek: "Następny tydzień",
+    copyPlan: "Kopiuj plan",
+    clearWeek: "Wyczyść tydzień",
+    clear: "Wyczyść",
+    change: "Zmień",
+    remove: "Usuń",
+    addMissing: "Dodaj brakujące do zakupów",
+    close: "Zamknij",
+    planned: "Zaplanowane",
+    mealsCount: "posiłków",
+    avgCalories: "Śr. kalorie",
+    kcalMeal: "kcal / posiłek",
+    protein: "Białko",
+    total: "łącznie",
+    cost: "Koszt",
+    estimated: "szacunkowo",
+    time: "Czas",
+    cooking: "gotowania",
+    clearDay: "Wyczyszczono dzień:",
+    confirmClear: "Wyczyścić cały plan posiłków dla tego tygodnia?",
+    clearWeekDone: "Plan tygodnia został wyczyszczony.",
+    copied: "Plan tygodnia został skopiowany.",
+    copyFailed: "Nie udało się skopiować planu.",
+    loading: "Wczytuję plan...",
+    plannedCount: "z 21 posiłków zaplanowanych",
+    local: "plan zapisuje się na tym urządzeniu",
+    selectRecipe: "Wybierz przepis",
+    firstGenerate: "Najpierw wygeneruj lub zapisz ulubiony przepis.",
+    planPrefix: "Plan posiłków:",
+    add: "Dodaj:",
+  },
+  en: {
+    days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    locale: "en-US",
+    meals: {
+      breakfast: "Breakfast",
+      lunch: "Lunch",
+      dinner: "Dinner",
+    },
+    eyebrow: "Plan ahead",
+    title: "Meal planner",
+    description:
+      "Assign generated or favorite recipes to a selected day and meal time.",
+    previousWeek: "Previous week",
+    nextWeek: "Next week",
+    copyPlan: "Copy plan",
+    clearWeek: "Clear week",
+    clear: "Clear",
+    change: "Change",
+    remove: "Remove",
+    addMissing: "Add missing to shopping list",
+    close: "Close",
+    planned: "Planned",
+    mealsCount: "meals",
+    avgCalories: "Avg. calories",
+    kcalMeal: "kcal / meal",
+    protein: "Protein",
+    total: "total",
+    cost: "Cost",
+    estimated: "estimated",
+    time: "Time",
+    cooking: "cooking",
+    clearDay: "Cleared day:",
+    confirmClear: "Clear the whole meal plan for this week?",
+    clearWeekDone: "The weekly plan has been cleared.",
+    copied: "The weekly plan has been copied.",
+    copyFailed: "Could not copy the plan.",
+    loading: "Loading plan...",
+    plannedCount: "of 21 meals planned",
+    local: "plan is saved on this device",
+    selectRecipe: "Choose recipe",
+    firstGenerate: "First generate or save a favorite recipe.",
+    planPrefix: "Meal plan:",
+    add: "Add:",
+  },
+} as const;
+
+const mealTypeKeys: MealType[] = ["breakfast", "lunch", "dinner"];
 
 type MealPlannerProps = {
   recipes: Recipe[];
@@ -22,6 +109,7 @@ type MealPlannerProps = {
   onOpenRecipe: (recipe: Recipe) => void;
   onAddToShoppingList: (items: string[]) => void;
   onEntriesChange?: (count: number) => void;
+  language?: AppLanguage;
 };
 
 function mondayOf(date: Date) {
@@ -43,14 +131,14 @@ function localStorageKey(weekStart: string) {
   return `smart-recipe:meal-plan:${weekStart}`;
 }
 
-function formatWeekRange(week: Date) {
+function formatWeekRange(week: Date, locale: string) {
   const end = new Date(week);
   end.setDate(end.getDate() + 6);
 
-  return `${new Intl.DateTimeFormat("pl-PL", {
+  return `${new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
-  }).format(week)} – ${new Intl.DateTimeFormat("pl-PL", {
+  }).format(week)} – ${new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -64,7 +152,13 @@ export function MealPlanner({
   onOpenRecipe,
   onAddToShoppingList,
   onEntriesChange,
+  language = "pl",
 }: MealPlannerProps) {
+  const copy = plannerCopy[language];
+  const mealTypes = mealTypeKeys.map((key) => ({
+    key,
+    label: copy.meals[key],
+  }));
   const [week, setWeek] = useState(() => mondayOf(new Date()));
   const [entries, setEntries] = useState<MealPlanEntry[]>([]);
   const [selection, setSelection] = useState<{
@@ -225,12 +319,12 @@ export function MealPlanner({
       }
     }
 
-    setPlannerMessage(`Wyczyszczono dzień: ${days[day]}.`);
+    setPlannerMessage(`${copy.clearDay} ${copy.days[day]}.`);
   }
 
   function clearWeek() {
     if (entries.length === 0) return;
-    if (!window.confirm("Wyczyścić cały plan posiłków dla tego tygodnia?")) {
+    if (!window.confirm(copy.confirmClear)) {
       return;
     }
 
@@ -242,16 +336,16 @@ export function MealPlanner({
         weekStart,
       });
     }
-    setPlannerMessage("Plan tygodnia został wyczyszczony.");
+    setPlannerMessage(copy.clearWeekDone);
   }
 
   async function copyWeekPlan() {
     if (entries.length === 0) return;
 
     const lines = [
-      `Plan posiłków: ${formatWeekRange(week)}`,
+      `${copy.planPrefix} ${formatWeekRange(week, copy.locale)}`,
       "",
-      ...days.flatMap((day, dayIndex) => {
+      ...copy.days.flatMap((day, dayIndex) => {
         const plannedMeals = mealTypes
           .map((meal) => {
             const entry = entries.find(
@@ -267,9 +361,9 @@ export function MealPlanner({
 
     try {
       await navigator.clipboard.writeText(lines.join("\n").trim());
-      setPlannerMessage("Plan tygodnia został skopiowany.");
+      setPlannerMessage(copy.copied);
     } catch {
-      setPlannerMessage("Nie udało się skopiować planu.");
+      setPlannerMessage(copy.copyFailed);
     }
   }
 
@@ -304,14 +398,13 @@ export function MealPlanner({
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-              Zaplanuj z wyprzedzeniem
+              {copy.eyebrow}
             </p>
             <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-              Plan posiłków
+              {copy.title}
             </h2>
             <p className="mt-3 max-w-xl leading-7 text-[#748078]">
-              Przypisz wygenerowane lub ulubione przepisy do wybranego dnia i
-              pory posiłku.
+              {copy.description}
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
@@ -319,17 +412,17 @@ export function MealPlanner({
               <button
                 onClick={() => shiftWeek(-7)}
                 className="grid size-9 place-items-center rounded-full hover:bg-[#f1eee7]"
-                aria-label="Poprzedni tydzień"
+                aria-label={copy.previousWeek}
               >
                 ←
               </button>
               <span className="min-w-44 text-center text-sm font-semibold">
-                {formatWeekRange(week)}
+                {formatWeekRange(week, copy.locale)}
               </span>
               <button
                 onClick={() => shiftWeek(7)}
                 className="grid size-9 place-items-center rounded-full hover:bg-[#f1eee7]"
-                aria-label="Następny tydzień"
+                aria-label={copy.nextWeek}
               >
                 →
               </button>
@@ -339,14 +432,14 @@ export function MealPlanner({
               disabled={entries.length === 0}
               className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold text-[#365a46] shadow-sm disabled:opacity-40"
             >
-              Kopiuj plan
+              {copy.copyPlan}
             </button>
             <button
               onClick={clearWeek}
               disabled={entries.length === 0}
               className="rounded-xl bg-[#fff0e8] px-4 py-2.5 text-sm font-semibold text-[#9a6251] disabled:opacity-40"
             >
-              Wyczyść tydzień
+              {copy.clearWeek}
             </button>
           </div>
         </div>
@@ -354,11 +447,11 @@ export function MealPlanner({
         <div className="mt-5 overflow-x-auto pb-1 sm:mt-6">
           <div className="grid min-w-[620px] grid-cols-5 gap-2 sm:min-w-0 sm:gap-3">
             {[
-              ["Zaplanowane", `${entries.length}/21`, "posiłków"],
-              ["Śr. kalorie", averageCalories, "kcal / posiłek"],
-              ["Białko", `${weekSummary.protein} g`, "łącznie"],
-              ["Koszt", `${weekSummary.cost} zł`, "szacunkowo"],
-              ["Czas", `${weekSummary.time} min`, "gotowania"],
+              [copy.planned, `${entries.length}/21`, copy.mealsCount],
+              [copy.avgCalories, averageCalories, copy.kcalMeal],
+              [copy.protein, `${weekSummary.protein} g`, copy.total],
+              [copy.cost, `${weekSummary.cost} zł`, copy.estimated],
+              [copy.time, `${weekSummary.time} min`, copy.cooking],
             ].map(([label, value, hint]) => (
               <article
                 key={label}
@@ -380,7 +473,7 @@ export function MealPlanner({
 
         <div className="mt-5 overflow-x-auto pb-3 sm:mt-10">
           <div className="grid min-w-[1050px] grid-cols-7 gap-3">
-            {days.map((day, dayIndex) => (
+            {copy.days.map((day, dayIndex) => (
               <div key={day} className="space-y-3">
                 <div className="rounded-xl bg-[#2f684f] px-3 py-3 text-center text-white">
                   <div>
@@ -398,7 +491,7 @@ export function MealPlanner({
                       onClick={() => clearDay(dayIndex)}
                       className="mt-2 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-white/25"
                     >
-                      Wyczyść
+                      {copy.clear}
                     </button>
                   )}
                 </div>
@@ -454,13 +547,13 @@ export function MealPlanner({
                               }
                               className="text-[#356248] hover:underline"
                             >
-                              Zmień
+                              {copy.change}
                             </button>
                             <button
                               onClick={() => removeEntry(entry)}
                               className="text-[#a45c45] hover:underline"
                             >
-                              Usuń
+                              {copy.remove}
                             </button>
                           </div>
                         </div>
@@ -473,7 +566,7 @@ export function MealPlanner({
                             })
                           }
                           className="mt-3 grid h-24 w-full place-items-center rounded-xl border border-dashed border-[#d5d4ce] text-2xl text-[#9aa49d] transition hover:border-[#75917f] hover:bg-[#f4f7f3] hover:text-[#3f6852]"
-                          aria-label={`Dodaj: ${day}, ${meal.label}`}
+                          aria-label={`${copy.add} ${day}, ${meal.label}`}
                         >
                           +
                         </button>
@@ -490,9 +583,9 @@ export function MealPlanner({
           <div>
             <p className="text-sm text-[#68736b]">
               {isLoading
-                ? "Wczytuję plan..."
-                : `${entries.length} z 21 posiłków zaplanowanych`}
-              {!isSignedIn && " · plan zapisuje się na tym urządzeniu"}
+                ? copy.loading
+                : `${entries.length} ${copy.plannedCount}`}
+              {!isSignedIn && ` · ${copy.local}`}
             </p>
             {plannerMessage && (
               <p className="mt-1 text-xs font-semibold text-[#356248]">
@@ -505,7 +598,7 @@ export function MealPlanner({
               onClick={() => onAddToShoppingList(missingIngredients)}
               className="rounded-xl bg-[#e8efe9] px-4 py-2.5 text-sm font-semibold text-[#356248]"
             >
-              Dodaj brakujące do zakupów ({missingIngredients.length})
+              {copy.addMissing} ({missingIngredients.length})
             </button>
           )}
         </div>
@@ -516,7 +609,7 @@ export function MealPlanner({
           className="modal-safe-area fixed inset-0 z-[55] grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
-          aria-label="Wybierz przepis"
+          aria-label={copy.selectRecipe}
           onClick={() => setSelection(null)}
         >
           <div
@@ -526,16 +619,16 @@ export function MealPlanner({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-                  Plan posiłków
+                  {copy.title}
                 </p>
                 <h3 className="mt-2 font-serif text-3xl font-semibold">
-                  Wybierz przepis
+                  {copy.selectRecipe}
                 </h3>
               </div>
               <button
                 onClick={() => setSelection(null)}
                 className="grid size-9 place-items-center rounded-full bg-[#eeeae2] text-xl"
-                aria-label="Zamknij"
+                aria-label={copy.close}
               >
                 ×
               </button>
@@ -574,7 +667,7 @@ export function MealPlanner({
                 ))
               ) : (
                 <p className="sm:col-span-2 rounded-xl bg-[#f5f2eb] p-5 text-sm text-[#748078]">
-                  Najpierw wygeneruj lub zapisz ulubiony przepis.
+                  {copy.firstGenerate}
                 </p>
               )}
             </div>

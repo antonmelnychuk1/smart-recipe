@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import type { AppLanguage } from "@/lib/i18n";
 import type { PantryItem } from "@/lib/recipe-types";
 
 type PantryProps = {
@@ -13,7 +14,132 @@ type PantryProps = {
   onAddToShoppingList: (labels: string[]) => void;
   onCookFromPantry: () => void;
   isGenerating: boolean;
+  language?: AppLanguage;
 };
+
+const pantryCopy = {
+  pl: {
+    locale: "pl-PL",
+    all: "Wszystkie",
+    categories: {
+      produce: "Warzywa i owoce",
+      meat: "Mięso, ryby i jajka",
+      dairy: "Nabiał",
+      dry: "Produkty suche",
+      sauces: "Przyprawy i sosy",
+      other: "Pozostałe",
+    },
+    expiry: {
+      expired: "po terminie",
+      today: "ważne do dzisiaj",
+      oneDay: "został 1 dzień",
+      days: "zostały",
+      daysSuffix: "dni",
+    },
+    headerTitle: "Moja spiżarnia",
+    headerText:
+      "Zapisz produkty, które masz w domu. Te z krótką datą ważności oznaczymy jako priorytet dla AI.",
+    useUrgent: "Użyj pilnych",
+    urgentToShopping: "Pilne do zakupów",
+    addAllToGenerator: "Dodaj wszystkie do generatora",
+    cookFromPantry: "Ugotuj ze spiżarni",
+    aiCooking: "AI gotuje...",
+    product: "Produkt",
+    productPlaceholder: "np. jogurt naturalny",
+    quantity: "Ilość",
+    quantityPlaceholder: "np. 500 g",
+    expiryDate: "Data ważności",
+    cancel: "Anuluj",
+    save: "Zapisz",
+    addProduct: "Dodaj produkt",
+    syncSignedIn: "Spiżarnia synchronizuje się z Twoim kontem.",
+    syncGuest:
+      "Zaloguj się, aby synchronizować spiżarnię między urządzeniami.",
+    urgent: "Pilne",
+    expired: "Po terminie",
+    noDate: "Bez daty",
+    categoriesLabel: "Kategorie",
+    status: "Status",
+    ending: "Kończące się",
+    sorting: "Sortowanie",
+    shortestDate: "Najkrótsza data",
+    alphabetical: "Alfabetycznie",
+    byCategory: "Kategoriami",
+    addToGeneratorTitle: "Dodaj do generatora",
+    addToShopping: "Na zakupy",
+    edit: "Edytuj",
+    consumedTitle: "Oznacz jako zużyte",
+    empty:
+      "Spiżarnia jest pusta. Dodaj pierwszy produkt wraz z ilością i opcjonalną datą ważności.",
+    noCategory: "Brak produktów w tej kategorii.",
+    aria: {
+      addToShopping: "Dodaj do listy zakupów",
+      edit: "Edytuj w spiżarni",
+      consume: "Oznacz jako zużyte",
+      remove: "Usuń ze spiżarni",
+    },
+  },
+  en: {
+    locale: "en-US",
+    all: "All",
+    categories: {
+      produce: "Fruit and vegetables",
+      meat: "Meat, fish and eggs",
+      dairy: "Dairy",
+      dry: "Dry goods",
+      sauces: "Spices and sauces",
+      other: "Other",
+    },
+    expiry: {
+      expired: "expired",
+      today: "expires today",
+      oneDay: "1 day left",
+      days: "",
+      daysSuffix: "days left",
+    },
+    headerTitle: "My pantry",
+    headerText:
+      "Save products you have at home. Items close to expiry will be prioritized for AI.",
+    useUrgent: "Use urgent",
+    urgentToShopping: "Urgent to shopping",
+    addAllToGenerator: "Add all to generator",
+    cookFromPantry: "Cook from pantry",
+    aiCooking: "AI is cooking...",
+    product: "Product",
+    productPlaceholder: "e.g. plain yogurt",
+    quantity: "Quantity",
+    quantityPlaceholder: "e.g. 500 g",
+    expiryDate: "Expiry date",
+    cancel: "Cancel",
+    save: "Save",
+    addProduct: "Add product",
+    syncSignedIn: "Pantry syncs with your account.",
+    syncGuest: "Log in to sync your pantry across devices.",
+    urgent: "Urgent",
+    expired: "Expired",
+    noDate: "No date",
+    categoriesLabel: "Categories",
+    status: "Status",
+    ending: "Expiring soon",
+    sorting: "Sort",
+    shortestDate: "Soonest expiry",
+    alphabetical: "Alphabetical",
+    byCategory: "By category",
+    addToGeneratorTitle: "Add to generator",
+    addToShopping: "Shopping",
+    edit: "Edit",
+    consumedTitle: "Mark as used",
+    empty:
+      "Your pantry is empty. Add the first product with quantity and optional expiry date.",
+    noCategory: "No products in this category.",
+    aria: {
+      addToShopping: "Add to shopping list",
+      edit: "Edit in pantry",
+      consume: "Mark as used",
+      remove: "Remove from pantry",
+    },
+  },
+} as const;
 
 function daysUntil(date: string) {
   const today = new Date();
@@ -22,16 +148,21 @@ function daysUntil(date: string) {
   return Math.ceil((expiry.getTime() - today.getTime()) / 86_400_000);
 }
 
-function expiryLabel(expiresAt: string | null) {
+function expiryLabel(expiresAt: string | null, language: AppLanguage) {
   if (!expiresAt) return null;
 
+  const copy = pantryCopy[language];
   const days = daysUntil(expiresAt);
-  if (days < 0) return "po terminie";
-  if (days === 0) return "ważne do dzisiaj";
-  if (days === 1) return "został 1 dzień";
-  if (days <= 4) return `zostały ${days} dni`;
+  if (days < 0) return copy.expiry.expired;
+  if (days === 0) return copy.expiry.today;
+  if (days === 1) return copy.expiry.oneDay;
+  if (days <= 4) {
+    return language === "pl"
+      ? `${copy.expiry.days} ${days} ${copy.expiry.daysSuffix}`
+      : `${days} ${copy.expiry.daysSuffix}`;
+  }
 
-  return new Intl.DateTimeFormat("pl-PL", {
+  return new Intl.DateTimeFormat(copy.locale, {
     day: "numeric",
     month: "short",
   }).format(new Date(`${expiresAt}T12:00:00`));
@@ -132,6 +263,21 @@ function getPantryCategory(label: string) {
   return category?.name ?? "Pozostałe";
 }
 
+function displayCategoryName(category: string, language: AppLanguage) {
+  const copy = pantryCopy[language].categories;
+  const labels: Record<string, string> = {
+    "Warzywa i owoce": copy.produce,
+    "Mięso, ryby i jajka": copy.meat,
+    Nabiał: copy.dairy,
+    "Produkty suche": copy.dry,
+    "Przyprawy i sosy": copy.sauces,
+    Pozostałe: copy.other,
+    Wszystkie: pantryCopy[language].all,
+  };
+
+  return labels[category] ?? category;
+}
+
 export function Pantry({
   items,
   isSignedIn,
@@ -142,7 +288,9 @@ export function Pantry({
   onAddToShoppingList,
   onCookFromPantry,
   isGenerating,
+  language = "pl",
 }: PantryProps) {
+  const copy = pantryCopy[language];
   const [label, setLabel] = useState("");
   const [quantity, setQuantity] = useState("1 szt.");
   const [expiresAt, setExpiresAt] = useState("");
@@ -256,14 +404,15 @@ export function Pantry({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h3 className="font-serif text-2xl font-semibold">Moja spiżarnia</h3>
+            <h3 className="font-serif text-2xl font-semibold">
+              {copy.headerTitle}
+            </h3>
             <span className="rounded-full bg-[#dfeae1] px-3 py-1 text-xs font-bold text-[#356248]">
               {items.length}
             </span>
           </div>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[#748078]">
-            Zapisz produkty, które masz w domu. Te z krótką datą ważności
-            oznaczymy jako priorytet dla AI.
+            {copy.headerText}
           </p>
         </div>
         {items.length > 0 && (
@@ -276,7 +425,7 @@ export function Pantry({
                   }
                   className="rounded-xl bg-[#fff0e3] px-4 py-2.5 text-xs font-semibold text-[#a45c45] transition hover:bg-[#f8e3d3]"
                 >
-                  Użyj pilnych ({urgentItems.length})
+                  {copy.useUrgent} ({urgentItems.length})
                 </button>
                 <button
                   onClick={() =>
@@ -284,7 +433,7 @@ export function Pantry({
                   }
                   className="rounded-xl border border-[#efd5ab] bg-white px-4 py-2.5 text-xs font-semibold text-[#8d6840] transition hover:bg-[#fff8e9]"
                 >
-                  Pilne do zakupów
+                  {copy.urgentToShopping}
                 </button>
               </>
             )}
@@ -292,14 +441,14 @@ export function Pantry({
               onClick={() => onUseIngredients(items.map((item) => item.label))}
               className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#275b44]"
             >
-              Dodaj wszystkie do generatora
+              {copy.addAllToGenerator}
             </button>
             <button
               onClick={onCookFromPantry}
               disabled={isGenerating}
               className="rounded-xl bg-[#d66a49] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#c35d3e] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isGenerating ? "AI gotuje..." : "Ugotuj ze spiżarni"}
+              {isGenerating ? copy.aiCooking : copy.cookFromPantry}
             </button>
           </div>
         )}
@@ -310,30 +459,30 @@ export function Pantry({
         className="mt-5 grid gap-3 rounded-2xl border border-[#dfe6df] bg-white p-3 sm:grid-cols-[1fr_0.65fr_0.8fr_auto] sm:p-4"
       >
         <label className="text-xs font-semibold text-[#59675f]">
-          Produkt
+          {copy.product}
           <input
             required
             value={label}
             onChange={(event) => setLabel(event.target.value)}
             disabled={editingId !== null}
             maxLength={80}
-            placeholder="np. jogurt naturalny"
+            placeholder={copy.productPlaceholder}
             className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] disabled:bg-[#f3f1eb]"
           />
         </label>
         <label className="text-xs font-semibold text-[#59675f]">
-          Ilość
+          {copy.quantity}
           <input
             required
             value={quantity}
             onChange={(event) => setQuantity(event.target.value)}
             maxLength={60}
-            placeholder="np. 500 g"
+            placeholder={copy.quantityPlaceholder}
             className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e]"
           />
         </label>
         <label className="text-xs font-semibold text-[#59675f]">
-          Data ważności
+          {copy.expiryDate}
           <input
             type="date"
             value={expiresAt}
@@ -348,29 +497,29 @@ export function Pantry({
               onClick={cancelEditing}
               className="h-11 rounded-xl border border-[#d8d7d0] px-3 text-xs font-semibold text-[#68736b]"
             >
-              Anuluj
+              {copy.cancel}
             </button>
           )}
           <button className="h-11 flex-1 rounded-xl bg-[#356248] px-5 text-sm font-semibold text-white transition hover:bg-[#2b553d]">
-            {editingId ? "Zapisz" : "Dodaj produkt"}
+            {editingId ? copy.save : copy.addProduct}
           </button>
         </div>
       </form>
 
       <p className="mt-2 text-[11px] text-[#8a948e]">
         {isSignedIn
-          ? "Spiżarnia synchronizuje się z Twoim kontem."
-          : "Zaloguj się, aby synchronizować spiżarnię między urządzeniami."}
+          ? copy.syncSignedIn
+          : copy.syncGuest}
       </p>
 
       {items.length > 0 && (
         <>
           <div className="mt-4 grid gap-2 sm:grid-cols-4">
             {[
-              ["Wszystkie", items.length, "bg-white text-[#365a46]"],
-              ["Pilne", urgentItems.length, "bg-[#fff8e9] text-[#8d6840]"],
-              ["Po terminie", expiredItems.length, "bg-[#fff3ef] text-[#a45c45]"],
-              ["Bez daty", noDateItems.length, "bg-[#eef2ec] text-[#59675f]"],
+              [copy.all, items.length, "bg-white text-[#365a46]"],
+              [copy.urgent, urgentItems.length, "bg-[#fff8e9] text-[#8d6840]"],
+              [copy.expired, expiredItems.length, "bg-[#fff3ef] text-[#a45c45]"],
+              [copy.noDate, noDateItems.length, "bg-[#eef2ec] text-[#59675f]"],
             ].map(([label, value, className]) => (
               <div
                 key={label}
@@ -387,7 +536,7 @@ export function Pantry({
           <div className="mt-4 grid gap-3 rounded-2xl border border-[#dfe6df] bg-white p-3 lg:grid-cols-[1fr_auto]">
             <div>
               <p className="mb-2 px-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#8a948e]">
-                Kategorie
+                {copy.categoriesLabel}
               </p>
               <div className="flex flex-wrap gap-2">
                 {availableCategories.map((category) => (
@@ -400,7 +549,7 @@ export function Pantry({
                         : "bg-[#f6f5ef] text-[#59675f] hover:bg-[#edf1ec]"
                     }`}
                   >
-                    {category.name} ({category.count})
+                    {displayCategoryName(category.name, language)} ({category.count})
                   </button>
                 ))}
               </div>
@@ -408,7 +557,7 @@ export function Pantry({
 
             <div className="grid gap-2 sm:grid-cols-2 lg:min-w-72 lg:grid-cols-1">
               <label className="text-xs font-semibold text-[#59675f]">
-                Status
+                {copy.status}
                 <select
                   value={statusFilter}
                   onChange={(event) =>
@@ -416,14 +565,14 @@ export function Pantry({
                   }
                   className="mt-1.5 block h-10 w-full rounded-xl border border-[#dedfd9] bg-white px-3 text-sm font-normal outline-none focus:border-[#71927e]"
                 >
-                  <option value="all">Wszystkie</option>
-                  <option value="urgent">Kończące się</option>
-                  <option value="expired">Po terminie</option>
-                  <option value="no-date">Bez daty</option>
+                  <option value="all">{copy.all}</option>
+                  <option value="urgent">{copy.ending}</option>
+                  <option value="expired">{copy.expired}</option>
+                  <option value="no-date">{copy.noDate}</option>
                 </select>
               </label>
               <label className="text-xs font-semibold text-[#59675f]">
-                Sortowanie
+                {copy.sorting}
                 <select
                   value={sortBy}
                   onChange={(event) =>
@@ -431,9 +580,9 @@ export function Pantry({
                   }
                   className="mt-1.5 block h-10 w-full rounded-xl border border-[#dedfd9] bg-white px-3 text-sm font-normal outline-none focus:border-[#71927e]"
                 >
-                  <option value="expiry">Najkrótsza data</option>
-                  <option value="name">Alfabetycznie</option>
-                  <option value="category">Kategoriami</option>
+                  <option value="expiry">{copy.shortestDate}</option>
+                  <option value="name">{copy.alphabetical}</option>
+                  <option value="category">{copy.byCategory}</option>
                 </select>
               </label>
             </div>
@@ -462,7 +611,7 @@ export function Pantry({
                 <button
                   onClick={() => onUseIngredients([item.label])}
                   className="min-w-0 flex-1 text-left"
-                  title="Dodaj do generatora"
+                  title={copy.addToGeneratorTitle}
                 >
                   <span className="block truncate text-sm font-semibold">
                     + {item.label}
@@ -477,7 +626,7 @@ export function Pantry({
                             isExpired || isUrgent ? "font-semibold text-[#a45c45]" : ""
                           }
                         >
-                          {expiryLabel(item.expiresAt)}
+                          {expiryLabel(item.expiresAt, language)}
                         </span>
                       </>
                     )}
@@ -487,30 +636,30 @@ export function Pantry({
                   {(isExpired || isUrgent) && (
                     <button
                       onClick={() => onAddToShoppingList([item.label])}
-                      aria-label={`Dodaj ${item.label} do listy zakupów`}
+                      aria-label={`${copy.aria.addToShopping}: ${item.label}`}
                       className="rounded-lg px-2 py-2 text-[11px] font-semibold text-[#8d6840] transition hover:bg-[#fff4de]"
                     >
-                      Na zakupy
+                      {copy.addToShopping}
                     </button>
                   )}
                   <button
                     onClick={() => startEditing(item)}
-                    aria-label={`Edytuj ${item.label} w spiżarni`}
+                    aria-label={`${copy.aria.edit}: ${item.label}`}
                     className="rounded-lg px-2 py-2 text-[11px] font-semibold text-[#59675f] transition hover:bg-[#edf1ec]"
                   >
-                    Edytuj
+                    {copy.edit}
                   </button>
                   <button
                     onClick={() => onConsume(item)}
-                    aria-label={`Oznacz ${item.label} jako zużyte`}
-                    title="Oznacz jako zużyte"
+                    aria-label={`${copy.aria.consume}: ${item.label}`}
+                    title={copy.consumedTitle}
                     className="grid size-9 place-items-center rounded-full text-sm font-bold text-[#356248] transition hover:bg-[#dfeae1]"
                   >
                     ✓
                   </button>
                   <button
                     onClick={() => onRemove(item)}
-                    aria-label={`Usuń ${item.label} ze spiżarni`}
+                    aria-label={`${copy.aria.remove}: ${item.label}`}
                     className="grid size-9 place-items-center rounded-full text-lg text-[#9a6251] transition hover:bg-[#fff0e8]"
                   >
                     ×
@@ -522,8 +671,8 @@ export function Pantry({
         ) : (
           <p className="rounded-xl bg-white p-4 text-sm leading-6 text-[#7a857e] sm:col-span-2 lg:col-span-3">
             {items.length === 0
-              ? "Spiżarnia jest pusta. Dodaj pierwszy produkt wraz z ilością i opcjonalną datą ważności."
-              : "Brak produktów w tej kategorii."}
+              ? copy.empty
+              : copy.noCategory}
           </p>
         )}
       </div>

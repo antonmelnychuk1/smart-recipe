@@ -2719,6 +2719,7 @@ export default function Home() {
         recipes={generated ? generatedRecipes : sampleRecipes}
         favorites={favorites}
         isSignedIn={Boolean(session?.user)}
+        language={language}
         onOpenRecipe={openRecipe}
         onAddToShoppingList={addToShoppingList}
         onEntriesChange={handleMealPlanEntriesChange}
@@ -2781,6 +2782,7 @@ export default function Home() {
               onAddToShoppingList={addToShoppingList}
               onCookFromPantry={cookFromPantry}
               isGenerating={isLoading}
+              language={language}
             />
           </div>
 
@@ -3740,7 +3742,12 @@ export default function Home() {
         </div>
       )}
 
-      {authOpen && <AuthDialog onClose={() => setAuthOpen(false)} />}
+      {authOpen && (
+        <AuthDialog
+          language={language}
+          onClose={() => setAuthOpen(false)}
+        />
+      )}
 
       {toast && (
         <div
