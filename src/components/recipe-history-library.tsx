@@ -2,14 +2,59 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import type { AppLanguage } from "@/lib/i18n";
 import type { SearchHistoryEntry } from "@/lib/recipe-types";
 
 type RecipeHistoryLibraryProps = {
   initialEntries: SearchHistoryEntry[];
+  language?: AppLanguage;
 };
 
-function formatDate(date: string) {
-  return new Intl.DateTimeFormat("pl-PL", {
+const historyLibraryCopy = {
+  pl: {
+    locale: "pl-PL",
+    search: "Szukaj po daniu, składniku albo opisie",
+    allTypes: "Wszystkie typy",
+    fromIngredients: "Ze składników",
+    byDish: "Po nazwie dania",
+    allDiets: "Każda dieta",
+    anyTime: "Dowolny czas",
+    newest: "Najnowsze",
+    oldest: "Najstarsze",
+    mostRecipes: "Najwięcej przepisów",
+    entries: "wpisów historii",
+    dish: "Danie",
+    ingredients: "Składniki",
+    dishPrefix: "Danie:",
+    upTo: "do",
+    openResults: "Otwórz wyniki",
+    noHistory: "Brak pasującej historii",
+    noHistoryHint: "Zmień filtry albo wygeneruj nowe przepisy w aplikacji.",
+  },
+  en: {
+    locale: "en-US",
+    search: "Search by dish, ingredient or description",
+    allTypes: "All types",
+    fromIngredients: "From ingredients",
+    byDish: "By dish name",
+    allDiets: "Any diet",
+    anyTime: "Any time",
+    newest: "Newest",
+    oldest: "Oldest",
+    mostRecipes: "Most recipes",
+    entries: "history entries",
+    dish: "Dish",
+    ingredients: "Ingredients",
+    dishPrefix: "Dish:",
+    upTo: "up to",
+    openResults: "Open results",
+    noHistory: "No matching history",
+    noHistoryHint: "Change filters or generate new recipes in the app.",
+  },
+} as const;
+
+function formatDate(date: string, language: AppLanguage) {
+  return new Intl.DateTimeFormat(historyLibraryCopy[language].locale, {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -18,15 +63,17 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
-function entryTitle(entry: SearchHistoryEntry) {
+function entryTitle(entry: SearchHistoryEntry, language: AppLanguage) {
   return entry.mode === "dish" && entry.query
-    ? `Danie: ${entry.query}`
+    ? `${historyLibraryCopy[language].dishPrefix} ${entry.query}`
     : entry.ingredients.join(", ");
 }
 
 export function RecipeHistoryLibrary({
   initialEntries,
+  language = "pl",
 }: RecipeHistoryLibraryProps) {
+  const copy = historyLibraryCopy[language];
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState("all");
   const [diet, setDiet] = useState("all");
@@ -56,7 +103,7 @@ export function RecipeHistoryLibrary({
 
         return (
           (!query ||
-            entryTitle(entry).toLocaleLowerCase("pl").includes(query) ||
+            entryTitle(entry, language).toLocaleLowerCase("pl").includes(query) ||
             recipesText.includes(query)) &&
           (mode === "all" || entry.mode === mode) &&
           (diet === "all" || entry.diet === diet) &&
@@ -78,7 +125,7 @@ export function RecipeHistoryLibrary({
           new Date(first.createdAt).getTime()
         );
       });
-  }, [diet, initialEntries, maxTime, mode, search, sort]);
+  }, [diet, initialEntries, language, maxTime, mode, search, sort]);
 
   function resetFilters() {
     setSearch("");
@@ -102,7 +149,7 @@ export function RecipeHistoryLibrary({
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Szukaj po daniu, składniku albo opisie"
+          placeholder={copy.search}
           className="h-11 rounded-xl border border-[#dedfd9] px-3 text-sm outline-none focus:border-[#71927e] sm:col-span-2"
         />
         <select
@@ -110,16 +157,16 @@ export function RecipeHistoryLibrary({
           onChange={(event) => setMode(event.target.value)}
           className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
         >
-          <option value="all">Wszystkie typy</option>
-          <option value="ingredients">Ze składników</option>
-          <option value="dish">Po nazwie dania</option>
+          <option value="all">{copy.allTypes}</option>
+          <option value="ingredients">{copy.fromIngredients}</option>
+          <option value="dish">{copy.byDish}</option>
         </select>
         <select
           value={diet}
           onChange={(event) => setDiet(event.target.value)}
           className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
         >
-          <option value="all">Każda dieta</option>
+          <option value="all">{copy.allDiets}</option>
           {diets.map((option) => (
             <option key={option}>{option}</option>
           ))}
@@ -129,20 +176,20 @@ export function RecipeHistoryLibrary({
           onChange={(event) => setMaxTime(event.target.value)}
           className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
         >
-          <option value="all">Dowolny czas</option>
-          <option value="15">do 15 min</option>
-          <option value="30">do 30 min</option>
-          <option value="45">do 45 min</option>
-          <option value="60">do 60 min</option>
+          <option value="all">{copy.anyTime}</option>
+          <option value="15">{copy.upTo} 15 min</option>
+          <option value="30">{copy.upTo} 30 min</option>
+          <option value="45">{copy.upTo} 45 min</option>
+          <option value="60">{copy.upTo} 60 min</option>
         </select>
         <select
           value={sort}
           onChange={(event) => setSort(event.target.value)}
           className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
         >
-          <option value="newest">Najnowsze</option>
-          <option value="oldest">Najstarsze</option>
-          <option value="recipes">Najwięcej przepisów</option>
+          <option value="newest">{copy.newest}</option>
+          <option value="oldest">{copy.oldest}</option>
+          <option value="recipes">{copy.mostRecipes}</option>
         </select>
         <button
           onClick={resetFilters}
@@ -153,7 +200,7 @@ export function RecipeHistoryLibrary({
       </div>
 
       <div className="mt-4 text-xs text-[#7a857e]">
-        {visibleEntries.length} z {initialEntries.length} wpisów historii
+        {visibleEntries.length} / {initialEntries.length} {copy.entries}
       </div>
 
       {visibleEntries.length > 0 ? (
@@ -166,21 +213,23 @@ export function RecipeHistoryLibrary({
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <span className="rounded-full bg-[#eef2ec] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#356248]">
-                    {entry.mode === "dish" ? "Danie" : "Składniki"}
+                    {entry.mode === "dish" ? copy.dish : copy.ingredients}
                   </span>
                   <h2 className="mt-3 break-anywhere font-serif text-2xl font-semibold">
-                    {entryTitle(entry)}
+                    {entryTitle(entry, language)}
                   </h2>
                   <p className="mt-1 text-xs text-[#7a857e]">
-                    {formatDate(entry.createdAt)} · {entry.diet}
-                    {entry.maxTime > 0 ? ` · do ${entry.maxTime} min` : ""}
+                    {formatDate(entry.createdAt, language)} · {entry.diet}
+                    {entry.maxTime > 0
+                      ? ` · ${copy.upTo} ${entry.maxTime} min`
+                      : ""}
                   </p>
                 </div>
                 <button
                   onClick={() => restore(entry)}
                   className="rounded-xl bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white"
                 >
-                  Otwórz wyniki
+                  {copy.openResults}
                 </button>
               </div>
 
@@ -220,10 +269,10 @@ export function RecipeHistoryLibrary({
       ) : (
         <div className="mt-4 rounded-[1.7rem] border border-dashed border-[#cfcec7] bg-white/60 p-10 text-center">
           <p className="font-serif text-2xl font-semibold">
-            Brak pasującej historii
+            {copy.noHistory}
           </p>
           <p className="mt-2 text-sm text-[#7a857e]">
-            Zmień filtry albo wygeneruj nowe przepisy w aplikacji.
+            {copy.noHistoryHint}
           </p>
         </div>
       )}

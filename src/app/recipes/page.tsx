@@ -90,7 +90,7 @@ export default async function SavedRecipesPage() {
           </div>
         </header>
 
-        <SavedRecipesLibrary initialItems={recipes} />
+        <SavedRecipesLibrary initialItems={recipes} language={language} />
       </div>
     </main>
   );

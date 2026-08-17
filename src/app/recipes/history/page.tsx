@@ -99,7 +99,7 @@ export default async function RecipeHistoryPage() {
           </div>
         </header>
 
-        <RecipeHistoryLibrary initialEntries={entries} />
+        <RecipeHistoryLibrary initialEntries={entries} language={language} />
       </div>
     </main>
   );

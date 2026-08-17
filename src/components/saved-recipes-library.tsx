@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import type { AppLanguage } from "@/lib/i18n";
 import type { Recipe } from "@/lib/recipe-types";
 
 export type SavedRecipeListItem = {
@@ -66,11 +67,110 @@ const difficultyOrder: Record<string, number> = {
   łatwa: 1,
   proste: 1,
   prosty: 1,
+  easy: 1,
+  "very easy": 1,
   średni: 2,
   średnia: 2,
+  medium: 2,
   trudny: 3,
   trudna: 3,
+  hard: 3,
 };
+
+const savedCopy = {
+  pl: {
+    search: "Szukaj po nazwie, składniku, opisie albo brakującym produkcie",
+    allStatuses: "Wszystkie statusy",
+    private: "Prywatne",
+    public: "Publiczne",
+    allDifficulties: "Każda trudność",
+    allTypes: "Każdy typ",
+    anyTime: "Dowolny czas",
+    anyCalories: "Dowolne kcal",
+    anyCost: "Dowolny koszt",
+    newest: "Najnowsze",
+    fastest: "Najszybsze",
+    easiest: "Najłatwiejsze",
+    leastCalories: "Najmniej kalorii",
+    cheapest: "Najtańsze",
+    recipes: "przepisów",
+    open: "Otwórz",
+    copyLink: "Kopiuj link",
+    hide: "Ukryj",
+    share: "Udostępnij",
+    delete: "Usuń",
+    approx: "ok.",
+    visibilityFailed: "Nie udało się zmienić widoczności.",
+    isPublic: "Przepis jest publiczny.",
+    isPrivate: "Przepis jest prywatny.",
+    deleteConfirm: "Usunąć zapisany przepis",
+    deleteFailed: "Nie udało się usunąć przepisu.",
+    deleted: "Przepis został usunięty.",
+    copied: "Link został skopiowany.",
+    empty: "Nie masz jeszcze zapisanych przepisów",
+    noMatches: "Brak pasujących przepisów",
+    emptyHint:
+      "Wygeneruj przepis i kliknij serduszko, żeby pojawił się w bibliotece.",
+    noMatchesHint: "Zmień filtry albo zapisz nowy przepis w aplikacji.",
+    backToGenerator: "Wróć do generatora",
+    copyPublicAria: "Kopiuj publiczny link do",
+    hideAria: "Ukryj przepis",
+    shareAria: "Udostępnij przepis",
+    deleteAria: "Usuń zapisany przepis",
+    tags: {
+      "Bez mięsa": "Bez mięsa",
+      Wegańskie: "Wegańskie",
+      Bezglutenowe: "Bezglutenowe",
+      Wysokobiałkowe: "Wysokobiałkowe",
+    },
+  },
+  en: {
+    search: "Search by name, ingredient, description or missing product",
+    allStatuses: "All statuses",
+    private: "Private",
+    public: "Public",
+    allDifficulties: "Any difficulty",
+    allTypes: "Any type",
+    anyTime: "Any time",
+    anyCalories: "Any kcal",
+    anyCost: "Any cost",
+    newest: "Newest",
+    fastest: "Fastest",
+    easiest: "Easiest",
+    leastCalories: "Lowest calories",
+    cheapest: "Cheapest",
+    recipes: "recipes",
+    open: "Open",
+    copyLink: "Copy link",
+    hide: "Hide",
+    share: "Share",
+    delete: "Delete",
+    approx: "approx.",
+    visibilityFailed: "Could not change visibility.",
+    isPublic: "Recipe is public.",
+    isPrivate: "Recipe is private.",
+    deleteConfirm: "Delete saved recipe",
+    deleteFailed: "Could not delete recipe.",
+    deleted: "Recipe deleted.",
+    copied: "Link copied.",
+    empty: "You do not have saved recipes yet",
+    noMatches: "No matching recipes",
+    emptyHint:
+      "Generate a recipe and click the heart so it appears in your library.",
+    noMatchesHint: "Change filters or save a new recipe in the app.",
+    backToGenerator: "Back to generator",
+    copyPublicAria: "Copy public link to",
+    hideAria: "Hide recipe",
+    shareAria: "Share recipe",
+    deleteAria: "Delete saved recipe",
+    tags: {
+      "Bez mięsa": "Meat-free",
+      Wegańskie: "Vegan",
+      Bezglutenowe: "Gluten-free",
+      Wysokobiałkowe: "High-protein",
+    },
+  },
+} as const;
 
 function recipeText(recipe: Recipe) {
   return [
@@ -105,9 +205,12 @@ function difficultyRank(difficulty: string) {
 
 export function SavedRecipesLibrary({
   initialItems,
+  language = "pl",
 }: {
   initialItems: SavedRecipeListItem[];
+  language?: AppLanguage;
 }) {
+  const copy = savedCopy[language];
   const [items, setItems] = useState(initialItems);
   const [search, setSearch] = useState("");
   const [visibility, setVisibility] = useState("all");
@@ -219,7 +322,7 @@ export function SavedRecipesLibrary({
     setPendingId("");
 
     if (!response.ok) {
-      setMessage(data.error ?? "Nie udało się zmienić widoczności.");
+      setMessage(data.error ?? copy.visibilityFailed);
       return;
     }
 
@@ -228,11 +331,11 @@ export function SavedRecipesLibrary({
         saved.id === item.id ? { ...saved, isPublic } : saved,
       ),
     );
-    setMessage(isPublic ? "Przepis jest publiczny." : "Przepis jest prywatny.");
+    setMessage(isPublic ? copy.isPublic : copy.isPrivate);
   }
 
   async function remove(item: SavedRecipeListItem) {
-    if (!window.confirm(`Usunąć zapisany przepis „${item.recipe.title}”?`)) {
+    if (!window.confirm(`${copy.deleteConfirm} “${item.recipe.title}”?`)) {
       return;
     }
 
@@ -247,19 +350,19 @@ export function SavedRecipesLibrary({
     setPendingId("");
 
     if (!response.ok) {
-      setMessage(data.error ?? "Nie udało się usunąć przepisu.");
+      setMessage(data.error ?? copy.deleteFailed);
       return;
     }
 
     setItems((current) => current.filter((saved) => saved.id !== item.id));
-    setMessage("Przepis został usunięty.");
+    setMessage(copy.deleted);
   }
 
   async function copyLink(item: SavedRecipeListItem) {
     await navigator.clipboard.writeText(
       `${window.location.origin}/recipes/${item.id}`,
     );
-    setMessage("Link został skopiowany.");
+    setMessage(copy.copied);
   }
 
   return (
@@ -268,7 +371,7 @@ export function SavedRecipesLibrary({
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Szukaj po nazwie, składniku, opisie albo brakującym produkcie"
+          placeholder={copy.search}
           className="h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm outline-none focus:border-[#71927e]"
         />
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
@@ -277,16 +380,16 @@ export function SavedRecipesLibrary({
             onChange={(event) => setVisibility(event.target.value)}
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
-            <option value="all">Wszystkie statusy</option>
-            <option value="private">Prywatne</option>
-            <option value="public">Publiczne</option>
+            <option value="all">{copy.allStatuses}</option>
+            <option value="private">{copy.private}</option>
+            <option value="public">{copy.public}</option>
           </select>
           <select
             value={difficulty}
             onChange={(event) => setDifficulty(event.target.value)}
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
-            <option value="all">Każda trudność</option>
+            <option value="all">{copy.allDifficulties}</option>
             {difficulties.map((option) => (
               <option key={option}>{option}</option>
             ))}
@@ -296,9 +399,11 @@ export function SavedRecipesLibrary({
             onChange={(event) => setDietTag(event.target.value)}
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
-            <option value="all">Każdy typ</option>
+            <option value="all">{copy.allTypes}</option>
             {dietFilterOptions.map((option) => (
-              <option key={option}>{option}</option>
+              <option key={option} value={option}>
+                {copy.tags[option as keyof typeof copy.tags]}
+              </option>
             ))}
           </select>
           <select
@@ -306,7 +411,7 @@ export function SavedRecipesLibrary({
             onChange={(event) => setMaxTime(event.target.value)}
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
-            <option value="all">Dowolny czas</option>
+            <option value="all">{copy.anyTime}</option>
             <option value="15">do 15 min</option>
             <option value="30">do 30 min</option>
             <option value="45">do 45 min</option>
@@ -317,7 +422,7 @@ export function SavedRecipesLibrary({
             onChange={(event) => setMaxCalories(event.target.value)}
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
-            <option value="all">Dowolne kcal</option>
+            <option value="all">{copy.anyCalories}</option>
             <option value="400">do 400 kcal</option>
             <option value="600">do 600 kcal</option>
             <option value="800">do 800 kcal</option>
@@ -327,7 +432,7 @@ export function SavedRecipesLibrary({
             onChange={(event) => setMaxCost(event.target.value)}
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
-            <option value="all">Dowolny koszt</option>
+            <option value="all">{copy.anyCost}</option>
             <option value="20">do 20 zł</option>
             <option value="40">do 40 zł</option>
             <option value="60">do 60 zł</option>
@@ -337,11 +442,11 @@ export function SavedRecipesLibrary({
             onChange={(event) => setSort(event.target.value)}
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
-            <option value="newest">Najnowsze</option>
-            <option value="fastest">Najszybsze</option>
-            <option value="difficulty">Najłatwiejsze</option>
-            <option value="calories">Najmniej kalorii</option>
-            <option value="cost">Najtańsze</option>
+            <option value="newest">{copy.newest}</option>
+            <option value="fastest">{copy.fastest}</option>
+            <option value="difficulty">{copy.easiest}</option>
+            <option value="calories">{copy.leastCalories}</option>
+            <option value="cost">{copy.cheapest}</option>
             <option value="title">A-Z</option>
           </select>
           <button
@@ -355,7 +460,7 @@ export function SavedRecipesLibrary({
 
       <div className="mt-4 flex min-h-6 items-center justify-between gap-3 text-xs text-[#7a857e]">
         <span>
-          {visibleItems.length} z {items.length} przepisów
+          {visibleItems.length} / {items.length} {copy.recipes}
         </span>
         {message && <span className="font-semibold text-[#356248]">{message}</span>}
       </div>
@@ -386,7 +491,7 @@ export function SavedRecipesLibrary({
                       : "bg-white/95 text-[#68736b]"
                   }`}
                 >
-                  {item.isPublic ? "Publiczny" : "Prywatny"}
+                  {item.isPublic ? copy.public : copy.private}
                 </span>
               </div>
 
@@ -409,7 +514,7 @@ export function SavedRecipesLibrary({
                   </span>
                   {item.recipe.estimatedCost && (
                     <span className="rounded-full bg-[#f6f3ec] px-2.5 py-1">
-                      ok. {item.recipe.estimatedCost} zł
+                      {copy.approx} {item.recipe.estimatedCost} zł
                     </span>
                   )}
                 </div>
@@ -421,7 +526,7 @@ export function SavedRecipesLibrary({
                         key={tag}
                         className="rounded-full bg-[#eef6ef] px-2.5 py-1 text-[0.68rem] font-semibold text-[#356248]"
                       >
-                        {tag}
+                        {copy.tags[tag as keyof typeof copy.tags]}
                       </span>
                     ))}
                 </div>
@@ -431,15 +536,15 @@ export function SavedRecipesLibrary({
                     href={`/recipes/${item.id}`}
                     className="inline-flex h-9 items-center justify-center rounded-xl bg-[#2f684f] px-3 text-xs font-semibold text-white"
                   >
-                    Otwórz
+                    {copy.open}
                   </Link>
                   {item.isPublic && (
                     <button
                       onClick={() => copyLink(item)}
-                      aria-label={`Kopiuj publiczny link do ${item.recipe.title}`}
+                      aria-label={`${copy.copyPublicAria} ${item.recipe.title}`}
                       className="rounded-xl bg-[#edf1ec] px-3 py-2 text-xs font-semibold text-[#356248]"
                     >
-                      Kopiuj link
+                      {copy.copyLink}
                     </button>
                   )}
                   <button
@@ -447,20 +552,20 @@ export function SavedRecipesLibrary({
                     onClick={() => setPublic(item, !item.isPublic)}
                     aria-label={
                       item.isPublic
-                        ? `Ukryj przepis ${item.recipe.title}`
-                        : `Udostępnij przepis ${item.recipe.title}`
+                        ? `${copy.hideAria} ${item.recipe.title}`
+                        : `${copy.shareAria} ${item.recipe.title}`
                     }
                     className="rounded-xl border border-[#d8d7d0] px-3 py-2 text-xs font-semibold disabled:opacity-40"
                   >
-                    {item.isPublic ? "Ukryj" : "Udostępnij"}
+                    {item.isPublic ? copy.hide : copy.share}
                   </button>
                   <button
                     disabled={pendingId === item.id}
                     onClick={() => remove(item)}
-                    aria-label={`Usuń zapisany przepis ${item.recipe.title}`}
+                    aria-label={`${copy.deleteAria} ${item.recipe.title}`}
                     className="ml-auto px-2 py-2 text-xs font-semibold text-[#a45c45] disabled:opacity-40"
                   >
-                    Usuń
+                    {copy.delete}
                   </button>
                 </div>
               </div>
@@ -471,20 +576,20 @@ export function SavedRecipesLibrary({
         <div className="mt-4 rounded-[1.7rem] border border-dashed border-[#cfcec7] bg-white/60 p-10 text-center">
           <p className="font-serif text-2xl font-semibold">
             {items.length === 0
-              ? "Nie masz jeszcze zapisanych przepisów"
-              : "Brak pasujących przepisów"}
+              ? copy.empty
+              : copy.noMatches}
           </p>
           <p className="mt-2 text-sm text-[#7a857e]">
             {items.length === 0
-              ? "Wygeneruj przepis i kliknij serduszko, żeby pojawił się w bibliotece."
-              : "Zmień filtry albo zapisz nowy przepis w aplikacji."}
+              ? copy.emptyHint
+              : copy.noMatchesHint}
           </p>
           {items.length === 0 && (
             <Link
               href="/#generator"
               className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white"
             >
-              Wróć do generatora
+              {copy.backToGenerator}
             </Link>
           )}
         </div>
