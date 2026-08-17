@@ -1,16 +1,45 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { RecipeHistoryLibrary } from "@/components/recipe-history-library";
 import { auth } from "@/lib/auth";
+import {
+  languageCookieName,
+  normalizeLanguage,
+  type AppLanguage,
+} from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 import type { Recipe, SearchHistoryEntry } from "@/lib/recipe-types";
 
 export const dynamic = "force-dynamic";
 
+const historyCopy: Record<
+  AppLanguage,
+  { title: string; description: string; saved: string; back: string }
+> = {
+  pl: {
+    title: "Historia przepisów",
+    description:
+      "Przeglądaj wcześniejsze generowania, filtruj wyniki i wracaj do przepisów jednym kliknięciem.",
+    saved: "Zapisane",
+    back: "← Wróć do aplikacji",
+  },
+  en: {
+    title: "Recipe history",
+    description:
+      "Browse previous generations, filter results and return to recipes with one click.",
+    saved: "Saved",
+    back: "← Back to app",
+  },
+};
+
 export default async function RecipeHistoryPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect("/");
+  const language = normalizeLanguage(
+    (await cookies()).get(languageCookieName)?.value,
+  );
+  const copy = historyCopy[language];
 
   const records = await prisma.searchHistory.findMany({
     where: { userId: session.user.id },
@@ -48,11 +77,10 @@ export default async function RecipeHistoryPage() {
               SmartRecipe
             </p>
             <h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-              Historia przepisów
+              {copy.title}
             </h1>
             <p className="mt-2 text-sm leading-6 text-[#748078]">
-              Przeglądaj wcześniejsze generowania, filtruj wyniki i wracaj do
-              przepisów jednym kliknięciem.
+              {copy.description}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -60,13 +88,13 @@ export default async function RecipeHistoryPage() {
               href="/recipes"
               className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold shadow-sm"
             >
-              Zapisane
+              {copy.saved}
             </Link>
             <Link
               href="/"
               className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold shadow-sm"
             >
-              ← Wróć do aplikacji
+              {copy.back}
             </Link>
           </div>
         </header>

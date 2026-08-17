@@ -1,25 +1,73 @@
 import Link from "next/link";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import {
+  languageCookieName,
+  normalizeLanguage,
+  type AppLanguage,
+} from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 
 type VerificationPageProps = {
   searchParams: Promise<{ error?: string }>;
 };
 
-const errorMessages: Record<string, string> = {
-  INVALID_TOKEN:
-    "Link weryfikacyjny jest nieprawidłowy. Wyślij nową wiadomość i użyj najnowszego linku.",
-  TOKEN_EXPIRED:
-    "Link weryfikacyjny wygasł. Wyślij nową wiadomość z poziomu aplikacji.",
-  USER_NOT_FOUND: "Nie znaleziono konta powiązanego z tym adresem e-mail.",
-  INVALID_ORIGIN: "Adres przekierowania nie został zaakceptowany.",
+const emailVerifiedCopy: Record<
+  AppLanguage,
+  {
+    successTitle: string;
+    failedTitle: string;
+    success: (email: string) => string;
+    failed: string;
+    unknownFailed: string;
+    back: string;
+    errors: Record<string, string>;
+  }
+> = {
+  pl: {
+    successTitle: "E-mail potwierdzony",
+    failedTitle: "Nie udało się potwierdzić",
+    success: (email) => `Adres ${email} został pomyślnie zweryfikowany.`,
+    failed:
+      "Konto nadal nie jest zweryfikowane. Wróć do aplikacji i wyślij nowy link.",
+    unknownFailed: "Weryfikacja nie powiodła się",
+    back: "Wróć do aplikacji",
+    errors: {
+      INVALID_TOKEN:
+        "Link weryfikacyjny jest nieprawidłowy. Wyślij nową wiadomość i użyj najnowszego linku.",
+      TOKEN_EXPIRED:
+        "Link weryfikacyjny wygasł. Wyślij nową wiadomość z poziomu aplikacji.",
+      USER_NOT_FOUND: "Nie znaleziono konta powiązanego z tym adresem e-mail.",
+      INVALID_ORIGIN: "Adres przekierowania nie został zaakceptowany.",
+    },
+  },
+  en: {
+    successTitle: "E-mail confirmed",
+    failedTitle: "Could not confirm e-mail",
+    success: (email) => `Address ${email} has been verified successfully.`,
+    failed:
+      "The account is still not verified. Return to the app and send a new link.",
+    unknownFailed: "Verification failed",
+    back: "Back to app",
+    errors: {
+      INVALID_TOKEN:
+        "The verification link is invalid. Send a new message and use the latest link.",
+      TOKEN_EXPIRED:
+        "The verification link has expired. Send a new message from the app.",
+      USER_NOT_FOUND: "No account was found for this e-mail address.",
+      INVALID_ORIGIN: "The redirect address was not accepted.",
+    },
+  },
 };
 
 export default async function EmailVerifiedPage({
   searchParams,
 }: VerificationPageProps) {
   const { error } = await searchParams;
+  const language = normalizeLanguage(
+    (await cookies()).get(languageCookieName)?.value,
+  );
+  const copy = emailVerifiedCopy[language];
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user.id
     ? await prisma.user.findUnique({
@@ -29,8 +77,7 @@ export default async function EmailVerifiedPage({
     : null;
   const verified = user?.emailVerified === true;
   const errorMessage = error
-    ? errorMessages[error] ??
-      `Weryfikacja nie powiodła się (kod: ${error}).`
+    ? copy.errors[error] ?? `${copy.unknownFailed} (code: ${error}).`
     : null;
 
   return (
@@ -49,19 +96,18 @@ export default async function EmailVerifiedPage({
           SmartRecipe
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">
-          {verified ? "E-mail potwierdzony" : "Nie udało się potwierdzić"}
+          {verified ? copy.successTitle : copy.failedTitle}
         </h1>
         <p className="mt-4 leading-7 text-[#68736b]">
           {verified
-            ? `Adres ${user.email} został pomyślnie zweryfikowany.`
-            : errorMessage ??
-              "Konto nadal nie jest zweryfikowane. Wróć do aplikacji i wyślij nowy link."}
+            ? copy.success(user.email)
+            : errorMessage ?? copy.failed}
         </p>
         <Link
           href="/"
           className="mt-7 inline-flex h-12 items-center justify-center rounded-xl bg-[#2f684f] px-6 font-semibold text-white"
         >
-          Wróć do aplikacji
+          {copy.back}
         </Link>
       </section>
     </main>

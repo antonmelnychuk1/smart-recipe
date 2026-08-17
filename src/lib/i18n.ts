@@ -1,9 +1,20 @@
 export type AppLanguage = "pl" | "en";
 
-export const languageOptions: { value: AppLanguage; label: string }[] = [
-  { value: "pl", label: "PL" },
-  { value: "en", label: "EN" },
+export const languageCookieName = "smart-recipe:language";
+
+export const languageOptions: {
+  value: AppLanguage;
+  label: string;
+  flag: string;
+  name: string;
+}[] = [
+  { value: "pl", label: "PL", flag: "🇵🇱", name: "Polski" },
+  { value: "en", label: "EN", flag: "🇬🇧", name: "English" },
 ];
+
+export function normalizeLanguage(value: string | undefined | null): AppLanguage {
+  return value === "en" ? "en" : "pl";
+}
 
 export const homeCopy = {
   pl: {

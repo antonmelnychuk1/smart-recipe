@@ -10,6 +10,7 @@ import { authClient } from "@/lib/auth-client";
 import {
   formatOptionLabel,
   homeCopy,
+  languageCookieName,
   languageOptions,
   type AppLanguage,
 } from "@/lib/i18n";
@@ -417,13 +418,15 @@ function LanguageSwitcher({
           type="button"
           onClick={() => onChange(option.value)}
           aria-pressed={language === option.value}
-          className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
+          title={option.name}
+          className={`flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition ${
             language === option.value
               ? "bg-[#2f684f] text-white"
               : "text-[#667168] hover:bg-[#f3f6f2] hover:text-[#25322b]"
           } ${compact ? "flex-1" : ""}`}
         >
-          {option.label}
+          <span className="text-sm leading-none">{option.flag}</span>
+          <span>{option.label}</span>
         </button>
       ))}
     </div>
@@ -644,6 +647,7 @@ export default function Home() {
     setLanguage(nextLanguage);
     setLanguageLoaded(true);
     setSampleRecipes(getSampleRecipes(nextLanguage));
+    document.cookie = `${languageCookieName}=${nextLanguage}; path=/; max-age=31536000; samesite=lax`;
   }
 
   useEffect(() => {
@@ -660,6 +664,7 @@ export default function Home() {
       setSampleRecipes(getSampleRecipes(nextLanguage));
       setLanguageLoaded(true);
       document.documentElement.lang = nextLanguage;
+      document.cookie = `${languageCookieName}=${nextLanguage}; path=/; max-age=31536000; samesite=lax`;
     }, 0);
 
     return () => window.clearTimeout(timeout);
@@ -670,6 +675,7 @@ export default function Home() {
 
     window.localStorage.setItem(storageKeys.language, language);
     document.documentElement.lang = language;
+    document.cookie = `${languageCookieName}=${language}; path=/; max-age=31536000; samesite=lax`;
   }, [language, languageLoaded]);
 
   useEffect(() => {
