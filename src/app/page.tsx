@@ -254,6 +254,21 @@ function getShoppingCategory(item: string) {
   return category?.name ?? "Pozostałe";
 }
 
+function displayShoppingCategory(category: string, language: AppLanguage) {
+  if (language === "pl") return category;
+
+  const labels: Record<string, string> = {
+    "Warzywa i owoce": "Fruit and vegetables",
+    "Mięso, ryby i jajka": "Meat, fish and eggs",
+    Nabiał: "Dairy",
+    "Produkty suche": "Dry goods",
+    "Przyprawy i sosy": "Spices and sauces",
+    Pozostałe: "Other",
+  };
+
+  return labels[category] ?? category;
+}
+
 function groupShoppingItems(items: string[]) {
   return items.reduce<{ name: string; items: string[] }[]>((groups, item) => {
     const categoryName = getShoppingCategory(item);
@@ -306,12 +321,14 @@ function normalizeStoredShoppingList(value: unknown): ShoppingListItem[] {
 
 function formatShoppingListForClipboard(
   groups: ReturnType<typeof groupShoppingItems>,
+  title: string,
+  language: AppLanguage,
 ) {
   return [
-    "Lista zakupów",
+    title,
     "",
     ...groups.flatMap((group) => [
-      group.name,
+      displayShoppingCategory(group.name, language),
       ...group.items.map((item) => `- ${item}`),
       "",
     ]),
@@ -505,6 +522,123 @@ export default function Home() {
   );
   const modalOpen = Boolean(selectedRecipe) || cookingMode || authOpen;
   const copy = homeCopy[language];
+  const pageCopy =
+    language === "pl"
+      ? {
+          suggestions,
+          confirmCloseTimer: "Timer nadal działa. Zamknąć tryb gotowania?",
+          shareFailed: "Nie udało się udostępnić przepisu.",
+          shareCopied: "Przepis jest publiczny. Link został skopiowany.",
+          privateFailed: "Nie udało się ukryć przepisu.",
+          feedbackRemoved: "Usunięto ocenę przepisu.",
+          feedbackLiked: "Dzięki! Zapisaliśmy, że ten przepis Ci pasuje.",
+          feedbackSaved: "Dzięki za feedback. Przyda się do dalszych ulepszeń.",
+          changed: "Zmieniono:",
+          productChanged: "Produkt został zmieniony.",
+          alreadyInPantry: "jest już w spiżarni. Usunięto z listy zakupów.",
+          movedToPantry: "Przeniesiono do spiżarni:",
+          removedOneBought: "Usunięto 1 kupiony produkt.",
+          removedBought: "kupionych produktów usunięto.",
+          boughtAlreadyInPantry:
+            "Kupione produkty były już w spiżarni. Usunięto je z listy.",
+          movedProductsToPantry: "produktów przeniesiono do spiżarni.",
+          addedToPantry: "Dodano do spiżarni:",
+          consumed: "Zużyto:",
+          noPantryMatches: "Nie znaleziono pasujących produktów w spiżarni.",
+          markAsUsed: "Oznaczyć jako zużyte:",
+          removedFromPantry: "produktów usunięto ze spiżarni.",
+          addedToGenerator: "produktów dodano do generatora.",
+          verificationSent:
+            "Wiadomość została wysłana. Sprawdź również folder spam.",
+          alreadyVerified: "Ten adres jest już zweryfikowany. Odśwież stronę.",
+          tooManyAttempts:
+            "Wysłano zbyt wiele prób. Poczekaj chwilę i spróbuj ponownie.",
+          sendFailed: "Nie udało się wysłać wiadomości. Kod:",
+          verifyPrefix: "Potwierdź adres",
+          verifySuffix: "aby zabezpieczyć konto.",
+          sending: "Wysyłam...",
+          sendVerification: "Wyślij link weryfikacyjny",
+          checkPantry: "Sprawdź spiżarnię:",
+          expired: "po terminie",
+          expiring: "z krótką datą ważności",
+          viewProducts: "Zobacz produkty",
+          setPreferences: "Ustaw preferencje gotowania",
+          preferencesText:
+            "Dieta, budżet, czas i wykluczone składniki będą automatycznie używane przy generowaniu przepisów.",
+          completeNow: "Uzupełnij teraz",
+          userPanel: "Panel użytkownika",
+          hello: "Cześć",
+          dashboardText:
+            "Szybki podgląd Twojej kuchni: limity, zakupy, spiżarnia i ostatnie przepisy w jednym miejscu.",
+          generateRecipe: "Generuj przepis",
+          activity: "Aktywność",
+          latest: "Ostatnio:",
+          noGenerationHistory: "Nie masz jeszcze historii generowania.",
+          history: "Historia",
+          limitUsage: "Wykorzystanie limitu",
+          adminUnlimited:
+            "Masz konto administratora, więc generowanie jest bez limitu.",
+          used: "Wykorzystano",
+          from: "z",
+          limitStarts: "Limit zacznie się liczyć po pierwszym generowaniu.",
+        }
+      : {
+          suggestions: ["eggs", "rice", "chicken", "tomato", "spinach"],
+          confirmCloseTimer: "The timer is still running. Close cooking mode?",
+          shareFailed: "Could not share the recipe.",
+          shareCopied: "The recipe is public. Link copied.",
+          privateFailed: "Could not hide the recipe.",
+          feedbackRemoved: "Recipe rating removed.",
+          feedbackLiked: "Thanks! We saved that this recipe works for you.",
+          feedbackSaved: "Thanks for the feedback. It will help improve recipes.",
+          changed: "Changed:",
+          productChanged: "Product changed.",
+          alreadyInPantry:
+            "is already in your pantry. Removed from shopping list.",
+          movedToPantry: "Moved to pantry:",
+          removedOneBought: "Removed 1 bought product.",
+          removedBought: "bought products removed.",
+          boughtAlreadyInPantry:
+            "Bought products were already in your pantry. Removed them from the list.",
+          movedProductsToPantry: "products moved to pantry.",
+          addedToPantry: "Added to pantry:",
+          consumed: "Used:",
+          noPantryMatches: "No matching products found in pantry.",
+          markAsUsed: "Mark as used:",
+          removedFromPantry: "products removed from pantry.",
+          addedToGenerator: "products added to generator.",
+          verificationSent: "Message sent. Also check your spam folder.",
+          alreadyVerified: "This address is already verified. Refresh the page.",
+          tooManyAttempts: "Too many attempts. Wait a moment and try again.",
+          sendFailed: "Could not send the message. Code:",
+          verifyPrefix: "Confirm address",
+          verifySuffix: "to secure your account.",
+          sending: "Sending...",
+          sendVerification: "Send verification link",
+          checkPantry: "Check pantry:",
+          expired: "expired",
+          expiring: "expiring soon",
+          viewProducts: "View products",
+          setPreferences: "Set cooking preferences",
+          preferencesText:
+            "Diet, budget, time and excluded ingredients will be used automatically when generating recipes.",
+          completeNow: "Complete now",
+          userPanel: "User panel",
+          hello: "Hi",
+          dashboardText:
+            "A quick look at your kitchen: limits, shopping, pantry and recent recipes in one place.",
+          generateRecipe: "Generate recipe",
+          activity: "Activity",
+          latest: "Recently:",
+          noGenerationHistory: "You do not have generation history yet.",
+          history: "History",
+          limitUsage: "Limit usage",
+          adminUnlimited:
+            "You have an administrator account, so generation is unlimited.",
+          used: "Used",
+          from: "of",
+          limitStarts: "The limit will start counting after your first generation.",
+        };
 
   function changeLanguage(nextLanguage: AppLanguage) {
     setLanguage(nextLanguage);
@@ -852,14 +986,14 @@ export default function Home() {
   const shoppingSections = [
     {
       key: "pending",
-      title: "Do kupienia",
+      title: copy.shopping.pending,
       count: pendingShoppingCount,
       groups: groupedShoppingList,
       checked: false,
     },
     {
       key: "bought",
-      title: "Kupione",
+      title: copy.shopping.bought,
       count: boughtShoppingCount,
       groups: groupedBoughtShoppingList,
       checked: true,
@@ -880,13 +1014,13 @@ export default function Home() {
     0,
   );
   const kitchenStats = [
-    ["Wygenerowane", generatedRecipeCount, "przepisy z historii"],
-    ["Ulubione", favorites.length, "zapisane inspiracje"],
-    ["Historia", history.length, "ostatnie wyszukiwania"],
-    ["Spiżarnia", pantryItems.length, "produkty w domu"],
-    ["Zakupy", pendingShoppingCount, "produkty do kupienia"],
-    ["Plan", mealPlanCount, "posiłki w tygodniu"],
-    ["Feedback", feedbackCount, "oceny przepisów"],
+    [copy.kitchen.generated, generatedRecipeCount, copy.kitchen.generatedHint],
+    [copy.kitchen.favorites, favorites.length, copy.kitchen.savedInspirations],
+    [copy.kitchen.history, history.length, copy.kitchen.recentSearches],
+    [copy.kitchen.pantry, pantryItems.length, copy.kitchen.pantryHint],
+    [copy.kitchen.shoppingShort, pendingShoppingCount, copy.kitchen.shoppingHint],
+    [copy.kitchen.plan, mealPlanCount, copy.kitchen.planHint],
+    [copy.kitchen.feedback, feedbackCount, copy.kitchen.feedbackHint],
   ];
   const usagePercent =
     currentGenerationUsage && !currentGenerationUsage.unlimited
@@ -900,43 +1034,46 @@ export default function Home() {
   const latestFavorite = favorites[0];
   const dashboardCards = [
     {
-      label: "Dzisiejszy limit",
+      label: copy.kitchen.dailyLimit,
       value:
         currentGenerationUsage?.unlimited || isAdmin
-          ? "bez limitu"
+          ? copy.kitchen.noLimit
           : currentGenerationUsage
             ? `${currentGenerationUsage.remaining}/${currentGenerationUsage.limit}`
             : `${dailyGenerationLimit}/${dailyGenerationLimit}`,
       hint:
         currentGenerationUsage?.unlimited || isAdmin
-          ? "konto administratora"
-          : "pozostałe generowania",
+          ? copy.kitchen.adminAccount
+          : copy.kitchen.remainingGenerations,
       href: "#generator",
     },
     {
-      label: "Lista zakupów",
+      label: copy.kitchen.shoppingList,
       value: pendingShoppingCount,
       hint:
         pendingShoppingCount === 1
-          ? "produkt do kupienia"
-          : "produktów do kupienia",
+          ? copy.kitchen.oneProductToBuy
+          : copy.kitchen.productsToBuy,
       href: "#my-kitchen",
     },
     {
-      label: "Spiżarnia",
+      label: copy.kitchen.pantry,
       value: pantryItems.length,
       hint:
         expiredPantryItems.length > 0
-          ? `${expiredPantryItems.length} po terminie`
+          ? `${expiredPantryItems.length} ${copy.kitchen.expired}`
           : expiringPantryItems.length > 0
-            ? `${expiringPantryItems.length} z krótką datą`
-            : "produkty w domu",
+            ? `${expiringPantryItems.length} ${copy.kitchen.expiringSoon}`
+            : copy.kitchen.pantryHint,
       href: "#my-kitchen",
     },
     {
-      label: "Plan tygodnia",
+      label: copy.kitchen.weeklyPlan,
       value: mealPlanCount,
-      hint: mealPlanCount === 1 ? "zaplanowany posiłek" : "zaplanowanych posiłków",
+      hint:
+        mealPlanCount === 1
+          ? copy.kitchen.plannedMeal
+          : copy.kitchen.plannedMeals,
       href: "#meal-planner",
     },
   ];
@@ -977,7 +1114,7 @@ export default function Home() {
   function closeCookingMode() {
     if (
       cookingTimerRunning &&
-      !window.confirm("Timer nadal działa. Zamknąć tryb gotowania?")
+      !window.confirm(pageCopy.confirmCloseTimer)
     ) {
       return;
     }
@@ -1059,18 +1196,18 @@ export default function Home() {
         error?: string;
       };
       if (!response.ok || !data.savedId || !data.path) {
-        throw new Error(data.error ?? "Nie udało się udostępnić przepisu.");
+        throw new Error(data.error ?? pageCopy.shareFailed);
       }
 
       updateSavedRecipe(recipe.title, data.savedId, true);
       const url = `${window.location.origin}${data.path}`;
       await navigator.clipboard.writeText(url);
-      setToast("Przepis jest publiczny. Link został skopiowany.");
+      setToast(pageCopy.shareCopied);
     } catch (caughtError) {
       setToast(
         caughtError instanceof Error
           ? caughtError.message
-          : "Nie udało się udostępnić przepisu.",
+          : pageCopy.shareFailed,
       );
     } finally {
       setSharePending(false);
@@ -1089,16 +1226,16 @@ export default function Home() {
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) {
-        throw new Error(data.error ?? "Nie udało się ukryć przepisu.");
+        throw new Error(data.error ?? pageCopy.privateFailed);
       }
 
       updateSavedRecipe(recipe.title, recipe.savedId, false);
-      setToast("Przepis jest teraz prywatny.");
+      setToast(copy.recipeModal.privateInfo);
     } catch (caughtError) {
       setToast(
         caughtError instanceof Error
           ? caughtError.message
-          : "Nie udało się ukryć przepisu.",
+          : pageCopy.privateFailed,
       );
     } finally {
       setSharePending(false);
@@ -1123,10 +1260,10 @@ export default function Home() {
 
     setToast(
       selectedAgain
-        ? "Usunięto ocenę przepisu."
+        ? pageCopy.feedbackRemoved
         : feedback === "liked"
-          ? "Dzięki! Zapisaliśmy, że ten przepis Ci pasuje."
-          : "Dzięki za feedback. Przyda się do dalszych ulepszeń.",
+          ? pageCopy.feedbackLiked
+          : pageCopy.feedbackSaved,
     );
 
     if (session?.user) {
@@ -1183,10 +1320,10 @@ export default function Home() {
 
     setToast(
       newItems.length === 0
-        ? "Te produkty są już na liście zakupów."
+        ? copy.shopping.alreadyOnList
         : newItems.length === 1
-          ? `Dodano: ${newItems[0]}`
-          : `Dodano ${newItems.length} produktów do listy zakupów.`,
+          ? `${copy.shopping.added} ${newItems[0]}`
+          : `${newItems.length} ${copy.shopping.addedMany}`,
     );
 
     if (session?.user && newItems.length > 0) {
@@ -1209,11 +1346,15 @@ export default function Home() {
 
     try {
       await navigator.clipboard.writeText(
-        formatShoppingListForClipboard(groupedShoppingList),
+        formatShoppingListForClipboard(
+          groupedShoppingList,
+          copy.shopping.listTitle,
+          language,
+        ),
       );
-      setToast("Lista zakupów została skopiowana.");
+      setToast(copy.shopping.copied);
     } catch {
-      setToast("Nie udało się skopiować listy zakupów.");
+      setToast(copy.shopping.copyFailed);
     }
   }
 
@@ -1294,8 +1435,8 @@ export default function Home() {
     cancelEditingShoppingItem();
     setToast(
       oldItem
-        ? `Zmieniono: ${oldItem.label} → ${newLabel}`
-        : "Produkt został zmieniony.",
+        ? `${pageCopy.changed} ${oldItem.label} → ${newLabel}`
+        : pageCopy.productChanged,
     );
   }
 
@@ -1327,8 +1468,8 @@ export default function Home() {
     removeShoppingItem(item);
     setToast(
       alreadyInPantry
-        ? `${label} jest już w spiżarni. Usunięto z listy zakupów.`
-        : `Przeniesiono do spiżarni: ${label}`,
+        ? `${label} ${pageCopy.alreadyInPantry}`
+        : `${pageCopy.movedToPantry} ${label}`,
     );
   }
 
@@ -1342,8 +1483,8 @@ export default function Home() {
     }
     setToast(
       boughtItems.length === 1
-        ? "Usunięto 1 kupiony produkt."
-        : `Usunięto ${boughtItems.length} kupionych produktów.`,
+        ? pageCopy.removedOneBought
+        : `${boughtItems.length} ${pageCopy.removedBought}`,
     );
   }
 
@@ -1385,8 +1526,8 @@ export default function Home() {
 
     setToast(
       itemsToAdd.length === 0
-        ? "Kupione produkty były już w spiżarni. Usunięto je z listy."
-        : `Przeniesiono ${itemsToAdd.length} produktów do spiżarni.`,
+        ? pageCopy.boughtAlreadyInPantry
+        : `${itemsToAdd.length} ${pageCopy.movedProductsToPantry}`,
     );
   }
 
@@ -1422,8 +1563,8 @@ export default function Home() {
     });
     setToast(
       isUpdate
-        ? `Zaktualizowano: ${item.label}`
-        : `Dodano do spiżarni: ${item.label}`,
+        ? `${pageCopy.changed} ${item.label}`
+        : `${pageCopy.addedToPantry} ${item.label}`,
     );
 
     if (session?.user) {
@@ -1446,7 +1587,7 @@ export default function Home() {
 
   function consumePantryItem(item: PantryItem) {
     removePantryItem(item);
-    setToast(`Zużyto: ${item.label}`);
+    setToast(`${pageCopy.consumed} ${item.label}`);
   }
 
   function consumeRecipePantryItems(recipe: Recipe) {
@@ -1458,19 +1599,19 @@ export default function Home() {
       ),
     );
     if (usedItems.length === 0) {
-      setToast("Nie znaleziono pasujących produktów w spiżarni.");
+      setToast(pageCopy.noPantryMatches);
       return;
     }
     if (
       !window.confirm(
-        `Oznaczyć jako zużyte: ${usedItems.map((item) => item.label).join(", ")}?`,
+        `${pageCopy.markAsUsed} ${usedItems.map((item) => item.label).join(", ")}?`,
       )
     ) {
       return;
     }
 
     usedItems.forEach(removePantryItem);
-    setToast(`Usunięto ze spiżarni ${usedItems.length} produktów.`);
+    setToast(`${usedItems.length} ${pageCopy.removedFromPantry}`);
   }
 
   function usePantryIngredients(labels: string[]) {
@@ -1487,8 +1628,8 @@ export default function Home() {
     ]);
     setToast(
       labels.length === 1
-        ? `Dodano do generatora: ${labels[0]}`
-        : `Dodano ${labels.length} produktów do generatora.`,
+        ? `${copy.shopping.added} ${labels[0]}`
+        : `${labels.length} ${pageCopy.addedToGenerator}`,
     );
     window.setTimeout(
       () => window.scrollTo({ top: 0, behavior: "smooth" }),
@@ -1743,30 +1884,22 @@ export default function Home() {
     setVerificationPending(false);
 
     if (!result.error) {
-      setVerificationMessage(
-        "Wiadomość została wysłana. Sprawdź również folder spam.",
-      );
+      setVerificationMessage(pageCopy.verificationSent);
       return;
     }
 
     if (result.error.code === "EMAIL_ALREADY_VERIFIED") {
-      setVerificationMessage(
-        "Ten adres jest już zweryfikowany. Odśwież stronę.",
-      );
+      setVerificationMessage(pageCopy.alreadyVerified);
       return;
     }
 
     if (result.error.status === 429) {
-      setVerificationMessage(
-        "Wysłano zbyt wiele prób. Poczekaj chwilę i spróbuj ponownie.",
-      );
+      setVerificationMessage(pageCopy.tooManyAttempts);
       return;
     }
 
     const errorCode = result.error.code ?? `HTTP_${result.error.status}`;
-    setVerificationMessage(
-      `Nie udało się wysłać wiadomości. Kod: ${errorCode}.`,
-    );
+    setVerificationMessage(`${pageCopy.sendFailed} ${errorCode}.`);
   }
 
   return (
@@ -1967,8 +2100,8 @@ export default function Home() {
         <div className="border-y border-[#efd4a8] bg-[#fff5df] px-5 py-3 sm:px-8">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 text-sm text-[#795d2f]">
             <p>
-              Potwierdź adres <strong>{session.user.email}</strong>, aby
-              zabezpieczyć konto.
+              {pageCopy.verifyPrefix} <strong>{session.user.email}</strong>,{" "}
+              {pageCopy.verifySuffix}
               {verificationMessage && (
                 <span className="ml-2 text-xs">{verificationMessage}</span>
               )}
@@ -1979,8 +2112,8 @@ export default function Home() {
               className="rounded-lg bg-[#795d2f] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
             >
               {verificationPending
-                ? "Wysyłam..."
-                : "Wyślij link weryfikacyjny"}
+                ? pageCopy.sending
+                : pageCopy.sendVerification}
             </button>
           </div>
         </div>
@@ -1990,20 +2123,20 @@ export default function Home() {
         <div className="border-y border-[#efd5ab] bg-[#fff8e9] px-4 py-3 sm:px-8">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-[#795d2f]">
-              <strong>Sprawdź spiżarnię:</strong>{" "}
+              <strong>{pageCopy.checkPantry}</strong>{" "}
               {expiredPantryItems.length > 0 &&
-                `${expiredPantryItems.length} po terminie`}
+                `${expiredPantryItems.length} ${pageCopy.expired}`}
               {expiredPantryItems.length > 0 &&
                 expiringPantryItems.length > 0 &&
                 " · "}
               {expiringPantryItems.length > 0 &&
-                `${expiringPantryItems.length} z krótką datą ważności`}
+                `${expiringPantryItems.length} ${pageCopy.expiring}`}
             </p>
             <a
               href="#my-kitchen"
               className="rounded-lg bg-[#795d2f] px-3 py-2 text-xs font-semibold text-white"
             >
-              Zobacz produkty
+              {pageCopy.viewProducts}
             </a>
           </div>
         </div>
@@ -2014,18 +2147,17 @@ export default function Home() {
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-[#365a46]">
-                Ustaw preferencje gotowania
+                {pageCopy.setPreferences}
               </p>
               <p className="mt-0.5 text-xs leading-5 text-[#68736b]">
-                Dieta, budżet, czas i wykluczone składniki będą automatycznie
-                używane przy generowaniu przepisów.
+                {pageCopy.preferencesText}
               </p>
             </div>
             <Link
               href="/settings"
               className="rounded-lg bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white"
             >
-              Uzupełnij teraz
+              {pageCopy.completeNow}
             </Link>
           </div>
         </div>
@@ -2037,14 +2169,13 @@ export default function Home() {
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-                  Panel użytkownika
+                  {pageCopy.userPanel}
                 </p>
                 <h2 className="mt-0.5 truncate font-serif text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Cześć, {session.user.name}
+                  {pageCopy.hello}, {session.user.name}
                 </h2>
                 <p className="mt-1 hidden max-w-2xl text-xs leading-5 text-[#68736b] sm:block">
-                  Szybki podgląd Twojej kuchni: limity, zakupy, spiżarnia i
-                  ostatnie przepisy w jednym miejscu.
+                  {pageCopy.dashboardText}
                 </p>
               </div>
               <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
@@ -2052,19 +2183,19 @@ export default function Home() {
                   href="#generator"
                   className="shrink-0 rounded-xl bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#275b44]"
                 >
-                  Generuj przepis
+                  {pageCopy.generateRecipe}
                 </a>
                 <a
                   href="#my-kitchen"
                   className="shrink-0 rounded-xl border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
                 >
-                  Moja kuchnia
+                  {copy.nav.kitchen}
                 </a>
                 <Link
                   href="/recipes"
                   className="shrink-0 rounded-xl border border-[#d8d7d0] bg-white px-3 py-2 text-xs font-semibold text-[#33433a] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f8f6f0]"
                 >
-                  Zapisane
+                  {copy.nav.saved}
                 </Link>
               </div>
             </div>
@@ -2096,19 +2227,19 @@ export default function Home() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-xs font-semibold text-[#365a46]">
-                      Aktywność
+                      {pageCopy.activity}
                     </p>
                     <p className="mt-0.5 truncate text-xs leading-5 text-[#68736b]">
                       {latestHistoryEntry
-                        ? `Ostatnio: ${latestHistoryEntry.ingredients.join(", ")}`
-                        : "Nie masz jeszcze historii generowania."}
+                        ? `${pageCopy.latest} ${latestHistoryEntry.ingredients.join(", ")}`
+                        : pageCopy.noGenerationHistory}
                     </p>
                   </div>
                   <Link
                     href="/recipes/history"
                     className="shrink-0 rounded-lg bg-white px-2.5 py-1.5 text-xs font-semibold text-[#365a46] shadow-sm"
                   >
-                    Historia
+                    {pageCopy.history}
                   </Link>
                 </div>
                 {latestFavorite && (
@@ -2116,7 +2247,7 @@ export default function Home() {
                     onClick={() => openRecipe(latestFavorite)}
                     className="mt-2 w-full truncate rounded-lg bg-white px-3 py-2 text-left text-xs font-semibold text-[#25322b] shadow-sm transition hover:bg-[#f9fbf8]"
                   >
-                    Ostatnio zapisany:{" "}
+                    {copy.kitchen.lastSaved}{" "}
                     <span className="text-[#d26849]">{latestFavorite.title}</span>
                   </button>
                 )}
@@ -2124,11 +2255,11 @@ export default function Home() {
 
               <div className="min-w-0 rounded-xl bg-[#fff5df] p-3">
                 <p className="text-xs font-semibold text-[#795d2f]">
-                  Wykorzystanie limitu
+                  {pageCopy.limitUsage}
                 </p>
                 {currentGenerationUsage?.unlimited || isAdmin ? (
                   <p className="mt-1 text-xs leading-5 text-[#795d2f]">
-                    Masz konto administratora, więc generowanie jest bez limitu.
+                    {pageCopy.adminUnlimited}
                   </p>
                 ) : (
                   <>
@@ -2140,11 +2271,11 @@ export default function Home() {
                     </div>
                     <p className="mt-1 text-xs leading-5 text-[#795d2f]">
                       {currentGenerationUsage
-                        ? `Wykorzystano ${
+                        ? `${pageCopy.used} ${
                             currentGenerationUsage.limit -
                             currentGenerationUsage.remaining
-                          } z ${currentGenerationUsage.limit}.`
-                        : "Limit zacznie się liczyć po pierwszym generowaniu."}
+                          } ${pageCopy.from} ${currentGenerationUsage.limit}.`
+                        : pageCopy.limitStarts}
                     </p>
                   </>
                 )}
@@ -2218,7 +2349,7 @@ export default function Home() {
 
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#828a84]">
             <span>{copy.generator.suggestions}</span>
-            {suggestions
+            {pageCopy.suggestions
               .filter((item) => !ingredients.includes(item))
               .map((item) => (
                 <button
@@ -2883,25 +3014,25 @@ export default function Home() {
                     >
                       <span className="break-anywhere block text-sm font-semibold">
                         {entry.mode === "dish" && entry.query
-                          ? `Danie: ${entry.query}`
+                          ? `${copy.dish.historyPrefix} ${entry.query}`
                           : entry.ingredients.join(", ")}
                       </span>
                       <span className="mt-1 block text-xs text-[#7a857e]">
-                        {new Intl.DateTimeFormat("pl-PL", {
+                        {new Intl.DateTimeFormat(language === "pl" ? "pl-PL" : "en-US", {
                           day: "numeric",
                           month: "short",
                           hour: "2-digit",
                           minute: "2-digit",
                         }).format(new Date(entry.createdAt))}{" "}
                         · {entry.diet}
-                        {entry.mode === "dish" && " · konkretne danie"}
+                        {entry.mode === "dish" &&
+                          ` · ${copy.kitchen.specificDish}`}
                       </span>
                     </button>
                   ))
                 ) : (
                   <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
-                    Po wygenerowaniu przepisów zapiszemy tutaj ostatnie
-                    wyszukiwania.
+                    {copy.kitchen.noHistory}
                   </p>
                 )}
               </div>
@@ -2911,10 +3042,11 @@ export default function Home() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h3 className="font-serif text-2xl font-semibold">
-                    Lista zakupów
+                    {copy.shopping.listTitle}
                   </h3>
                   <p className="mt-1 text-xs text-[#7a857e]">
-                    {visibleShoppingCount} widocznych · {shoppingList.length} łącznie
+                    {visibleShoppingCount} {copy.shopping.visible} ·{" "}
+                    {shoppingList.length} {copy.shopping.total}
                   </p>
                 </div>
                 {shoppingList.length > 0 && (
@@ -2924,7 +3056,7 @@ export default function Home() {
                       disabled={pendingShoppingCount === 0}
                       className="rounded-full bg-[#edf3ee] px-3 py-1.5 text-xs font-semibold text-[#356248] transition hover:bg-[#dfece2]"
                     >
-                      Kopiuj
+                      {copy.shopping.copy}
                     </button>
                     {boughtShoppingCount > 0 && (
                       <>
@@ -2932,13 +3064,13 @@ export default function Home() {
                           onClick={moveBoughtShoppingItemsToPantry}
                           className="rounded-full bg-[#2f684f] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#275b44]"
                         >
-                          Kupione do spiżarni
+                          {copy.shopping.boughtToPantry}
                         </button>
                         <button
                           onClick={clearBoughtShoppingItems}
                           className="rounded-full bg-[#fff0e8] px-3 py-1.5 text-xs font-semibold text-[#9a6251] transition hover:bg-[#ffe3d7]"
                         >
-                          Usuń kupione
+                          {copy.shopping.removeBought}
                         </button>
                       </>
                     )}
@@ -2951,7 +3083,7 @@ export default function Home() {
                       }}
                       className="rounded-full px-3 py-1.5 text-xs font-semibold text-[#9a6251] transition hover:bg-[#fff0e8]"
                     >
-                      Wyczyść
+                      {copy.shopping.clear}
                     </button>
                   </div>
                 )}
@@ -2965,13 +3097,13 @@ export default function Home() {
                   onChange={(event) => setShoppingInput(event.target.value)}
                   maxLength={80}
                   className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] disabled:bg-[#f3f1eb]"
-                  placeholder="Dodaj produkt, np. banany"
+                  placeholder={copy.shopping.placeholder}
                 />
                 <button
                   disabled={shoppingInput.trim().length === 0}
                   className="h-11 rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white transition hover:bg-[#275b44] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Dodaj
+                  {copy.shopping.add}
                 </button>
               </form>
 
@@ -2979,9 +3111,9 @@ export default function Home() {
                 <>
                   <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-[#f4f1e9] p-1.5 text-xs font-semibold">
                     {[
-                      ["pending", `Do kupienia (${pendingShoppingCount})`],
-                      ["bought", `Kupione (${boughtShoppingCount})`],
-                      ["all", `Wszystko (${shoppingList.length})`],
+                      ["pending", `${copy.shopping.pending} (${pendingShoppingCount})`],
+                      ["bought", `${copy.shopping.bought} (${boughtShoppingCount})`],
+                      ["all", `${copy.shopping.all} (${shoppingList.length})`],
                     ].map(([value, label]) => (
                       <button
                         key={value}
@@ -3006,7 +3138,8 @@ export default function Home() {
                           key={category.name}
                           className="rounded-full bg-[#f8f6f0] px-2.5 py-1 text-[0.68rem] font-bold text-[#68736b] ring-1 ring-[#eeeae2]"
                         >
-                          {category.name}: {category.count}
+                          {displayShoppingCategory(category.name, language)}:{" "}
+                          {category.count}
                         </span>
                       ))}
                     </div>
@@ -3044,7 +3177,7 @@ export default function Home() {
                             <div key={group.name}>
                               <div className="mb-2 flex items-center justify-between gap-3 px-1">
                                 <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#9aa29d]">
-                                  {group.name}
+                                  {displayShoppingCategory(group.name, language)}
                                 </p>
                                 <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-[#7a857e]">
                                   {group.items.length}
@@ -3065,8 +3198,8 @@ export default function Home() {
                                         type="checkbox"
                                         aria-label={
                                           section.checked
-                                            ? `Cofnij oznaczenie ${item}`
-                                            : `Oznacz ${item} jako kupione`
+                                            ? `${copy.shopping.uncheck}: ${item}`
+                                            : `${copy.shopping.markBought}: ${item}`
                                         }
                                         checked={section.checked}
                                         onChange={(event) =>
@@ -3118,13 +3251,13 @@ export default function Home() {
                                             onClick={saveEditedShoppingItem}
                                             className="rounded-lg bg-[#2f684f] px-2 py-1.5 text-[11px] font-semibold text-white"
                                           >
-                                            Zapisz
+                                            {copy.shopping.save}
                                           </button>
                                           <button
                                             onClick={cancelEditingShoppingItem}
                                             className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#7a857e] transition hover:bg-white"
                                           >
-                                            Anuluj
+                                            {copy.shopping.cancel}
                                           </button>
                                         </>
                                       ) : (
@@ -3135,7 +3268,7 @@ export default function Home() {
                                             }
                                             className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#68736b] transition hover:bg-white"
                                           >
-                                            Edytuj
+                                            {copy.shopping.edit}
                                           </button>
                                           <button
                                             onClick={() =>
@@ -3143,7 +3276,7 @@ export default function Home() {
                                             }
                                             className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
                                           >
-                                            Do spiżarni
+                                            {copy.shopping.toPantry}
                                           </button>
                                           <button
                                             onClick={() =>
@@ -3151,7 +3284,7 @@ export default function Home() {
                                             }
                                             className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#9a6251] transition hover:bg-[#fff0e8]"
                                           >
-                                            Usuń
+                                            {copy.shopping.remove}
                                           </button>
                                         </>
                                       )}
@@ -3165,16 +3298,15 @@ export default function Home() {
                       ) : (
                         <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
                           {section.checked
-                            ? "Nie masz jeszcze kupionych produktów."
-                            : "Wszystko z listy jest oznaczone jako kupione."}
+                            ? copy.shopping.noBought
+                            : copy.shopping.allBought}
                         </p>
                       )}
                     </div>
                   ))
                 ) : (
                   <p className="rounded-xl bg-[#faf8f3] p-4 text-sm leading-6 text-[#7a857e]">
-                    Dodaj produkt ręcznie albo przenieś brakujące składniki z
-                    karty przepisu.
+                    {copy.shopping.empty}
                   </p>
                 )}
               </div>
@@ -3213,7 +3345,8 @@ export default function Home() {
                       rel="noreferrer"
                       className="absolute bottom-3 left-4 text-xs font-medium text-white hover:underline"
                     >
-                      Zdjęcie: {selectedRecipe.image.photographer} · Pexels
+                      {copy.recipeModal.photo}{" "}
+                      {selectedRecipe.image.photographer} · Pexels
                     </a>
                   </div>
                 ) : (
@@ -3228,7 +3361,7 @@ export default function Home() {
               </div>
               <button
                 onClick={() => setSelectedRecipe(null)}
-                aria-label={`Zamknij przepis ${selectedRecipe.title}`}
+                aria-label={`${copy.recipeModal.closeRecipe} ${selectedRecipe.title}`}
                 className="absolute right-5 top-5 grid size-10 shrink-0 place-items-center rounded-full bg-[#eeeae2] text-xl"
               >
                 ×
@@ -3238,19 +3371,26 @@ export default function Home() {
             <div className="mt-6 grid grid-cols-2 gap-2 rounded-2xl bg-[#edf2ed] p-3 text-sm sm:grid-cols-5 sm:gap-3 sm:p-4">
               <span className="min-w-0 truncate">{selectedRecipe.time} min</span>
               <span className="min-w-0 truncate">{selectedRecipe.calories} kcal</span>
-              <span className="min-w-0 truncate">B: {selectedRecipe.protein} g</span>
-              <span className="min-w-0 truncate">W: {selectedRecipe.carbs} g</span>
-              <span className="min-w-0 truncate">T: {selectedRecipe.fat} g</span>
+              <span className="min-w-0 truncate">
+                {copy.recipeModal.proteinShort}: {selectedRecipe.protein} g
+              </span>
+              <span className="min-w-0 truncate">
+                {copy.recipeModal.carbsShort}: {selectedRecipe.carbs} g
+              </span>
+              <span className="min-w-0 truncate">
+                {copy.recipeModal.fatShort}: {selectedRecipe.fat} g
+              </span>
               {selectedRecipe.estimatedCost && (
                 <span className="min-w-0 truncate">
-                  ok. {selectedRecipe.estimatedCost} zł / 2 porcje
+                  {copy.recipeModal.approx} {selectedRecipe.estimatedCost} zł / 2{" "}
+                  {copy.recipeModal.servings}
                 </span>
               )}
             </div>
 
             <div className="mt-4 rounded-2xl border border-[#e6e1d7] bg-white p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-[#829087]">
-                Oceń ten przepis
+                {copy.recipeModal.rate}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {feedbackOptions.map((option) => {
@@ -3267,7 +3407,7 @@ export default function Home() {
                           : "bg-[#f6f3ec] text-[#748078] hover:bg-[#eee9df]"
                       }`}
                     >
-                      {option.label}
+                      {copy.feedback[option.value]}
                     </button>
                   );
                 })}
@@ -3277,12 +3417,12 @@ export default function Home() {
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#f6f3ec] p-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-[#59675f]">
-                  Porcje
+                  {copy.recipeModal.servingsLabel}
                 </span>
                 <button
                   onClick={() => setServings((current) => Math.max(1, current - 1))}
                   className="grid size-9 place-items-center rounded-full bg-white text-lg shadow-sm"
-                  aria-label="Zmniejsz liczbę porcji"
+                  aria-label={copy.recipeModal.decreaseServings}
                 >
                   −
                 </button>
@@ -3290,7 +3430,7 @@ export default function Home() {
                 <button
                   onClick={() => setServings((current) => Math.min(12, current + 1))}
                   className="grid size-9 place-items-center rounded-full bg-white text-lg shadow-sm"
-                  aria-label="Zwiększ liczbę porcji"
+                  aria-label={copy.recipeModal.increaseServings}
                 >
                   +
                 </button>
@@ -3300,13 +3440,13 @@ export default function Home() {
                   onClick={startCookingMode}
                   className="rounded-xl bg-[#d66a49] px-4 py-2.5 text-xs font-semibold text-white"
                 >
-                  Tryb gotowania
+                  {copy.recipeModal.cookingMode}
                 </button>
                 <button
                   onClick={() => consumeRecipePantryItems(selectedRecipe)}
                   className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-xs font-semibold text-[#356248]"
                 >
-                  Oznacz produkty jako zużyte
+                  {copy.recipeModal.markUsed}
                 </button>
               </div>
             </div>
@@ -3319,7 +3459,9 @@ export default function Home() {
                     onClick={() => shareRecipe(selectedRecipe)}
                     className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
                   >
-                    {sharePending ? "Przetwarzam..." : "Kopiuj link"}
+                    {sharePending
+                      ? copy.recipeModal.processing
+                      : copy.recipeModal.copyLink}
                   </button>
                   <a
                     href={`/recipes/${selectedRecipe.savedId}`}
@@ -3327,14 +3469,14 @@ export default function Home() {
                     rel="noreferrer"
                     className="rounded-xl border border-[#ccd7cf] px-4 py-2.5 text-xs font-semibold text-[#356248]"
                   >
-                    Otwórz publiczną stronę
+                    {copy.recipeModal.openPublic}
                   </a>
                   <button
                     disabled={sharePending}
                     onClick={() => makeRecipePrivate(selectedRecipe)}
                     className="px-3 py-2.5 text-xs font-semibold text-[#9a6251] disabled:opacity-50"
                   >
-                    Ustaw jako prywatny
+                    {copy.recipeModal.makePrivate}
                   </button>
                 </>
               ) : (
@@ -3343,20 +3485,22 @@ export default function Home() {
                   onClick={() => shareRecipe(selectedRecipe)}
                   className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
                 >
-                  {sharePending ? "Udostępniam..." : "Udostępnij przepis"}
+                  {sharePending
+                    ? copy.recipeModal.sharing
+                    : copy.recipeModal.shareRecipe}
                 </button>
               )}
               <span className="text-xs text-[#7a857e]">
                 {selectedRecipe.isPublic
-                  ? "Każda osoba z linkiem może zobaczyć ten przepis."
-                  : "Przepis jest prywatny, dopóki go nie udostępnisz."}
+                  ? copy.recipeModal.publicInfo
+                  : copy.recipeModal.privateInfo}
               </span>
             </div>
 
             {selectedRecipe.missing.length > 0 && (
               <div className="mt-5 rounded-2xl border border-[#eee1d8] bg-[#fff8f3] p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#9a6251]">
-                  Brakujące — kliknij, aby dodać
+                  {copy.recipeModal.missingClick}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {selectedRecipe.missing.map((item) => {
@@ -3385,7 +3529,7 @@ export default function Home() {
               selectedRecipe.substitutions.length > 0 && (
                 <div className="mt-5 rounded-2xl border border-[#dde7dc] bg-[#f6faf5] p-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-[#4f765e]">
-                    Zamienniki składników
+                    {copy.recipeModal.substitutions}
                   </p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {selectedRecipe.substitutions.map((item) => (
@@ -3407,7 +3551,9 @@ export default function Home() {
 
             <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="font-serif text-2xl font-semibold">Składniki</h3>
+                <h3 className="font-serif text-2xl font-semibold">
+                  {copy.recipeModal.ingredients}
+                </h3>
                 <ul className="mt-4 space-y-2 text-sm leading-6 text-[#59675f]">
                   {selectedRecipe.ingredients.map((ingredient) => (
                     <li key={ingredient} className="flex gap-2">
@@ -3419,7 +3565,7 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-serif text-2xl font-semibold">
-                  Przygotowanie
+                  {copy.recipeModal.preparation}
                 </h3>
                 <ol className="mt-4 space-y-4 text-sm leading-6 text-[#59675f]">
                   {selectedRecipe.steps.map((step, index) => (
@@ -3442,13 +3588,14 @@ export default function Home() {
           className="modal-safe-area fixed inset-0 z-[70] grid place-items-center bg-[#18241e]/85 backdrop-blur-md"
           role="dialog"
           aria-modal="true"
-          aria-label={`Tryb gotowania: ${selectedRecipe.title}`}
+          aria-label={`${copy.cookingMode.label} ${selectedRecipe.title}`}
         >
           <div className="modal-panel-safe-tall w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-                  Krok {cookingStep + 1} z {selectedRecipe.steps.length}
+                  {copy.cookingMode.step} {cookingStep + 1}{" "}
+                  {copy.cookingMode.of} {selectedRecipe.steps.length}
                 </p>
                 <h2 className="break-anywhere mt-2 font-serif text-3xl font-semibold">
                   {selectedRecipe.title}
@@ -3456,7 +3603,7 @@ export default function Home() {
               </div>
               <button
                 onClick={closeCookingMode}
-                aria-label="Zamknij tryb gotowania"
+                aria-label={copy.cookingMode.close}
                 className="grid size-10 place-items-center rounded-full bg-[#eeeae2] text-xl"
               >
                 ×
@@ -3466,7 +3613,8 @@ export default function Home() {
             <div className="mt-5">
               <div className="mb-2 flex items-center justify-between text-xs font-semibold text-[#68736b]">
                 <span>
-                  Postęp: {Object.values(checkedCookingSteps).filter(Boolean).length}/
+                  {copy.cookingMode.progress}{" "}
+                  {Object.values(checkedCookingSteps).filter(Boolean).length}/
                   {selectedRecipe.steps.length}
                 </span>
                 <span>
@@ -3489,15 +3637,15 @@ export default function Home() {
             <div className="mt-6 rounded-2xl border border-[#dedbd2] bg-white p-4">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-sm font-bold text-[#35483e]">
-                  Składniki na {servings}{" "}
+                  {copy.cookingMode.ingredientsFor} {servings}{" "}
                   {servings === 1
-                    ? "porcję"
+                    ? copy.cookingMode.servingOne
                     : servings < 5
-                      ? "porcje"
-                      : "porcji"}
+                      ? copy.cookingMode.servingFew
+                      : copy.cookingMode.servingMany}
                 </h3>
                 <span className="text-xs text-[#7a857e]">
-                  proporcje przeliczone
+                  {copy.cookingMode.scaled}
                 </span>
               </div>
               <div className="mt-3 grid gap-2 text-sm text-[#59675f] sm:grid-cols-2">
@@ -3543,7 +3691,7 @@ export default function Home() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#829087]">
-                    Timer kuchenny
+                    {copy.cookingMode.timer}
                   </p>
                   <p className="mt-1 font-serif text-4xl font-semibold">
                     {formatTimer(cookingTimerSeconds)}
@@ -3587,8 +3735,8 @@ export default function Home() {
                     className="h-10 rounded-xl bg-[#2f684f] px-3 text-xs font-semibold text-white disabled:opacity-40"
                   >
                     {cookingTimerRunning && cookingTimerSeconds > 0
-                      ? "Pauza"
-                      : "Start"}
+                      ? copy.cookingMode.pause
+                      : copy.cookingMode.start}
                   </button>
                   <button
                     onClick={() => {
@@ -3609,11 +3757,10 @@ export default function Home() {
                   ✓
                 </div>
                 <h3 className="mt-4 font-serif text-3xl font-semibold">
-                  Gotowe!
+                  {copy.cookingMode.doneTitle}
                 </h3>
                 <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#68736b]">
-                  Możesz oznaczyć użyte produkty jako zużyte w spiżarni albo
-                  wrócić do przepisu bez zmian.
+                  {copy.cookingMode.doneText}
                 </p>
                 <div className="mt-5 flex flex-wrap justify-center gap-2">
                   <button
@@ -3623,13 +3770,13 @@ export default function Home() {
                     }}
                     className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-sm font-semibold text-white"
                   >
-                    Oznacz składniki jako zużyte
+                    {copy.cookingMode.markUsed}
                   </button>
                   <button
                     onClick={closeCookingMode}
                     className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248]"
                   >
-                    Zamknij bez zmian
+                    {copy.cookingMode.closeWithoutChanges}
                   </button>
                 </div>
               </div>
@@ -3639,7 +3786,7 @@ export default function Home() {
                   selectedRecipe.substitutions.length > 0 && (
                   <details className="mt-3 rounded-2xl border border-[#dde7dc] bg-[#f6faf5] p-4">
                     <summary className="cursor-pointer text-sm font-bold text-[#356248]">
-                      Pokaż zamienniki składników
+                      {copy.cookingMode.showSubstitutions}
                     </summary>
                     <div className="mt-3 space-y-2 text-sm text-[#59675f]">
                       {selectedRecipe.substitutions.map((item) => (
@@ -3673,8 +3820,8 @@ export default function Home() {
                       }`}
                     >
                       {checkedCookingSteps[cookingStep]
-                        ? "✓ Zrobione"
-                        : "Odhacz krok"}
+                        ? copy.cookingMode.doneStep
+                        : copy.cookingMode.checkStep}
                     </button>
                   </div>
                   <p className="mt-5 font-serif text-2xl leading-9 text-[#25322b] sm:text-3xl sm:leading-10">
@@ -3686,7 +3833,7 @@ export default function Home() {
                     <button
                       key={step}
                       onClick={() => setCookingStep(index)}
-                      aria-label={`Przejdź do kroku ${index + 1}`}
+                      aria-label={`${copy.cookingMode.goToStep} ${index + 1}`}
                       className={`grid size-9 place-items-center rounded-full text-xs font-bold transition ${
                         cookingStep === index
                           ? "bg-[#d66a49] text-white"
@@ -3711,14 +3858,14 @@ export default function Home() {
                 }
                 className="h-12 flex-1 rounded-xl border border-[#ccd7cf] px-5 text-sm font-semibold text-[#356248] disabled:opacity-30"
               >
-                ← Poprzedni
+                {copy.cookingMode.previous}
               </button>
               {cookingStep === selectedRecipe.steps.length - 1 ? (
                 <button
                   onClick={finishCookingMode}
                   className="h-12 flex-1 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
                 >
-                  Gotowe
+                  {copy.cookingMode.done}
                 </button>
               ) : (
                 <button
@@ -3733,7 +3880,7 @@ export default function Home() {
                   }}
                   className="h-12 flex-1 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
                 >
-                  Następny →
+                  {copy.cookingMode.next}
                 </button>
               )}
             </div>
