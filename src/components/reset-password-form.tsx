@@ -20,7 +20,8 @@ export function ResetPasswordForm({
     event.preventDefault();
     if (!token) return;
 
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const password = String(formData.get("password"));
     const repeatedPassword = String(formData.get("repeatedPassword"));
 
@@ -56,7 +57,7 @@ export function ResetPasswordForm({
       }
 
       setMessage("Hasło zostało zmienione. Możesz wrócić do aplikacji i zalogować się ponownie.");
-      event.currentTarget.reset();
+      form.reset();
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
