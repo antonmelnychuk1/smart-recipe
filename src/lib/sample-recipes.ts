@@ -1,5 +1,9 @@
 import type { Recipe } from "@/lib/recipe-types";
-import type { AppLanguage } from "@/lib/i18n";
+import {
+  convertPrice,
+  type AppLanguage,
+  type CurrencyCode,
+} from "@/lib/i18n";
 
 export const sampleRecipes: Recipe[] = [
   {
@@ -262,6 +266,15 @@ export const sampleRecipesByLanguage: Record<AppLanguage, Recipe[]> = {
   ],
 };
 
-export function getSampleRecipes(language: AppLanguage) {
-  return sampleRecipesByLanguage[language];
+export function getSampleRecipes(
+  language: AppLanguage,
+  currency: CurrencyCode = "PLN",
+) {
+  return sampleRecipesByLanguage[language].map((recipe) => ({
+    ...recipe,
+    estimatedCost: recipe.estimatedCost
+      ? convertPrice(recipe.estimatedCost, "PLN", currency)
+      : undefined,
+    currency,
+  }));
 }

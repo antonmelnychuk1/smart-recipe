@@ -15,6 +15,7 @@ const recipeSchema = z.object({
   carbs: z.number(),
   fat: z.number(),
   estimatedCost: z.number().optional(),
+  currency: z.enum(["PLN", "EUR", "USD", "GBP"]).optional(),
   match: z.number(),
   ingredients: z.array(z.string()),
   missing: z.array(z.string()),

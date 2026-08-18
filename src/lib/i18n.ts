@@ -1,4 +1,5 @@
 export type AppLanguage = "pl" | "en";
+export type CurrencyCode = "PLN" | "EUR" | "USD" | "GBP";
 
 export const languageCookieName = "smart-recipe:language";
 
@@ -12,8 +13,57 @@ export const languageOptions: {
   { value: "en", label: "EN", flag: "🇬🇧", name: "English" },
 ];
 
+export const currencyOptions: {
+  value: CurrencyCode;
+  label: string;
+  symbol: string;
+}[] = [
+  { value: "PLN", label: "PLN", symbol: "zł" },
+  { value: "EUR", label: "EUR", symbol: "€" },
+  { value: "USD", label: "USD", symbol: "$" },
+  { value: "GBP", label: "GBP", symbol: "£" },
+];
+
+const currencyRatesToPln: Record<CurrencyCode, number> = {
+  PLN: 1,
+  EUR: 4.3,
+  USD: 4,
+  GBP: 5,
+};
+
 export function normalizeLanguage(value: string | undefined | null): AppLanguage {
   return value === "en" ? "en" : "pl";
+}
+
+export function normalizeCurrency(value: string | undefined | null): CurrencyCode {
+  return value === "EUR" || value === "USD" || value === "GBP" ? value : "PLN";
+}
+
+export function getCurrencyForLocale(locale: string | undefined): CurrencyCode {
+  const normalized = locale?.toLocaleLowerCase() ?? "";
+
+  if (normalized.startsWith("pl")) return "PLN";
+  if (normalized.startsWith("en-us")) return "USD";
+  if (normalized.startsWith("en-gb")) return "GBP";
+  if (
+    normalized.startsWith("de") ||
+    normalized.startsWith("fr") ||
+    normalized.startsWith("es") ||
+    normalized.startsWith("it") ||
+    normalized.startsWith("nl") ||
+    normalized.startsWith("pt") ||
+    normalized.startsWith("fi") ||
+    normalized.startsWith("el") ||
+    normalized.startsWith("sk") ||
+    normalized.startsWith("sl") ||
+    normalized.startsWith("et") ||
+    normalized.startsWith("lv") ||
+    normalized.startsWith("lt")
+  ) {
+    return "EUR";
+  }
+
+  return "USD";
 }
 
 export const homeCopy = {
@@ -557,16 +607,46 @@ export function formatOptionLabel(
   type: "time" | "budget",
   value: string,
   polishLabel: string,
+  currency?: CurrencyCode,
 ) {
   const copy = homeCopy[language].options;
+  const optionCurrency = currency ?? (language === "pl" ? "PLN" : "USD");
 
   if (language === "pl") return polishLabel;
   if (value === "0") return copy.noLimit;
-  if (type === "budget") return `${copy.minutesPrefix} ${value} ${copy.currency}`;
+  if (type === "budget") return `${copy.minutesPrefix} ${value} ${optionCurrency}`;
 
   return `${copy.minutesPrefix} ${value} ${copy.minutesSuffix}`;
 }
 
-export function formatPrice(language: AppLanguage, value: number | string) {
-  return language === "pl" ? `${value} zł` : `${value} PLN`;
+export function formatPrice(
+  language: AppLanguage,
+  value: number | string,
+  currency: CurrencyCode = "PLN",
+) {
+  const numericValue =
+    typeof value === "number"
+      ? new Intl.NumberFormat(language === "pl" ? "pl-PL" : "en-US", {
+          maximumFractionDigits: 0,
+        }).format(value)
+      : value;
+  const symbol = currencyOptions.find((option) => option.value === currency)?.symbol;
+
+  if (language === "pl" && currency === "PLN") return `${numericValue} zł`;
+  if (language === "en" && symbol && currency !== "PLN") {
+    return `${symbol}${numericValue}`;
+  }
+
+  return `${numericValue} ${currency}`;
+}
+
+export function convertPrice(
+  value: number,
+  fromCurrency: CurrencyCode,
+  toCurrency: CurrencyCode,
+) {
+  if (fromCurrency === toCurrency) return value;
+
+  const inPln = value * currencyRatesToPln[fromCurrency];
+  return Math.max(1, Math.round(inPln / currencyRatesToPln[toCurrency]));
 }

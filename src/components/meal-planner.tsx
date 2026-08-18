@@ -7,7 +7,12 @@ import type {
   MealType,
   Recipe,
 } from "@/lib/recipe-types";
-import { formatPrice, type AppLanguage } from "@/lib/i18n";
+import {
+  convertPrice,
+  formatPrice,
+  type AppLanguage,
+  type CurrencyCode,
+} from "@/lib/i18n";
 
 const plannerCopy = {
   pl: {
@@ -110,6 +115,7 @@ type MealPlannerProps = {
   onAddToShoppingList: (items: string[]) => void;
   onEntriesChange?: (count: number) => void;
   language?: AppLanguage;
+  currency?: CurrencyCode;
 };
 
 function mondayOf(date: Date) {
@@ -153,6 +159,7 @@ export function MealPlanner({
   onAddToShoppingList,
   onEntriesChange,
   language = "pl",
+  currency = "PLN",
 }: MealPlannerProps) {
   const copy = plannerCopy[language];
   const mealTypes = mealTypeKeys.map((key) => ({
@@ -381,7 +388,15 @@ export function MealPlanner({
     (summary, entry) => ({
       calories: summary.calories + entry.recipe.calories,
       protein: summary.protein + entry.recipe.protein,
-      cost: summary.cost + (entry.recipe.estimatedCost ?? 0),
+      cost:
+        summary.cost +
+        (entry.recipe.estimatedCost
+          ? convertPrice(
+              entry.recipe.estimatedCost,
+              entry.recipe.currency ?? "PLN",
+              currency,
+            )
+          : 0),
       time: summary.time + entry.recipe.time,
     }),
     { calories: 0, protein: 0, cost: 0, time: 0 },
@@ -450,7 +465,11 @@ export function MealPlanner({
               [copy.planned, `${entries.length}/21`, copy.mealsCount],
               [copy.avgCalories, averageCalories, copy.kcalMeal],
               [copy.protein, `${weekSummary.protein} g`, copy.total],
-              [copy.cost, formatPrice(language, weekSummary.cost), copy.estimated],
+              [
+                copy.cost,
+                formatPrice(language, weekSummary.cost, currency),
+                copy.estimated,
+              ],
               [copy.time, `${weekSummary.time} min`, copy.cooking],
             ].map(([label, value, hint]) => (
               <article

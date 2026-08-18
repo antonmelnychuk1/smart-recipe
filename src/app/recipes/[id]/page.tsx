@@ -225,7 +225,11 @@ export default async function RecipePage({ params }: RecipePageProps) {
     [
       copy.cost,
       recipe.estimatedCost
-        ? `${copy.approx} ${formatPrice(language, recipe.estimatedCost)}`
+        ? `${copy.approx} ${formatPrice(
+            language,
+            recipe.estimatedCost,
+            recipe.currency,
+          )}`
         : copy.noData,
       copy.estimate,
     ],
@@ -256,6 +260,15 @@ export default async function RecipePage({ params }: RecipePageProps) {
       carbohydrateContent: `${recipe.carbs} g`,
       fatContent: `${recipe.fat} g`,
     },
+    ...(recipe.estimatedCost
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: recipe.estimatedCost,
+            priceCurrency: recipe.currency ?? "PLN",
+          },
+        }
+      : {}),
   };
 
   return (

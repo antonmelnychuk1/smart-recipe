@@ -1,3 +1,5 @@
+import type { CurrencyCode } from "@/lib/i18n";
+
 export type Recipe = {
   title: string;
   description: string;
@@ -8,6 +10,7 @@ export type Recipe = {
   carbs: number;
   fat: number;
   estimatedCost?: number;
+  currency?: CurrencyCode;
   match: number;
   ingredients: string[];
   missing: string[];

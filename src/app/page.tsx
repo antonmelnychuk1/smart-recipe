@@ -8,11 +8,15 @@ import { MealPlanner } from "@/components/meal-planner";
 import { Pantry } from "@/components/pantry";
 import { authClient } from "@/lib/auth-client";
 import {
+  currencyOptions,
+  type CurrencyCode,
+  getCurrencyForLocale,
   formatOptionLabel,
   formatPrice,
   homeCopy,
   languageCookieName,
   languageOptions,
+  normalizeCurrency,
   type AppLanguage,
 } from "@/lib/i18n";
 import type {
@@ -169,6 +173,7 @@ const storageKeys = {
   feedback: "smart-recipe:feedback",
   restoreHistory: "smart-recipe:restore-history",
   language: "smart-recipe:language",
+  currency: "smart-recipe:currency",
 };
 
 const feedbackOptions: {
@@ -446,9 +451,43 @@ function LanguageSwitcher({
   );
 }
 
+function CurrencySwitcher({
+  language,
+  currency,
+  onChange,
+  compact = false,
+}: {
+  language: AppLanguage;
+  currency: CurrencyCode;
+  onChange: (currency: CurrencyCode) => void;
+  compact?: boolean;
+}) {
+  return (
+    <label
+      className={`inline-flex items-center gap-2 rounded-full border border-[#d9d7cd] bg-white px-3 py-1.5 text-xs font-bold text-[#667168] shadow-sm ${
+        compact ? "w-full justify-between" : ""
+      }`}
+    >
+      <span>{language === "pl" ? "Waluta" : "Currency"}</span>
+      <select
+        value={currency}
+        onChange={(event) => onChange(normalizeCurrency(event.target.value))}
+        className="bg-transparent text-xs font-bold text-[#25322b] outline-none"
+      >
+        {currencyOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export default function Home() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [language, setLanguage] = useState<AppLanguage>("pl");
+  const [currency, setCurrency] = useState<CurrencyCode>("PLN");
   const [languageLoaded, setLanguageLoaded] = useState(false);
   const [ingredients, setIngredients] = useState(defaultIngredientsByLanguage.pl);
   const [input, setInput] = useState("");
@@ -487,7 +526,7 @@ export default function Home() {
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [storageLoaded, setStorageLoaded] = useState(false);
   const [sampleRecipes, setSampleRecipes] =
-    useState<Recipe[]>(getSampleRecipes("pl"));
+    useState<Recipe[]>(getSampleRecipes("pl", "PLN"));
   const [generatedRecipes, setGeneratedRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [servings, setServings] = useState(2);
@@ -659,7 +698,7 @@ export default function Home() {
   function changeLanguage(nextLanguage: AppLanguage) {
     setLanguage(nextLanguage);
     setLanguageLoaded(true);
-    setSampleRecipes(getSampleRecipes(nextLanguage));
+    setSampleRecipes(getSampleRecipes(nextLanguage, currency));
     setIngredients((current) =>
       defaultIngredientSets.some((items) => sameIngredients(current, items))
         ? defaultIngredientsByLanguage[nextLanguage]
@@ -668,18 +707,31 @@ export default function Home() {
     document.cookie = `${languageCookieName}=${nextLanguage}; path=/; max-age=31536000; samesite=lax`;
   }
 
+  function changeCurrency(nextCurrency: CurrencyCode) {
+    setCurrency(nextCurrency);
+    setSampleRecipes(getSampleRecipes(language, nextCurrency));
+  }
+
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const storedLanguage = window.localStorage.getItem(storageKeys.language);
+      const storedCurrency = normalizeCurrency(
+        window.localStorage.getItem(storageKeys.currency),
+      );
       const nextLanguage =
         storedLanguage === "pl" || storedLanguage === "en"
           ? storedLanguage
           : window.navigator.language.toLocaleLowerCase().startsWith("en")
             ? "en"
             : "pl";
+      const nextCurrency =
+        window.localStorage.getItem(storageKeys.currency) === null
+          ? getCurrencyForLocale(window.navigator.language)
+          : storedCurrency;
 
       setLanguage(nextLanguage);
-      setSampleRecipes(getSampleRecipes(nextLanguage));
+      setCurrency(nextCurrency);
+      setSampleRecipes(getSampleRecipes(nextLanguage, nextCurrency));
       setIngredients((current) =>
         defaultIngredientSets.some((items) => sameIngredients(current, items))
           ? defaultIngredientsByLanguage[nextLanguage]
@@ -697,14 +749,15 @@ export default function Home() {
     if (!languageLoaded) return;
 
     window.localStorage.setItem(storageKeys.language, language);
+    window.localStorage.setItem(storageKeys.currency, currency);
     document.documentElement.lang = language;
     document.cookie = `${languageCookieName}=${language}; path=/; max-age=31536000; samesite=lax`;
-  }, [language, languageLoaded]);
+  }, [currency, language, languageLoaded]);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`/api/sample-recipes?v=2&language=${language}`)
+    fetch(`/api/sample-recipes?v=2&language=${language}&currency=${currency}`)
       .then((response) => {
         if (!response.ok) throw new Error("Sample photos request failed");
         return response.json() as Promise<{ recipes: Recipe[] }>;
@@ -719,7 +772,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [language]);
+  }, [currency, language]);
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -1726,6 +1779,7 @@ export default function Home() {
           diet,
           maxTime: Number(maxTime),
           maxBudget: Number(maxBudget),
+          currency,
           language,
           calorieTarget,
           proteinTarget,
@@ -1836,6 +1890,7 @@ export default function Home() {
           diet: desiredDishDiet,
           maxTime: Number(desiredDishMaxTime),
           maxBudget: Number(desiredDishBudget),
+          currency,
           language,
           calorieTarget,
           proteinTarget,
@@ -1971,6 +2026,11 @@ export default function Home() {
             </>
           )}
           <LanguageSwitcher language={language} onChange={changeLanguage} />
+          <CurrencySwitcher
+            language={language}
+            currency={currency}
+            onChange={changeCurrency}
+          />
           {sessionPending ? (
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
           ) : session?.user ? (
@@ -2070,6 +2130,14 @@ export default function Home() {
               <LanguageSwitcher
                 language={language}
                 onChange={changeLanguage}
+                compact
+              />
+            </div>
+            <div className="mb-3">
+              <CurrencySwitcher
+                language={language}
+                currency={currency}
+                onChange={changeCurrency}
                 compact
               />
             </div>
@@ -2418,7 +2486,7 @@ export default function Home() {
               >
                 {budgetOptions.map(([value, label]) => (
                   <option key={value} value={value}>
-                    {formatOptionLabel(language, "budget", value, label)}
+                    {formatOptionLabel(language, "budget", value, label, currency)}
                   </option>
                 ))}
               </select>
@@ -2592,7 +2660,7 @@ export default function Home() {
                 >
                   {budgetOptions.map(([value, label]) => (
                     <option key={value} value={value}>
-                      {formatOptionLabel(language, "budget", value, label)}
+                      {formatOptionLabel(language, "budget", value, label, currency)}
                     </option>
                   ))}
                 </select>
@@ -2767,7 +2835,7 @@ export default function Home() {
                   {recipe.estimatedCost && (
                     <span className="shrink-0">
                       {copy.results.approx}{" "}
-                      {formatPrice(language, recipe.estimatedCost)}
+                      {formatPrice(language, recipe.estimatedCost, recipe.currency)}
                     </span>
                   )}
                 </div>
@@ -2883,6 +2951,7 @@ export default function Home() {
         favorites={favorites}
         isSignedIn={Boolean(session?.user)}
         language={language}
+        currency={currency}
         onOpenRecipe={openRecipe}
         onAddToShoppingList={addToShoppingList}
         onEntriesChange={handleMealPlanEntriesChange}
@@ -3415,8 +3484,12 @@ export default function Home() {
               {selectedRecipe.estimatedCost && (
                 <span className="min-w-0 truncate">
                   {copy.recipeModal.approx}{" "}
-                  {formatPrice(language, selectedRecipe.estimatedCost)} / 2{" "}
-                  {copy.recipeModal.servings}
+                  {formatPrice(
+                    language,
+                    selectedRecipe.estimatedCost,
+                    selectedRecipe.currency,
+                  )}{" "}
+                  / 2 {copy.recipeModal.servings}
                 </span>
               )}
             </div>

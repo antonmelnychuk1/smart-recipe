@@ -3,7 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { formatPrice, type AppLanguage } from "@/lib/i18n";
+import {
+  convertPrice,
+  formatPrice,
+  getCurrencyForLocale,
+  normalizeCurrency,
+  type AppLanguage,
+  type CurrencyCode,
+} from "@/lib/i18n";
 import type { Recipe } from "@/lib/recipe-types";
 
 export type SavedRecipeListItem = {
@@ -88,7 +95,7 @@ const savedCopy = {
     anyTime: "Dowolny czas",
     anyCalories: "Dowolne kcal",
     anyCost: "Dowolny koszt",
-    maxCost: (value: string) => `do ${value} zł`,
+    maxCost: (value: string) => `do ${value}`,
     newest: "Najnowsze",
     fastest: "Najszybsze",
     easiest: "Najłatwiejsze",
@@ -135,7 +142,7 @@ const savedCopy = {
     anyTime: "Any time",
     anyCalories: "Any kcal",
     anyCost: "Any cost",
-    maxCost: (value: string) => `up to ${value} PLN`,
+    maxCost: (value: string) => `up to ${value}`,
     newest: "Newest",
     fastest: "Fastest",
     easiest: "Easiest",
@@ -213,6 +220,7 @@ export function SavedRecipesLibrary({
   language?: AppLanguage;
 }) {
   const copy = savedCopy[language];
+  const [currency, setCurrency] = useState<CurrencyCode>("PLN");
   const [items, setItems] = useState(initialItems);
   const [search, setSearch] = useState("");
   const [visibility, setVisibility] = useState("all");
@@ -224,6 +232,19 @@ export function SavedRecipesLibrary({
   const [sort, setSort] = useState("newest");
   const [pendingId, setPendingId] = useState("");
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const initialization = window.setTimeout(() => {
+      setCurrency(
+        normalizeCurrency(
+          window.localStorage.getItem("smart-recipe:currency") ??
+            getCurrencyForLocale(window.navigator.language),
+        ),
+      );
+    }, 0);
+
+    return () => window.clearTimeout(initialization);
+  }, []);
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -263,7 +284,11 @@ export function SavedRecipesLibrary({
           (calorieLimit === null || item.recipe.calories <= calorieLimit) &&
           (costLimit === null ||
             (item.recipe.estimatedCost !== undefined &&
-              item.recipe.estimatedCost <= costLimit)),
+              convertPrice(
+                item.recipe.estimatedCost,
+                item.recipe.currency ?? "PLN",
+                currency,
+              ) <= costLimit)),
       )
       .sort((first, second) => {
         if (sort === "fastest") return first.recipe.time - second.recipe.time;
@@ -280,8 +305,20 @@ export function SavedRecipesLibrary({
           return first.recipe.calories - second.recipe.calories;
         if (sort === "cost") {
           return (
-            (first.recipe.estimatedCost ?? Number.MAX_SAFE_INTEGER) -
-            (second.recipe.estimatedCost ?? Number.MAX_SAFE_INTEGER)
+            (first.recipe.estimatedCost
+              ? convertPrice(
+                  first.recipe.estimatedCost,
+                  first.recipe.currency ?? "PLN",
+                  currency,
+                )
+              : Number.MAX_SAFE_INTEGER) -
+            (second.recipe.estimatedCost
+              ? convertPrice(
+                  second.recipe.estimatedCost,
+                  second.recipe.currency ?? "PLN",
+                  currency,
+                )
+              : Number.MAX_SAFE_INTEGER)
           );
         }
         return (
@@ -292,6 +329,7 @@ export function SavedRecipesLibrary({
   }, [
     dietTag,
     difficulty,
+    currency,
     items,
     maxCalories,
     maxCost,
@@ -435,9 +473,9 @@ export function SavedRecipesLibrary({
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
             <option value="all">{copy.anyCost}</option>
-            <option value="20">{copy.maxCost("20")}</option>
-            <option value="40">{copy.maxCost("40")}</option>
-            <option value="60">{copy.maxCost("60")}</option>
+            <option value="20">{copy.maxCost(`20 ${currency}`)}</option>
+            <option value="40">{copy.maxCost(`40 ${currency}`)}</option>
+            <option value="60">{copy.maxCost(`60 ${currency}`)}</option>
           </select>
           <select
             value={sort}
@@ -517,7 +555,11 @@ export function SavedRecipesLibrary({
                   {item.recipe.estimatedCost && (
                     <span className="rounded-full bg-[#f6f3ec] px-2.5 py-1">
                       {copy.approx}{" "}
-                      {formatPrice(language, item.recipe.estimatedCost)}
+                      {formatPrice(
+                        language,
+                        item.recipe.estimatedCost,
+                        item.recipe.currency,
+                      )}
                     </span>
                   )}
                 </div>

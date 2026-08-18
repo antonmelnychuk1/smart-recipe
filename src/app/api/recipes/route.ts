@@ -18,6 +18,7 @@ const ingredientsRequestSchema = z.object({
   diet: z.string().trim().min(1).max(60),
   maxTime: z.number().int().min(0).max(240),
   maxBudget: z.number().int().min(0).max(1000),
+  currency: z.enum(["PLN", "EUR", "USD", "GBP"]).default("PLN"),
   language: z.enum(["pl", "en"]).default("pl"),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
@@ -36,6 +37,7 @@ const dishRequestSchema = z.object({
   diet: z.string().trim().min(1).max(60),
   maxTime: z.number().int().min(0).max(240),
   maxBudget: z.number().int().min(0).max(1000),
+  currency: z.enum(["PLN", "EUR", "USD", "GBP"]).default("PLN"),
   language: z.enum(["pl", "en"]).default("pl"),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
@@ -69,6 +71,7 @@ const recipeSchema = z.object({
   carbs: z.number().int(),
   fat: z.number().int(),
   estimatedCost: z.number().int().min(1),
+  currency: z.enum(["PLN", "EUR", "USD", "GBP"]),
   match: z.number().int().min(0).max(100),
   ingredients: z.array(
     z
@@ -135,6 +138,7 @@ export async function POST(request: Request) {
   const isDishMode = requestData.mode === "dish";
   const { diet, maxTime } = requestData;
   const language = requestData.language;
+  const currency = requestData.currency;
   const isEnglish = language === "en";
   const apiCopy =
     language === "en"
@@ -176,8 +180,8 @@ export async function POST(request: Request) {
         ? "No budget limit"
         : "Bez ograniczeń budżetowych"
       : isEnglish
-        ? `Maximum ${requestData.maxBudget} PLN for 2 servings`
-        : `Maksymalnie ${requestData.maxBudget} zł za 2 porcje`;
+        ? `Maximum ${requestData.maxBudget} ${currency} for 2 servings`
+        : `Maksymalnie ${requestData.maxBudget} ${currency} za 2 porcje`;
   const goalLabels: Record<typeof requestData.cookingGoal, string> = {
     balanced: isEnglish ? "a balanced meal" : "zbalansowany posiłek",
     quick: isEnglish
@@ -304,7 +308,7 @@ The missing field is ONLY a shopping list. Each missing item must be a short pro
 
 In preparation steps, include the amount and unit the first time each ingredient is used, e.g. “Add 250 g flour and 300 ml milk”. Do not omit proportions in instructions.
 
-estimatedCost is a realistic total estimated ingredient cost for 2 servings in whole PLN. Respect the budget if provided. Nutrition goals are a hint for one meal, not whole-day values.
+estimatedCost is a realistic total estimated ingredient cost for 2 servings in whole ${currency}. Set currency exactly to "${currency}". Respect the budget if provided. Nutrition goals are a hint for one meal, not whole-day values.
 
 substitutions must contain 2–5 practical swaps for ingredients users may want to replace or that are often problematic. Each item must mention the original recipe ingredient and 1–3 substitutes with short quantities, e.g. “150 g Greek yogurt” instead of “150 g sour cream”. Substitutes must fit the chosen diet and cannot break user restrictions.
 
@@ -320,7 +324,7 @@ Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing mus
 
 W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
 
-Pole estimatedCost to realistyczny, całkowity szacowany koszt składników dla 2 porcji w pełnych złotych. Przestrzegaj budżetu, jeśli został podany. Cele żywieniowe traktuj jako wskazówkę dla jednego posiłku, nie jako wartości całego dnia.
+Pole estimatedCost to realistyczny, całkowity szacowany koszt składników dla 2 porcji w pełnych jednostkach waluty ${currency}. Pole currency ustaw dokładnie na "${currency}". Przestrzegaj budżetu, jeśli został podany. Cele żywieniowe traktuj jako wskazówkę dla jednego posiłku, nie jako wartości całego dnia.
 
 Pole substitutions ma zawierać 2–5 praktycznych zamienników dla składników, które użytkownik może chcieć podmienić lub które często są problematyczne. Każdy element ma wskazywać oryginalny składnik z przepisu oraz 1–3 zamienniki z krótką ilością, np. „150 g jogurtu greckiego” zamiast „150 g śmietany”. Zamienniki muszą pasować do wybranej diety i nie mogą łamać ograniczeń użytkownika.
 
