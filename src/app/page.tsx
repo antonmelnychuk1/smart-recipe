@@ -4193,7 +4193,7 @@ export default function Home() {
         <div
           role="status"
           aria-live="polite"
-          className="toast-enter fixed bottom-5 left-1/2 z-[80] flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 items-center gap-3 rounded-2xl bg-[#253d31] px-4 py-3 text-sm font-semibold text-white shadow-2xl"
+          className="toast-enter safe-bottom fixed left-1/2 z-[80] flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 items-center gap-3 rounded-2xl bg-[#253d31] px-4 py-3 text-sm font-semibold text-white shadow-2xl"
         >
           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white/15">
             ✓
@@ -4203,15 +4203,31 @@ export default function Home() {
       )}
 
       <footer className="bg-[#23362c] px-4 py-6 text-center text-sm text-[#b8c3bc] sm:px-5 sm:py-8">
-        {copy.footer.text}{" "}
-        <a
-          href="https://www.pexels.com"
-          target="_blank"
-          rel="noreferrer"
-          className="underline decoration-white/30 underline-offset-4 hover:text-white"
-        >
-          {copy.footer.pexels}
-        </a>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+          <span>{copy.footer.text}</span>
+          <span className="hidden text-white/25 sm:inline">·</span>
+          <a
+            href="https://www.pexels.com"
+            target="_blank"
+            rel="noreferrer"
+            className="underline decoration-white/30 underline-offset-4 hover:text-white"
+          >
+            {copy.footer.pexels}
+          </a>
+          <span className="hidden text-white/25 sm:inline">·</span>
+          <Link
+            href="/privacy"
+            className="underline decoration-white/30 underline-offset-4 hover:text-white"
+          >
+            {copy.footer.privacy}
+          </Link>
+          <Link
+            href="/terms"
+            className="underline decoration-white/30 underline-offset-4 hover:text-white"
+          >
+            {copy.footer.terms}
+          </Link>
+        </div>
       </footer>
     </main>
   );

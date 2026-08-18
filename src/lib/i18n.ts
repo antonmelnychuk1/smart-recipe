@@ -416,6 +416,8 @@ const baseHomeCopy = {
     footer: {
       text: "SmartRecipe · Gotuj sprytniej, marnuj mniej.",
       pexels: "Photos provided by Pexels",
+      privacy: "Prywatność",
+      terms: "Regulamin",
     },
   },
   en: {
@@ -688,6 +690,8 @@ const baseHomeCopy = {
     footer: {
       text: "SmartRecipe · Cook smarter, waste less.",
       pexels: "Photos provided by Pexels",
+      privacy: "Privacy",
+      terms: "Terms",
     },
   },
   uk: {
@@ -963,6 +967,8 @@ const baseHomeCopy = {
     footer: {
       text: "SmartRecipe · Готуй розумніше, марнуй менше.",
       pexels: "Фото надані Pexels",
+      privacy: "Приватність",
+      terms: "Умови",
     },
   },
 } as const;
