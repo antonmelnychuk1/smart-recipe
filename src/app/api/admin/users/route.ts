@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   if (!admin) {
     return apiError(
       request,
-      { pl: "Brak uprawnień.", en: "Unauthorized." },
+      { pl: "Brak uprawnień.", en: "Unauthorized.", uk: "Немає доступу." },
       403,
     );
   }
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return apiError(
       request,
-      { pl: "Niepoprawne dane.", en: "Invalid data." },
+      { pl: "Niepoprawne dane.", en: "Invalid data.", uk: "Неправильні дані." },
       400,
     );
   }
@@ -71,7 +71,11 @@ export async function POST(request: Request) {
   if (!target) {
     return apiError(
       request,
-      { pl: "Użytkownik nie istnieje.", en: "User does not exist." },
+      {
+        pl: "Użytkownik nie istnieje.",
+        en: "User does not exist.",
+        uk: "Користувач не існує.",
+      },
       404,
     );
   }
@@ -83,6 +87,7 @@ export async function POST(request: Request) {
       {
         pl: "Nie możesz zablokować, zdegradować ani usunąć własnego konta.",
         en: "You cannot ban, downgrade or delete your own account.",
+        uk: "Не можна заблокувати, понизити або видалити власний акаунт.",
       },
       400,
     );

@@ -69,6 +69,7 @@ export async function POST(request: Request) {
       {
         pl: "Zaloguj się, aby udostępnić przepis.",
         en: "Log in to share a recipe.",
+        uk: "Увійди, щоб поділитися рецептом.",
       },
       401,
     );
@@ -78,7 +79,11 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return apiError(
       request,
-      { pl: "Niepoprawny przepis.", en: "Invalid recipe." },
+      {
+        pl: "Niepoprawny przepis.",
+        en: "Invalid recipe.",
+        uk: "Неправильний рецепт.",
+      },
       400,
     );
   }
@@ -115,7 +120,7 @@ export async function PATCH(request: Request) {
   if (!userId) {
     return apiError(
       request,
-      { pl: "Brak uprawnień.", en: "Unauthorized." },
+      { pl: "Brak uprawnień.", en: "Unauthorized.", uk: "Немає доступу." },
       401,
     );
   }
@@ -126,7 +131,7 @@ export async function PATCH(request: Request) {
   if (!parsed.success) {
     return apiError(
       request,
-      { pl: "Niepoprawne dane.", en: "Invalid data." },
+      { pl: "Niepoprawne dane.", en: "Invalid data.", uk: "Неправильні дані." },
       400,
     );
   }
@@ -141,6 +146,7 @@ export async function PATCH(request: Request) {
       {
         pl: "Nie znaleziono zapisanego przepisu.",
         en: "Saved recipe was not found.",
+        uk: "Збережений рецепт не знайдено.",
       },
       404,
     );
@@ -164,7 +170,7 @@ export async function DELETE(request: Request) {
   if (!userId) {
     return apiError(
       request,
-      { pl: "Brak uprawnień.", en: "Unauthorized." },
+      { pl: "Brak uprawnień.", en: "Unauthorized.", uk: "Немає доступу." },
       401,
     );
   }
@@ -173,7 +179,7 @@ export async function DELETE(request: Request) {
   if (!parsed.success) {
     return apiError(
       request,
-      { pl: "Niepoprawne dane.", en: "Invalid data." },
+      { pl: "Niepoprawne dane.", en: "Invalid data.", uk: "Неправильні дані." },
       400,
     );
   }
@@ -187,6 +193,7 @@ export async function DELETE(request: Request) {
       {
         pl: "Nie znaleziono zapisanego przepisu.",
         en: "Saved recipe was not found.",
+        uk: "Збережений рецепт не знайдено.",
       },
       404,
     );

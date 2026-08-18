@@ -34,7 +34,7 @@ export async function GET(request: Request) {
   if (!userId) {
     return apiError(
       request,
-      { pl: "Brak uprawnień.", en: "Unauthorized." },
+      { pl: "Brak uprawnień.", en: "Unauthorized.", uk: "Немає доступу." },
       401,
     );
   }
@@ -60,7 +60,7 @@ export async function PATCH(request: Request) {
   if (!userId) {
     return apiError(
       request,
-      { pl: "Brak uprawnień.", en: "Unauthorized." },
+      { pl: "Brak uprawnień.", en: "Unauthorized.", uk: "Немає доступу." },
       401,
     );
   }
@@ -69,7 +69,7 @@ export async function PATCH(request: Request) {
   if (!parsed.success) {
     return apiError(
       request,
-      { pl: "Niepoprawne cele.", en: "Invalid goals." },
+      { pl: "Niepoprawne cele.", en: "Invalid goals.", uk: "Неправильні цілі." },
       400,
     );
   }

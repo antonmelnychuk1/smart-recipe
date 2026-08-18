@@ -126,6 +126,7 @@ export async function POST(request: Request) {
       {
         pl: "Brakuje OPENAI_API_KEY w pliku .env.local.",
         en: "OPENAI_API_KEY is missing in .env.local.",
+        uk: "У файлі .env.local бракує OPENAI_API_KEY.",
       },
       500,
     );
@@ -140,6 +141,7 @@ export async function POST(request: Request) {
       {
         pl: "Podaj przynajmniej jeden poprawny składnik.",
         en: "Enter at least one valid ingredient.",
+        uk: "Введи принаймні один правильний інгредієнт.",
       },
       400,
     );
@@ -155,7 +157,17 @@ export async function POST(request: Request) {
   const isUkrainian = language === "uk";
   const usesEnglishPrompt = isEnglish || isUkrainian;
   const apiCopy =
-    language === "en"
+    language === "uk"
+      ? {
+          dailyLimit:
+            "Сьогоднішній ліміт генерацій використано. Спробуй завтра.",
+          emptyModel: "Модель не повернула готових рецептів. Спробуй ще раз.",
+          invalidKey: "API ключ неправильний.",
+          apiLimit: "Ліміт API досягнуто. Перевір ліміти або оплату.",
+          apiUnavailable: "OpenAI API тимчасово недоступне. Спробуй ще раз.",
+          fallback: "Не вдалося згенерувати рецепти.",
+        }
+      : language === "en"
       ? {
           dailyLimit:
             "Today's generation limit has been used. Try again tomorrow.",

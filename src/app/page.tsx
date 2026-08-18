@@ -673,6 +673,71 @@ export default function Home() {
           from: "z",
           limitStarts: "Limit zacznie się liczyć po pierwszym generowaniu.",
         }
+      : language === "uk"
+        ? {
+            suggestions: ["яйця", "рис", "курка", "помідор", "шпинат"],
+            confirmCloseTimer:
+              "Таймер усе ще працює. Закрити режим готування?",
+            shareFailed: "Не вдалося поділитися рецептом.",
+            shareCopied: "Рецепт публічний. Посилання скопійовано.",
+            privateFailed: "Не вдалося приховати рецепт.",
+            feedbackRemoved: "Оцінку рецепту видалено.",
+            feedbackLiked:
+              "Дякуємо! Ми зберегли, що цей рецепт тобі підходить.",
+            feedbackSaved:
+              "Дякуємо за відгук. Він допоможе покращувати рецепти.",
+            changed: "Змінено:",
+            productChanged: "Продукт змінено.",
+            alreadyInPantry:
+              "вже є в коморі. Видалено зі списку покупок.",
+            movedToPantry: "Перенесено до комори:",
+            removedOneBought: "Видалено 1 куплений продукт.",
+            removedBought: "куплених продуктів видалено.",
+            boughtAlreadyInPantry:
+              "Куплені продукти вже були в коморі. Їх видалено зі списку.",
+            movedProductsToPantry: "продуктів перенесено до комори.",
+            addedToPantry: "Додано до комори:",
+            consumed: "Використано:",
+            noPantryMatches: "Не знайдено відповідних продуктів у коморі.",
+            markAsUsed: "Позначити як використане:",
+            removedFromPantry: "продуктів видалено з комори.",
+            addedToGenerator: "продуктів додано до генератора.",
+            verificationSent:
+              "Повідомлення надіслано. Перевір також папку зі спамом.",
+            alreadyVerified:
+              "Цю адресу вже підтверджено. Онови сторінку.",
+            tooManyAttempts:
+              "Занадто багато спроб. Зачекай трохи й спробуй ще раз.",
+            sendFailed: "Не вдалося надіслати повідомлення. Код:",
+            verifyPrefix: "Підтвердь адресу",
+            verifySuffix: "щоб захистити акаунт.",
+            sending: "Надсилаю...",
+            sendVerification: "Надіслати посилання верифікації",
+            checkPantry: "Перевір комору:",
+            expired: "прострочено",
+            expiring: "скоро закінчується термін",
+            viewProducts: "Переглянути продукти",
+            setPreferences: "Налаштуй кулінарні вподобання",
+            preferencesText:
+              "Дієта, бюджет, час і виключені інгредієнти автоматично використовуватимуться під час генерації рецептів.",
+            completeNow: "Заповнити зараз",
+            userPanel: "Панель користувача",
+            hello: "Привіт",
+            dashboardText:
+              "Швидкий огляд твоєї кухні: ліміти, покупки, комора й останні рецепти в одному місці.",
+            generateRecipe: "Згенерувати рецепт",
+            activity: "Активність",
+            latest: "Останнє:",
+            noGenerationHistory: "У тебе ще немає історії генерацій.",
+            history: "Історія",
+            limitUsage: "Використання ліміту",
+            adminUnlimited:
+              "У тебе акаунт адміністратора, тому генерація без ліміту.",
+            used: "Використано",
+            from: "з",
+            limitStarts:
+              "Ліміт почне рахуватися після першої генерації.",
+          }
       : {
           suggestions: ["eggs", "rice", "chicken", "tomato", "spinach"],
           confirmCloseTimer: "The timer is still running. Close cooking mode?",

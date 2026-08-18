@@ -78,7 +78,11 @@ export async function GET(request: Request) {
   if (!userId) {
     return apiError(
       request,
-      { pl: "Zaloguj się, aby pobrać plan.", en: "Log in to load the plan." },
+      {
+        pl: "Zaloguj się, aby pobrać plan.",
+        en: "Log in to load the plan.",
+        uk: "Увійди, щоб завантажити план.",
+      },
       401,
     );
   }
@@ -88,7 +92,7 @@ export async function GET(request: Request) {
   if (!parsedWeek.success) {
     return apiError(
       request,
-      { pl: "Niepoprawny tydzień.", en: "Invalid week." },
+      { pl: "Niepoprawny tydzień.", en: "Invalid week.", uk: "Неправильний тиждень." },
       400,
     );
   }
@@ -113,7 +117,11 @@ export async function POST(request: Request) {
   if (!userId) {
     return apiError(
       request,
-      { pl: "Zaloguj się, aby zapisać plan.", en: "Log in to save the plan." },
+      {
+        pl: "Zaloguj się, aby zapisać plan.",
+        en: "Log in to save the plan.",
+        uk: "Увійди, щоб зберегти план.",
+      },
       401,
     );
   }
@@ -122,7 +130,11 @@ export async function POST(request: Request) {
   if (!body.success) {
     return apiError(
       request,
-      { pl: "Niepoprawne dane planera.", en: "Invalid planner data." },
+      {
+        pl: "Niepoprawne dane planera.",
+        en: "Invalid planner data.",
+        uk: "Неправильні дані планера.",
+      },
       400,
     );
   }

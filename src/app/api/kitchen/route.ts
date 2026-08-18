@@ -137,7 +137,11 @@ export async function GET(request: Request) {
   if (!userId) {
     return apiError(
       request,
-      { pl: "Zaloguj się, aby pobrać dane.", en: "Log in to load data." },
+      {
+        pl: "Zaloguj się, aby pobrać dane.",
+        en: "Log in to load data.",
+        uk: "Увійди, щоб завантажити дані.",
+      },
       401,
     );
   }
@@ -210,7 +214,11 @@ export async function POST(request: Request) {
   if (!userId) {
     return apiError(
       request,
-      { pl: "Zaloguj się, aby zapisać dane.", en: "Log in to save data." },
+      {
+        pl: "Zaloguj się, aby zapisać dane.",
+        en: "Log in to save data.",
+        uk: "Увійди, щоб зберегти дані.",
+      },
       401,
     );
   }
@@ -220,7 +228,7 @@ export async function POST(request: Request) {
   if (!body.success) {
     return apiError(
       request,
-      { pl: "Niepoprawne dane.", en: "Invalid data." },
+      { pl: "Niepoprawne dane.", en: "Invalid data.", uk: "Неправильні дані." },
       400,
     );
   }
