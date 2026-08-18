@@ -420,106 +420,95 @@ function RecipeCardSkeleton() {
   );
 }
 
-function LanguageSwitcher({
-  language,
-  onChange,
-  compact = false,
-}: {
-  language: AppLanguage;
-  onChange: (language: AppLanguage) => void;
-  compact?: boolean;
-}) {
-  return (
-    <div
-      aria-label={homeCopy[language].nav.language}
-      className={`inline-flex rounded-full border border-[#d9d7cd] bg-white p-1 shadow-sm ${
-        compact ? "w-full justify-between" : ""
-      }`}
-    >
-      {languageOptions.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          onClick={() => onChange(option.value)}
-          aria-pressed={language === option.value}
-          title={option.name}
-          className={`flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition ${
-            language === option.value
-              ? "bg-[#2f684f] text-white"
-              : "text-[#667168] hover:bg-[#f3f6f2] hover:text-[#25322b]"
-          } ${compact ? "flex-1" : ""}`}
-        >
-          <span className="text-sm leading-none">{option.flag}</span>
-          <span>{option.label}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function CurrencySwitcher({
+function LocaleSettings({
   language,
   currency,
-  onChange,
+  region,
+  onLanguageChange,
+  onCurrencyChange,
+  onRegionChange,
   compact = false,
 }: {
   language: AppLanguage;
   currency: CurrencyCode;
-  onChange: (currency: CurrencyCode) => void;
-  compact?: boolean;
-}) {
-  return (
-    <label
-      className={`inline-flex items-center gap-2 rounded-full border border-[#d9d7cd] bg-white px-3 py-1.5 text-xs font-bold text-[#667168] shadow-sm ${
-        compact ? "w-full justify-between" : ""
-      }`}
-    >
-      <span>{language === "pl" ? "Waluta" : "Currency"}</span>
-      <select
-        value={currency}
-        onChange={(event) => onChange(normalizeCurrency(event.target.value))}
-        className="bg-transparent text-xs font-bold text-[#25322b] outline-none"
-      >
-        {currencyOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function PriceRegionSwitcher({
-  language,
-  region,
-  onChange,
-  compact = false,
-}: {
-  language: AppLanguage;
   region: PriceRegionCode;
-  onChange: (region: PriceRegionCode) => void;
+  onLanguageChange: (language: AppLanguage) => void;
+  onCurrencyChange: (currency: CurrencyCode) => void;
+  onRegionChange: (region: PriceRegionCode) => void;
   compact?: boolean;
 }) {
+  const currentLanguage = languageOptions.find(
+    (option) => option.value === language,
+  );
+
   return (
-    <label
-      className={`inline-flex items-center gap-2 rounded-full border border-[#d9d7cd] bg-white px-3 py-1.5 text-xs font-bold text-[#667168] shadow-sm ${
-        compact ? "w-full justify-between" : ""
+    <div
+      className={`grid gap-2 rounded-2xl border border-[#d9d7cd] bg-white p-2 text-xs font-bold text-[#667168] shadow-sm ${
+        compact
+          ? "grid-cols-3"
+          : "grid-cols-[auto_auto_auto] rounded-full px-2 py-1.5"
       }`}
     >
-      <span>{language === "pl" ? "Region" : "Prices"}</span>
-      <select
-        value={region}
-        onChange={(event) => onChange(normalizePriceRegion(event.target.value))}
-        className="max-w-28 bg-transparent text-xs font-bold text-[#25322b] outline-none"
+      <label
+        className={`flex min-w-0 items-center gap-1.5 rounded-full bg-[#f7f4ed] px-2 py-1 ${
+          compact ? "justify-center" : ""
+        }`}
       >
-        {priceRegionOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
+        <span className="text-sm leading-none">{currentLanguage?.flag}</span>
+        <select
+          aria-label={homeCopy[language].nav.language}
+          value={language}
+          onChange={(event) =>
+            onLanguageChange(event.target.value === "en" ? "en" : "pl")
+          }
+          className="min-w-0 bg-transparent text-xs font-bold text-[#25322b] outline-none"
+        >
+          {languageOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label
+        className={`flex min-w-0 items-center gap-1.5 rounded-full bg-[#f7f4ed] px-2 py-1 ${
+          compact ? "justify-center" : ""
+        }`}
+      >
+        <span>{language === "pl" ? "Wal." : "Cur."}</span>
+        <select
+          aria-label={language === "pl" ? "Waluta" : "Currency"}
+          value={currency}
+          onChange={(event) => onCurrencyChange(normalizeCurrency(event.target.value))}
+          className="min-w-0 bg-transparent text-xs font-bold text-[#25322b] outline-none"
+        >
+          {currencyOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label
+        className={`flex min-w-0 items-center gap-1.5 rounded-full bg-[#f7f4ed] px-2 py-1 ${
+          compact ? "justify-center" : ""
+        }`}
+      >
+        <span>{language === "pl" ? "Ceny" : "Price"}</span>
+        <select
+          aria-label={language === "pl" ? "Region cen" : "Price region"}
+          value={region}
+          onChange={(event) => onRegionChange(normalizePriceRegion(event.target.value))}
+          className="min-w-0 max-w-20 bg-transparent text-xs font-bold text-[#25322b] outline-none"
+        >
+          {priceRegionOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.value}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
   );
 }
 
@@ -2062,7 +2051,7 @@ export default function Home() {
           />
           Smart<span className="-ml-2 text-[#dc704d]">Recipe</span>
         </a>
-        <div className="hidden items-center gap-7 text-sm font-medium text-[#667168] sm:flex">
+        <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] lg:gap-5 lg:text-sm sm:flex">
           <a className="transition hover:text-[#25322b]" href="#how">
             {copy.nav.how}
           </a>
@@ -2085,21 +2074,18 @@ export default function Home() {
               </Link>
             </>
           )}
-          <LanguageSwitcher language={language} onChange={changeLanguage} />
-          <CurrencySwitcher
+          <LocaleSettings
             language={language}
             currency={currency}
-            onChange={changeCurrency}
-          />
-          <PriceRegionSwitcher
-            language={language}
             region={priceRegion}
-            onChange={changePriceRegion}
+            onLanguageChange={changeLanguage}
+            onCurrencyChange={changeCurrency}
+            onRegionChange={changePriceRegion}
           />
           {sessionPending ? (
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
           ) : session?.user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 lg:gap-3">
               {isAdmin && (
                 <a
                   href="/admin"
@@ -2192,25 +2178,13 @@ export default function Home() {
 
           <div className="mt-2 border-t border-[#ebe8e0] pt-3">
             <div className="mb-3">
-              <LanguageSwitcher
-                language={language}
-                onChange={changeLanguage}
-                compact
-              />
-            </div>
-            <div className="mb-3">
-              <CurrencySwitcher
+              <LocaleSettings
                 language={language}
                 currency={currency}
-                onChange={changeCurrency}
-                compact
-              />
-            </div>
-            <div className="mb-3">
-              <PriceRegionSwitcher
-                language={language}
                 region={priceRegion}
-                onChange={changePriceRegion}
+                onLanguageChange={changeLanguage}
+                onCurrencyChange={changeCurrency}
+                onRegionChange={changePriceRegion}
                 compact
               />
             </div>
