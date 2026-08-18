@@ -1,7 +1,13 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminUsersPanel } from "@/components/admin-users-panel";
 import { getCurrentAdmin } from "@/lib/admin";
+import {
+  languageCookieName,
+  normalizeLanguage,
+  type AppLanguage,
+} from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 import type { Recipe } from "@/lib/recipe-types";
 
@@ -10,12 +16,111 @@ export const dynamic = "force-dynamic";
 const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
 
-const feedbackLabels: Record<string, string> = {
-  liked: "👍 Super",
-  too_expensive: "Za drogie",
-  too_hard: "Za trudne",
-  too_caloric: "Za dużo kalorii",
-  bad_photo: "Zdjęcie nie pasuje",
+const adminPageCopy = {
+  pl: {
+    feedbackLabels: {
+      liked: "👍 Super",
+      too_expensive: "Za drogie",
+      too_hard: "Za trudne",
+      too_caloric: "Za dużo kalorii",
+      bad_photo: "Zdjęcie nie pasuje",
+    },
+    noActivity: "Brak aktywności",
+    dishPrefix: "Danie:",
+    title: "Panel administratora",
+    signedInAs: "Zalogowano jako",
+    back: "← Wróć do aplikacji",
+    users: "Użytkownicy",
+    totalGenerations: "Generowania łącznie",
+    todayGenerations: "Generowania dzisiaj",
+    activeToday: "Aktywni dzisiaj",
+    atLimit: "Przy limicie",
+    favorites: "Ulubione przepisy",
+    mealPlans: "Zaplanowane posiłki",
+    recipeRatings: "Oceny przepisów",
+    guestGenerations: "Generowania gości",
+    averagePerUser: "Średnio na użytkownika",
+    recipeQuality: "Jakość przepisów",
+    userFeedback: "Feedback użytkowników",
+    ratings: "ocen",
+    latestSignals: "Ostatnie sygnały",
+    latestRatings: "Najnowsze oceny",
+    noRatings:
+      "Brak ocen. Gdy użytkownicy zaczną klikać feedback przy przepisach, zobaczysz je tutaj.",
+    trends: "Trendy",
+    trendsTitle: "Co użytkownicy generują najczęściej",
+    trendsDescription:
+      "Dane z ostatnich zapisanych wyszukiwań i ocen pomagają szybko zobaczyć, czego ludzie szukają i gdzie przepisy wymagają poprawy.",
+    historyEntries: "wpisów historii",
+    topSearches: "Najczęstsze zapytania",
+    topIngredients: "Najczęstsze składniki",
+    topRecipes: "Najczęściej generowane przepisy",
+    recipesToImprove: "Przepisy do poprawy",
+    noData: "Brak danych.",
+    latestSearches: "Najnowsze wyszukiwania",
+    noSearchHistory: "Brak zapisanej historii wyszukiwań.",
+    minutesPrefix: "do",
+    minutesSuffix: "min",
+    footnote:
+      "„Łącznie” obejmuje udane generowania zapisane w tabeli limitów. Historia pokazuje maksymalnie 50 ostatnich zapisanych wyszukiwań na konto.",
+    locale: "pl-PL",
+  },
+  en: {
+    feedbackLabels: {
+      liked: "👍 Great",
+      too_expensive: "Too expensive",
+      too_hard: "Too hard",
+      too_caloric: "Too many calories",
+      bad_photo: "Photo does not match",
+    },
+    noActivity: "No activity",
+    dishPrefix: "Dish:",
+    title: "Admin panel",
+    signedInAs: "Signed in as",
+    back: "← Back to app",
+    users: "Users",
+    totalGenerations: "Total generations",
+    todayGenerations: "Generations today",
+    activeToday: "Active today",
+    atLimit: "At limit",
+    favorites: "Favorite recipes",
+    mealPlans: "Planned meals",
+    recipeRatings: "Recipe ratings",
+    guestGenerations: "Guest generations",
+    averagePerUser: "Average per user",
+    recipeQuality: "Recipe quality",
+    userFeedback: "User feedback",
+    ratings: "ratings",
+    latestSignals: "Latest signals",
+    latestRatings: "Latest ratings",
+    noRatings:
+      "No ratings yet. When users start clicking recipe feedback, you will see it here.",
+    trends: "Trends",
+    trendsTitle: "What users generate most often",
+    trendsDescription:
+      "Recent searches and ratings help you quickly see what people want and which recipes need improvement.",
+    historyEntries: "history entries",
+    topSearches: "Top searches",
+    topIngredients: "Top ingredients",
+    topRecipes: "Most generated recipes",
+    recipesToImprove: "Recipes to improve",
+    noData: "No data.",
+    latestSearches: "Latest searches",
+    noSearchHistory: "No saved search history.",
+    minutesPrefix: "up to",
+    minutesSuffix: "min",
+    footnote:
+      "“Total” includes successful generations saved in the limits table. History shows up to 50 latest saved searches per account.",
+    locale: "en-US",
+  },
+} as const;
+
+const feedbackLabelKeys = {
+  liked: "liked",
+  too_expensive: "too_expensive",
+  too_hard: "too_hard",
+  too_caloric: "too_caloric",
+  bad_photo: "bad_photo",
 };
 
 const feedbackStyles: Record<string, string> = {
@@ -26,7 +131,7 @@ const feedbackStyles: Record<string, string> = {
   bad_photo: "bg-[#edf1ec] text-[#536159]",
 };
 
-const negativeFeedbackValues = Object.keys(feedbackLabels).filter(
+const negativeFeedbackValues = Object.keys(feedbackLabelKeys).filter(
   (feedback) => feedback !== "liked",
 );
 
@@ -37,10 +142,11 @@ function startOfUtcDay() {
   );
 }
 
-function formatDate(date: Date | null) {
-  if (!date) return "Brak aktywności";
+function formatDate(date: Date | null, language: AppLanguage) {
+  const copy = adminPageCopy[language];
+  if (!date) return copy.noActivity;
 
-  return new Intl.DateTimeFormat("pl-PL", {
+  return new Intl.DateTimeFormat(copy.locale, {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -72,9 +178,21 @@ function topEntries(map: Map<string, number>, limit = 6) {
     .slice(0, limit);
 }
 
+function feedbackLabel(
+  labels: (typeof adminPageCopy)[AppLanguage]["feedbackLabels"],
+  value: string,
+) {
+  return labels[value as keyof typeof labels] ?? value;
+}
+
 export default async function AdminPage() {
   const admin = await getCurrentAdmin();
   if (!admin) redirect("/");
+  const language = normalizeLanguage(
+    (await cookies()).get(languageCookieName)?.value,
+  );
+  const copy = adminPageCopy[language];
+  const feedbackLabels = copy.feedbackLabels;
 
   const today = startOfUtcDay();
   const [
@@ -254,7 +372,7 @@ export default async function AdminPage() {
   for (const entry of recentSearches) {
     const searchLabel =
       entry.mode === "dish" && entry.query
-        ? `Danie: ${entry.query}`
+        ? `${copy.dishPrefix} ${entry.query}`
         : entry.ingredients.join(", ");
     addCount(searchCounts, searchLabel);
 
@@ -288,27 +406,27 @@ export default async function AdminPage() {
               SmartRecipe
             </p>
             <h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-              Panel administratora
+              {copy.title}
             </h1>
             <p className="mt-2 text-sm text-[#748078]">
-              Zalogowano jako {admin.email}
+              {copy.signedInAs} {admin.email}
             </p>
           </div>
           <Link
             href="/"
             className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold shadow-sm"
           >
-            ← Wróć do aplikacji
+            {copy.back}
           </Link>
         </header>
 
         <section className="mt-6 grid gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-5">
           {[
-            ["Użytkownicy", users.length],
-            ["Generowania łącznie", totalGenerations],
-            ["Generowania dzisiaj", todayGenerations],
-            ["Aktywni dzisiaj", activeToday],
-            ["Przy limicie", usersAtLimit],
+            [copy.users, users.length],
+            [copy.totalGenerations, totalGenerations],
+            [copy.todayGenerations, todayGenerations],
+            [copy.activeToday, activeToday],
+            [copy.atLimit, usersAtLimit],
           ].map(([label, value]) => (
             <article
               key={label}
@@ -324,12 +442,12 @@ export default async function AdminPage() {
 
         <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[
-            ["Ulubione przepisy", totalFavorites],
-            ["Zaplanowane posiłki", totalMealPlans],
-            ["Oceny przepisów", totalFeedback],
-            ["Generowania gości", guestGenerations],
+            [copy.favorites, totalFavorites],
+            [copy.mealPlans, totalMealPlans],
+            [copy.recipeRatings, totalFeedback],
+            [copy.guestGenerations, guestGenerations],
             [
-              "Średnio na użytkownika",
+              copy.averagePerUser,
               users.length
                 ? (totalGenerations / users.length).toFixed(1)
                 : "0",
@@ -350,14 +468,14 @@ export default async function AdminPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
-                  Jakość przepisów
+                  {copy.recipeQuality}
                 </p>
                 <h2 className="mt-1 font-serif text-2xl font-semibold">
-                  Feedback użytkowników
+                  {copy.userFeedback}
                 </h2>
               </div>
               <span className="rounded-full bg-[#eef2ec] px-3 py-1.5 text-xs font-bold text-[#356248]">
-                {totalFeedback} ocen
+                {totalFeedback} {copy.ratings}
               </span>
             </div>
 
@@ -399,10 +517,10 @@ export default async function AdminPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
-                  Ostatnie sygnały
+                  {copy.latestSignals}
                 </p>
                 <h2 className="mt-1 font-serif text-2xl font-semibold">
-                  Najnowsze oceny
+                  {copy.latestRatings}
                 </h2>
               </div>
             </div>
@@ -410,8 +528,7 @@ export default async function AdminPage() {
             <div className="mt-5 divide-y divide-[#efede7]">
               {recentFeedback.length === 0 ? (
                 <p className="rounded-2xl bg-[#faf8f3] p-4 text-sm text-[#68736b]">
-                  Brak ocen. Gdy użytkownicy zaczną klikać feedback przy
-                  przepisach, zobaczysz je tutaj.
+                  {copy.noRatings}
                 </p>
               ) : (
                 recentFeedback.map((item) => (
@@ -425,7 +542,7 @@ export default async function AdminPage() {
                       </p>
                       <p className="mt-1 text-xs text-[#7a857e]">
                         {item.user.name || item.user.email} ·{" "}
-                        {formatDate(item.updatedAt)}
+                        {formatDate(item.updatedAt, language)}
                       </p>
                     </div>
                     <span
@@ -434,7 +551,7 @@ export default async function AdminPage() {
                         "bg-[#edf1ec] text-[#536159]"
                       }`}
                     >
-                      {feedbackLabels[item.feedback] ?? item.feedback}
+                      {feedbackLabel(feedbackLabels, item.feedback)}
                     </span>
                   </div>
                 ))
@@ -447,28 +564,26 @@ export default async function AdminPage() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
-                Trendy
+                {copy.trends}
               </p>
               <h2 className="mt-1 font-serif text-2xl font-semibold">
-                Co użytkownicy generują najczęściej
+                {copy.trendsTitle}
               </h2>
               <p className="mt-1 text-sm leading-6 text-[#7a857e]">
-                Dane z ostatnich zapisanych wyszukiwań i ocen pomagają szybko
-                zobaczyć, czego ludzie szukają i gdzie przepisy wymagają
-                poprawy.
+                {copy.trendsDescription}
               </p>
             </div>
             <span className="rounded-full bg-[#eef2ec] px-3 py-1.5 text-xs font-bold text-[#356248]">
-              {recentSearches.length} wpisów historii
+              {recentSearches.length} {copy.historyEntries}
             </span>
           </div>
 
           <div className="mt-5 grid gap-4 lg:grid-cols-4">
             {[
-              ["Najczęstsze zapytania", topSearches],
-              ["Najczęstsze składniki", topIngredients],
-              ["Najczęściej generowane przepisy", topRecipes],
-              ["Przepisy do poprawy", problemRecipes],
+              [copy.topSearches, topSearches],
+              [copy.topIngredients, topIngredients],
+              [copy.topRecipes, topRecipes],
+              [copy.recipesToImprove, problemRecipes],
             ].map(([title, rows]) => (
               <article
                 key={title as string}
@@ -496,7 +611,7 @@ export default async function AdminPage() {
                     ))
                   ) : (
                     <p className="rounded-xl bg-white p-3 text-sm leading-6 text-[#7a857e] ring-1 ring-[#eeeae2]">
-                      Brak danych.
+                      {copy.noData}
                     </p>
                   )}
                 </div>
@@ -506,7 +621,7 @@ export default async function AdminPage() {
 
           <article className="mt-4 rounded-2xl border border-[#eeeae2] bg-[#faf8f3] p-4">
             <h3 className="text-sm font-bold text-[#365a46]">
-              Najnowsze wyszukiwania
+              {copy.latestSearches}
             </h3>
             <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
               {recentSearches.slice(0, 6).length > 0 ? (
@@ -517,18 +632,20 @@ export default async function AdminPage() {
                   >
                     <p className="break-anywhere text-sm font-semibold">
                       {entry.mode === "dish" && entry.query
-                        ? `Danie: ${entry.query}`
+                        ? `${copy.dishPrefix} ${entry.query}`
                         : entry.ingredients.join(", ")}
                     </p>
                     <p className="mt-1 text-xs text-[#7a857e]">
-                      {formatDate(entry.createdAt)} · {entry.diet}
-                      {entry.maxTime > 0 ? ` · do ${entry.maxTime} min` : ""}
+                      {formatDate(entry.createdAt, language)} · {entry.diet}
+                      {entry.maxTime > 0
+                        ? ` · ${copy.minutesPrefix} ${entry.maxTime} ${copy.minutesSuffix}`
+                        : ""}
                     </p>
                   </div>
                 ))
               ) : (
                 <p className="rounded-xl bg-white p-3 text-sm leading-6 text-[#7a857e] ring-1 ring-[#eeeae2]">
-                  Brak zapisanej historii wyszukiwań.
+                  {copy.noSearchHistory}
                 </p>
               )}
             </div>
@@ -539,13 +656,10 @@ export default async function AdminPage() {
           users={adminUsers}
           currentAdminId={admin.id}
           emailVerificationEnabled={emailVerificationEnabled}
+          language={language}
         />
 
-        <p className="mt-5 text-xs leading-5 text-[#879089]">
-          „Łącznie” obejmuje udane generowania zapisane w tabeli limitów.
-          Historia pokazuje maksymalnie 50 ostatnich zapisanych wyszukiwań na
-          konto.
-        </p>
+        <p className="mt-5 text-xs leading-5 text-[#879089]">{copy.footnote}</p>
       </div>
     </main>
   );

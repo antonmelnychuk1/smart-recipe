@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AdminUserActions } from "@/components/admin-user-actions";
+import type { AppLanguage } from "@/lib/i18n";
 
 export type AdminPanelUser = {
   id: string;
@@ -31,12 +32,104 @@ type AdminUsersPanelProps = {
   users: AdminPanelUser[];
   currentAdminId: string;
   emailVerificationEnabled: boolean;
+  language?: AppLanguage;
 };
 
-function formatDate(date: string | null) {
-  if (!date) return "Brak aktywności";
+const adminUsersCopy = {
+  pl: {
+    noActivity: "Brak aktywności",
+    accountsAndLimits: "Konta i limity",
+    allUsers: "Wszyscy użytkownicy",
+    description:
+      "Szukaj, filtruj i zarządzaj kontami bez przewijania szerokiej tabeli.",
+    accounts: "kont",
+    admins: "Admini",
+    bannedUsers: "Zablokowani",
+    atLimit: "Przy limicie",
+    unverified: "Niezweryfikowani",
+    searchPlaceholder: "Szukaj po nazwie lub e-mailu",
+    allRoles: "Każda rola",
+    allStatuses: "Każdy status",
+    activeUsers: "Aktywni",
+    allVerification: "Każda weryfikacja",
+    verified: "Zweryfikowani",
+    allLimits: "Każdy limit",
+    availableLimit: "Z dostępnym limitem",
+    newest: "Najnowsi",
+    lastActivity: "Ostatnia aktywność",
+    mostGenerations: "Najwięcej generowań",
+    mostFavorites: "Najwięcej ulubionych",
+    mostHistory: "Najwięcej historii",
+    reset: "Reset",
+    unnamed: "Bez nazwy",
+    active: "aktywny",
+    banned: "zablokowany",
+    emailUnverified: "e-mail niezweryfikowany",
+    noLimit: "bez limitu",
+    today: "Dzisiaj",
+    total: "Łącznie",
+    favorites: "Ulubione",
+    history: "Historia",
+    shopping: "Zakupy",
+    feedback: "Feedback",
+    plan: "Plan",
+    activity: "Aktywność",
+    registration: "Rejestracja:",
+    noUsers: "Brak pasujących użytkowników",
+    noUsersHint: "Zmień filtry albo wyczyść wyszukiwanie.",
+    clearFilters: "Wyczyść filtry",
+    locale: "pl-PL",
+  },
+  en: {
+    noActivity: "No activity",
+    accountsAndLimits: "Accounts and limits",
+    allUsers: "All users",
+    description: "Search, filter and manage accounts without a wide table.",
+    accounts: "accounts",
+    admins: "Admins",
+    bannedUsers: "Banned",
+    atLimit: "At limit",
+    unverified: "Unverified",
+    searchPlaceholder: "Search by name or email",
+    allRoles: "Any role",
+    allStatuses: "Any status",
+    activeUsers: "Active",
+    allVerification: "Any verification",
+    verified: "Verified",
+    allLimits: "Any limit",
+    availableLimit: "Limit available",
+    newest: "Newest",
+    lastActivity: "Last activity",
+    mostGenerations: "Most generations",
+    mostFavorites: "Most favorites",
+    mostHistory: "Most history",
+    reset: "Reset",
+    unnamed: "Unnamed",
+    active: "active",
+    banned: "banned",
+    emailUnverified: "email unverified",
+    noLimit: "no limit",
+    today: "Today",
+    total: "Total",
+    favorites: "Favorites",
+    history: "History",
+    shopping: "Shopping",
+    feedback: "Feedback",
+    plan: "Plan",
+    activity: "Activity",
+    registration: "Registration:",
+    noUsers: "No matching users",
+    noUsersHint: "Change filters or clear the search.",
+    clearFilters: "Clear filters",
+    locale: "en-US",
+  },
+} as const satisfies Record<AppLanguage, Record<string, string>>;
 
-  return new Intl.DateTimeFormat("pl-PL", {
+function formatDate(date: string | null, language: AppLanguage) {
+  const copy = adminUsersCopy[language];
+  if (!date) return copy.noActivity;
+
+  return new Intl.DateTimeFormat(copy.locale, {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -59,7 +152,9 @@ export function AdminUsersPanel({
   users,
   currentAdminId,
   emailVerificationEnabled,
+  language = "pl",
 }: AdminUsersPanelProps) {
+  const copy = adminUsersCopy[language];
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("all");
   const [status, setStatus] = useState("all");
@@ -128,27 +223,26 @@ export function AdminUsersPanel({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
-              Konta i limity
+              {copy.accountsAndLimits}
             </p>
             <h2 className="mt-1 font-serif text-2xl font-semibold">
-              Wszyscy użytkownicy
+              {copy.allUsers}
             </h2>
             <p className="mt-1 text-sm leading-6 text-[#7a857e]">
-              Szukaj, filtruj i zarządzaj kontami bez przewijania szerokiej
-              tabeli.
+              {copy.description}
             </p>
           </div>
           <span className="rounded-full bg-[#e8efe9] px-3 py-1.5 text-xs font-bold text-[#356248]">
-            {visibleUsers.length} z {users.length} kont
+            {visibleUsers.length} / {users.length} {copy.accounts}
           </span>
         </div>
 
         <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["Admini", admins],
-            ["Zablokowani", banned],
-            ["Przy limicie", atLimit],
-            ["Niezweryfikowani", emailVerificationEnabled ? unverified : "off"],
+            [copy.admins, admins],
+            [copy.bannedUsers, banned],
+            [copy.atLimit, atLimit],
+            [copy.unverified, emailVerificationEnabled ? unverified : "off"],
           ].map(([label, value]) => (
             <div
               key={label}
@@ -166,7 +260,7 @@ export function AdminUsersPanel({
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Szukaj po nazwie lub e-mailu"
+            placeholder={copy.searchPlaceholder}
             className="h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm outline-none focus:border-[#71927e]"
           />
           <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
@@ -175,7 +269,7 @@ export function AdminUsersPanel({
               onChange={(event) => setRole(event.target.value)}
               className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
             >
-              <option value="all">Każda rola</option>
+              <option value="all">{copy.allRoles}</option>
               <option value="admin">Admin</option>
               <option value="user">User</option>
             </select>
@@ -184,45 +278,45 @@ export function AdminUsersPanel({
               onChange={(event) => setStatus(event.target.value)}
               className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
             >
-              <option value="all">Każdy status</option>
-              <option value="active">Aktywni</option>
-              <option value="banned">Zablokowani</option>
+              <option value="all">{copy.allStatuses}</option>
+              <option value="active">{copy.activeUsers}</option>
+              <option value="banned">{copy.bannedUsers}</option>
             </select>
             <select
               value={verification}
               onChange={(event) => setVerification(event.target.value)}
               className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
             >
-              <option value="all">Każda weryfikacja</option>
-              <option value="verified">Zweryfikowani</option>
-              <option value="unverified">Niezweryfikowani</option>
+              <option value="all">{copy.allVerification}</option>
+              <option value="verified">{copy.verified}</option>
+              <option value="unverified">{copy.unverified}</option>
             </select>
             <select
               value={limit}
               onChange={(event) => setLimit(event.target.value)}
               className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
             >
-              <option value="all">Każdy limit</option>
-              <option value="at-limit">Przy limicie</option>
-              <option value="available">Z dostępnym limitem</option>
+              <option value="all">{copy.allLimits}</option>
+              <option value="at-limit">{copy.atLimit}</option>
+              <option value="available">{copy.availableLimit}</option>
             </select>
             <select
               value={sort}
               onChange={(event) => setSort(event.target.value)}
               className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
             >
-              <option value="newest">Najnowsi</option>
-              <option value="activity">Ostatnia aktywność</option>
-              <option value="usage">Najwięcej generowań</option>
-              <option value="favorites">Najwięcej ulubionych</option>
-              <option value="searches">Najwięcej historii</option>
+              <option value="newest">{copy.newest}</option>
+              <option value="activity">{copy.lastActivity}</option>
+              <option value="usage">{copy.mostGenerations}</option>
+              <option value="favorites">{copy.mostFavorites}</option>
+              <option value="searches">{copy.mostHistory}</option>
               <option value="name">A-Z</option>
             </select>
             <button
               onClick={resetFilters}
               className="h-11 rounded-xl border border-[#d8d7d0] px-3 text-sm font-semibold text-[#59675f] transition hover:bg-[#f6f3ec]"
             >
-              Reset
+              {copy.reset}
             </button>
           </div>
         </div>
@@ -238,7 +332,7 @@ export function AdminUsersPanel({
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate font-semibold">
-                    {user.name || "Bez nazwy"}
+                    {user.name || copy.unnamed}
                   </p>
                   <p className="mt-1 break-all text-xs text-[#7a857e]">
                     {user.email}
@@ -251,6 +345,7 @@ export function AdminUsersPanel({
                   banned={user.banned}
                   dailyLimit={user.dailyLimit}
                   isCurrentAdmin={user.id === currentAdminId}
+                  language={language}
                 />
               </div>
 
@@ -272,16 +367,16 @@ export function AdminUsersPanel({
                   }`}
                   title={user.banReason ?? undefined}
                 >
-                  {user.banned ? "zablokowany" : "aktywny"}
+                  {user.banned ? copy.banned : copy.active}
                 </span>
                 {emailVerificationEnabled && !user.emailVerified && (
                   <span className="rounded-full bg-[#fff0e8] px-2.5 py-1 text-xs font-bold text-[#a45c45]">
-                    e-mail niezweryfikowany
+                    {copy.emailUnverified}
                   </span>
                 )}
                 {isAtLimit(user) && (
                   <span className="rounded-full bg-[#fff5df] px-2.5 py-1 text-xs font-bold text-[#9c6a16]">
-                    przy limicie
+                    {copy.atLimit.toLocaleLowerCase(language)}
                   </span>
                 )}
               </div>
@@ -289,18 +384,18 @@ export function AdminUsersPanel({
               <dl className="mt-4 grid grid-cols-2 gap-2 text-sm min-[520px]:grid-cols-4">
                 {[
                   [
-                    "Dzisiaj",
+                    copy.today,
                     user.role === "admin"
-                      ? "bez limitu"
+                      ? copy.noLimit
                       : `${user.usage.today}/${user.dailyLimit}`,
                   ],
-                  ["Łącznie", user.usage.total],
-                  ["Ulubione", user.counts.favorites],
-                  ["Historia", user.counts.searches],
-                  ["Zakupy", user.counts.shoppingItems],
-                  ["Feedback", user.counts.feedbacks],
-                  ["Plan", user.counts.mealPlans],
-                  ["Aktywność", formatDate(user.usage.lastActivity)],
+                  [copy.total, user.usage.total],
+                  [copy.favorites, user.counts.favorites],
+                  [copy.history, user.counts.searches],
+                  [copy.shopping, user.counts.shoppingItems],
+                  [copy.feedback, user.counts.feedbacks],
+                  [copy.plan, user.counts.mealPlans],
+                  [copy.activity, formatDate(user.usage.lastActivity, language)],
                 ].map(([label, value]) => (
                   <div
                     key={label}
@@ -311,7 +406,7 @@ export function AdminUsersPanel({
                     </dt>
                     <dd
                       className={`mt-1 text-xs font-semibold ${
-                        label === "Dzisiaj" && isAtLimit(user)
+                        label === copy.today && isAtLimit(user)
                           ? "text-[#b04f3a]"
                           : "text-[#4f5e56]"
                       }`}
@@ -323,7 +418,7 @@ export function AdminUsersPanel({
               </dl>
 
               <p className="mt-3 text-xs text-[#879089]">
-                Rejestracja: {formatDate(user.createdAt)}
+                {copy.registration} {formatDate(user.createdAt, language)}
               </p>
             </article>
           ))}
@@ -332,16 +427,14 @@ export function AdminUsersPanel({
         <div className="p-4">
           <div className="rounded-[1.4rem] border border-dashed border-[#cfcec7] bg-[#fffdf8] p-8 text-center">
             <p className="font-serif text-2xl font-semibold">
-              Brak pasujących użytkowników
+              {copy.noUsers}
             </p>
-            <p className="mt-2 text-sm text-[#7a857e]">
-              Zmień filtry albo wyczyść wyszukiwanie.
-            </p>
+            <p className="mt-2 text-sm text-[#7a857e]">{copy.noUsersHint}</p>
             <button
               onClick={resetFilters}
               className="mt-5 rounded-xl bg-[#2f684f] px-4 py-2.5 text-sm font-semibold text-white"
             >
-              Wyczyść filtry
+              {copy.clearFilters}
             </button>
           </div>
         </div>

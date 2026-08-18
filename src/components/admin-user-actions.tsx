@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { AppLanguage } from "@/lib/i18n";
 
 type AdminUserActionsProps = {
   userId: string;
@@ -10,7 +11,56 @@ type AdminUserActionsProps = {
   banned: boolean;
   dailyLimit: number;
   isCurrentAdmin: boolean;
+  language?: AppLanguage;
 };
+
+const adminActionCopy = {
+  pl: {
+    genericError: "Operacja nie powiodła się.",
+    manage: "Zarządzaj",
+    ariaManage: (name: string) => `Zarządzaj kontem ${name}`,
+    accountManagement: "Zarządzanie kontem",
+    close: "Zamknij",
+    dailyLimit: "Dzienny limit",
+    save: "Zapisz",
+    resetLimit: "Resetuj limit",
+    removeAdmin: "Odbierz admina",
+    makeAdmin: "Nadaj admina",
+    unban: "Odblokuj",
+    ban: "Zablokuj",
+    deleteAccount: "Usuń konto",
+    banConfirm: (name: string) =>
+      `Zablokować konto użytkownika ${name}? Aktywne sesje zostaną zakończone.`,
+    deleteConfirm: (name: string) =>
+      `Trwale usunąć konto ${name} i wszystkie jego dane? Tej operacji nie można cofnąć.`,
+    currentAdminInfo:
+      "Własnego konta administratora nie można zablokować, usunąć ani zdegradować.",
+  },
+  en: {
+    genericError: "Operation failed.",
+    manage: "Manage",
+    ariaManage: (name: string) => `Manage account ${name}`,
+    accountManagement: "Account management",
+    close: "Close",
+    dailyLimit: "Daily limit",
+    save: "Save",
+    resetLimit: "Reset limit",
+    removeAdmin: "Remove admin",
+    makeAdmin: "Make admin",
+    unban: "Unban",
+    ban: "Ban",
+    deleteAccount: "Delete account",
+    banConfirm: (name: string) =>
+      `Ban ${name}? Active sessions will be ended.`,
+    deleteConfirm: (name: string) =>
+      `Permanently delete ${name} and all their data? This cannot be undone.`,
+    currentAdminInfo:
+      "Your own admin account cannot be banned, deleted or downgraded.",
+  },
+} as const satisfies Record<
+  AppLanguage,
+  Record<string, string | ((value: string) => string)>
+>;
 
 export function AdminUserActions({
   userId,
@@ -19,7 +69,9 @@ export function AdminUserActions({
   banned,
   dailyLimit,
   isCurrentAdmin,
+  language = "pl",
 }: AdminUserActionsProps) {
+  const copy = adminActionCopy[language];
   const router = useRouter();
   const [limit, setLimit] = useState(String(dailyLimit));
   const [pending, setPending] = useState("");
@@ -43,7 +95,7 @@ export function AdminUserActions({
     setPending("");
 
     if (!response.ok) {
-      setError(result.error ?? "Operacja nie powiodła się.");
+      setError(result.error ?? copy.genericError);
       return;
     }
 
@@ -56,14 +108,14 @@ export function AdminUserActions({
         onClick={() => setOpen(true)}
         className="w-full whitespace-nowrap rounded-xl border border-[#d8d7d0] bg-white px-3 py-2.5 text-xs font-semibold shadow-sm transition hover:-translate-y-0.5 hover:border-[#c9c3b8] hover:shadow-md sm:w-auto"
       >
-        Zarządzaj
+        {copy.manage}
       </button>
       {open && (
         <div
           className="modal-safe-area fixed inset-0 z-50 grid place-items-center bg-[#18241e]/60 text-left backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
-          aria-label={`Zarządzaj kontem ${userName}`}
+          aria-label={copy.ariaManage(userName)}
           onClick={() => setOpen(false)}
         >
           <div
@@ -73,7 +125,7 @@ export function AdminUserActions({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
-                  Zarządzanie kontem
+                  {copy.accountManagement}
                 </p>
                 <h3 className="mt-1 font-serif text-2xl font-semibold">
                   {userName}
@@ -81,7 +133,7 @@ export function AdminUserActions({
               </div>
               <button
                 onClick={() => setOpen(false)}
-                aria-label="Zamknij"
+                aria-label={copy.close}
                 className="grid size-9 place-items-center rounded-full bg-[#eeeae2] text-xl"
               >
                 ×
@@ -89,7 +141,7 @@ export function AdminUserActions({
             </div>
 
             <label className="mt-5 block text-xs font-semibold text-[#68736b]">
-              Dzienny limit
+              {copy.dailyLimit}
               <div className="mt-1.5 flex gap-2">
                 <input
                   type="number"
@@ -110,7 +162,7 @@ export function AdminUserActions({
                   }
                   className="rounded-lg bg-[#356248] px-4 text-xs font-semibold text-white disabled:opacity-40"
                 >
-                  Zapisz
+                  {copy.save}
                 </button>
               </div>
             </label>
@@ -121,7 +173,7 @@ export function AdminUserActions({
                 onClick={() => run({ action: "reset-usage" })}
                 className="rounded-lg bg-[#edf1ec] px-3 py-2.5 text-xs font-semibold text-[#365a46] disabled:opacity-40"
               >
-                Resetuj limit
+                {copy.resetLimit}
               </button>
               <button
                 disabled={pending !== "" || isCurrentAdmin}
@@ -133,7 +185,7 @@ export function AdminUserActions({
                 }
                 className="rounded-lg bg-[#edf1ec] px-3 py-2.5 text-xs font-semibold text-[#365a46] disabled:opacity-40"
               >
-                {role === "admin" ? "Odbierz admina" : "Nadaj admina"}
+                {role === "admin" ? copy.removeAdmin : copy.makeAdmin}
               </button>
               <button
                 disabled={pending !== "" || isCurrentAdmin}
@@ -142,31 +194,30 @@ export function AdminUserActions({
                     { action: banned ? "unban" : "ban" },
                     banned
                       ? undefined
-                      : `Zablokować konto użytkownika ${userName}? Aktywne sesje zostaną zakończone.`,
+                      : copy.banConfirm(userName),
                   )
                 }
                 className="rounded-lg bg-[#fff0e8] px-3 py-2.5 text-xs font-semibold text-[#a45c45] disabled:opacity-40"
               >
-                {banned ? "Odblokuj" : "Zablokuj"}
+                {banned ? copy.unban : copy.ban}
               </button>
               <button
                 disabled={pending !== "" || isCurrentAdmin}
                 onClick={() =>
                   run(
                     { action: "delete" },
-                    `Trwale usunąć konto ${userName} i wszystkie jego dane? Tej operacji nie można cofnąć.`,
+                    copy.deleteConfirm(userName),
                   )
                 }
                 className="rounded-lg bg-[#b44f3d] px-3 py-2.5 text-xs font-semibold text-white disabled:opacity-40"
               >
-                Usuń konto
+                {copy.deleteAccount}
               </button>
             </div>
 
             {isCurrentAdmin && (
               <p className="mt-3 text-[11px] leading-4 text-[#8a948e]">
-                Własnego konta administratora nie można zablokować, usunąć ani
-                zdegradować.
+                {copy.currentAdminInfo}
               </p>
             )}
             {error && (
