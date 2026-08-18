@@ -9,6 +9,7 @@ import { Pantry } from "@/components/pantry";
 import { authClient } from "@/lib/auth-client";
 import {
   formatOptionLabel,
+  formatPrice,
   homeCopy,
   languageCookieName,
   languageOptions,
@@ -2765,7 +2766,8 @@ export default function Home() {
                   <span className="shrink-0">{recipe.calories} kcal</span>
                   {recipe.estimatedCost && (
                     <span className="shrink-0">
-                      {copy.results.approx} {recipe.estimatedCost} zł
+                      {copy.results.approx}{" "}
+                      {formatPrice(language, recipe.estimatedCost)}
                     </span>
                   )}
                 </div>
@@ -3412,7 +3414,8 @@ export default function Home() {
               </span>
               {selectedRecipe.estimatedCost && (
                 <span className="min-w-0 truncate">
-                  {copy.recipeModal.approx} {selectedRecipe.estimatedCost} zł / 2{" "}
+                  {copy.recipeModal.approx}{" "}
+                  {formatPrice(language, selectedRecipe.estimatedCost)} / 2{" "}
                   {copy.recipeModal.servings}
                 </span>
               )}

@@ -7,7 +7,7 @@ import type {
   MealType,
   Recipe,
 } from "@/lib/recipe-types";
-import type { AppLanguage } from "@/lib/i18n";
+import { formatPrice, type AppLanguage } from "@/lib/i18n";
 
 const plannerCopy = {
   pl: {
@@ -450,7 +450,7 @@ export function MealPlanner({
               [copy.planned, `${entries.length}/21`, copy.mealsCount],
               [copy.avgCalories, averageCalories, copy.kcalMeal],
               [copy.protein, `${weekSummary.protein} g`, copy.total],
-              [copy.cost, `${weekSummary.cost} zł`, copy.estimated],
+              [copy.cost, formatPrice(language, weekSummary.cost), copy.estimated],
               [copy.time, `${weekSummary.time} min`, copy.cooking],
             ].map(([label, value, hint]) => (
               <article

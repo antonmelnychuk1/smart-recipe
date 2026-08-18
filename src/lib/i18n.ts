@@ -566,3 +566,7 @@ export function formatOptionLabel(
 
   return `${copy.minutesPrefix} ${value} ${copy.minutesSuffix}`;
 }
+
+export function formatPrice(language: AppLanguage, value: number | string) {
+  return language === "pl" ? `${value} zł` : `${value} PLN`;
+}

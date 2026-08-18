@@ -7,6 +7,7 @@ import { cache } from "react";
 import { CopyButton, CopyRecipeLink } from "@/components/copy-recipe-link";
 import { auth } from "@/lib/auth";
 import {
+  formatPrice,
   languageCookieName,
   normalizeLanguage,
   type AppLanguage,
@@ -224,7 +225,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
     [
       copy.cost,
       recipe.estimatedCost
-        ? `${copy.approx} ${recipe.estimatedCost} zł`
+        ? `${copy.approx} ${formatPrice(language, recipe.estimatedCost)}`
         : copy.noData,
       copy.estimate,
     ],

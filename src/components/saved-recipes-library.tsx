@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import type { AppLanguage } from "@/lib/i18n";
+import { formatPrice, type AppLanguage } from "@/lib/i18n";
 import type { Recipe } from "@/lib/recipe-types";
 
 export type SavedRecipeListItem = {
@@ -88,6 +88,7 @@ const savedCopy = {
     anyTime: "Dowolny czas",
     anyCalories: "Dowolne kcal",
     anyCost: "Dowolny koszt",
+    maxCost: (value: string) => `do ${value} zł`,
     newest: "Najnowsze",
     fastest: "Najszybsze",
     easiest: "Najłatwiejsze",
@@ -134,6 +135,7 @@ const savedCopy = {
     anyTime: "Any time",
     anyCalories: "Any kcal",
     anyCost: "Any cost",
+    maxCost: (value: string) => `up to ${value} PLN`,
     newest: "Newest",
     fastest: "Fastest",
     easiest: "Easiest",
@@ -433,9 +435,9 @@ export function SavedRecipesLibrary({
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
             <option value="all">{copy.anyCost}</option>
-            <option value="20">do 20 zł</option>
-            <option value="40">do 40 zł</option>
-            <option value="60">do 60 zł</option>
+            <option value="20">{copy.maxCost("20")}</option>
+            <option value="40">{copy.maxCost("40")}</option>
+            <option value="60">{copy.maxCost("60")}</option>
           </select>
           <select
             value={sort}
@@ -514,7 +516,8 @@ export function SavedRecipesLibrary({
                   </span>
                   {item.recipe.estimatedCost && (
                     <span className="rounded-full bg-[#f6f3ec] px-2.5 py-1">
-                      {copy.approx} {item.recipe.estimatedCost} zł
+                      {copy.approx}{" "}
+                      {formatPrice(language, item.recipe.estimatedCost)}
                     </span>
                   )}
                 </div>
