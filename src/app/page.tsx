@@ -2146,7 +2146,7 @@ export default function Home() {
           />
           Smart<span className="-ml-2 text-[#dc704d]">Recipe</span>
         </a>
-        <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] lg:gap-5 lg:text-sm sm:flex">
+        <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] xl:flex xl:gap-5 xl:text-sm">
           <a className="transition hover:text-[#25322b]" href="#how">
             {copy.nav.how}
           </a>
@@ -2220,7 +2220,7 @@ export default function Home() {
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-navigation"
           onClick={() => setMobileMenuOpen((current) => !current)}
-          className="grid size-11 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm sm:hidden"
+          className="grid size-11 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm xl:hidden"
         >
           <span className="relative block h-4 w-5">
             <span
@@ -2245,7 +2245,7 @@ export default function Home() {
       {mobileMenuOpen && (
         <div
           id="mobile-navigation"
-          className="relative z-30 mx-4 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl sm:hidden"
+          className="relative z-30 mx-4 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl xl:hidden"
         >
           <div className="grid gap-1 text-sm font-semibold text-[#536159]">
             {[
