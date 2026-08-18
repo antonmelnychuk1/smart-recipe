@@ -197,16 +197,8 @@ const baseHomeCopy = {
     },
     how: [
       ["01", "Dodaj składniki", "Wpisz to, co masz w lodówce i spiżarni."],
-      [
-        "02",
-        "Ustaw preferencje",
-        "Dieta, czas i poziom trudności są po Twojej stronie.",
-      ],
-      [
-        "03",
-        "Gotuj bez resztek",
-        "Wybierz pomysł i wykorzystaj produkty do końca.",
-      ],
+      ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie.",],
+      ["03", "Gotuj bez resztek", "Wybierz pomysł i wykorzystaj produkty do końca.",],
     ],
     dish: {
       eyebrow: "Masz ochotę na konkretne danie?",

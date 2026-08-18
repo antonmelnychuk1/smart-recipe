@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ResetPasswordForm } from "@/components/reset-password-form";
 import { cookies } from "next/headers";
 import {
@@ -14,6 +15,15 @@ type ResetPasswordPageProps = {
     lang?: string | string[];
     language?: string | string[];
   }>;
+};
+
+export const metadata: Metadata = {
+  title: "Reset password",
+  description: "Set a new password for your SmartRecipe account.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const resetPageCopy: Record<

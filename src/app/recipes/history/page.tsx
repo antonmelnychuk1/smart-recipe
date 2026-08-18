@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -13,6 +14,16 @@ import { prisma } from "@/lib/prisma";
 import type { Recipe, SearchHistoryEntry } from "@/lib/recipe-types";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Recipe history",
+  description:
+    "Browse your previous SmartRecipe AI recipe generations and restore results.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const historyCopy: Record<
   UiLanguage,

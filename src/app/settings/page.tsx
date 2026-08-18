@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -10,6 +11,15 @@ import {
 } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Account settings",
+  description: "Manage your SmartRecipe preferences, password and sessions.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const settingsCopy: Record<
   UiLanguage,

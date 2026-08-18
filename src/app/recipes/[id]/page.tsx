@@ -15,6 +15,7 @@ import {
 } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 import type { Recipe } from "@/lib/recipe-types";
+import { siteName, siteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -211,6 +212,10 @@ export async function generateMetadata({
     return {
       title: recipePageCopy.pl.sharedTitle,
       description: recipePageCopy.pl.sharedDescription,
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
@@ -218,12 +223,17 @@ export async function generateMetadata({
   const description = truncate(recipe.description);
 
   return {
-    title: `${recipe.title} · SmartRecipe`,
+    title: `${recipe.title} · ${siteName}`,
     description,
+    alternates: {
+      canonical: `/recipes/${id}`,
+    },
     openGraph: {
       title: recipe.title,
       description,
       type: "article",
+      url: `${siteUrl}/recipes/${id}`,
+      siteName,
       images: recipe.image
         ? [
             {

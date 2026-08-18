@@ -1,59 +1,57 @@
 import type { Metadata, Viewport } from "next";
+import {
+  siteDescription,
+  siteKeywords,
+  siteLanguages,
+  siteName,
+  siteTitle,
+  siteUrl,
+} from "@/lib/site";
 import "./globals.css";
 
-const appUrl = new URL("https://smartrecipeapp.com");
-const appTitle = "SmartRecipe — AI recipe generator";
-const appDescription =
-  "Create recipes from ingredients you already have, plan meals, build shopping lists and reduce food waste with AI.";
-
 export const metadata: Metadata = {
-  metadataBase: appUrl,
+  metadataBase: new URL(siteUrl),
   title: {
-    default: appTitle,
-    template: "%s · SmartRecipe",
+    default: siteTitle,
+    template: `%s · ${siteName}`,
   },
-  description: appDescription,
-  applicationName: "SmartRecipe",
-  authors: [{ name: "SmartRecipe" }],
-  creator: "SmartRecipe",
-  publisher: "SmartRecipe",
+  description: siteDescription,
+  applicationName: siteName,
+  authors: [{ name: siteName, url: siteUrl }],
+  creator: siteName,
+  publisher: siteName,
   category: "Food & Drink",
-  keywords: [
-    "AI recipe generator",
-    "smart recipe",
-    "meal planner",
-    "shopping list",
-    "food waste",
-    "recipe app",
-    "healthy recipes",
-  ],
+  keywords: siteKeywords,
   alternates: {
     canonical: "/",
-    languages: {
-      en: "/?lang=en",
-      pl: "/?lang=pl",
-      "x-default": "/",
-    },
+    languages: siteLanguages,
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "SmartRecipe",
+    title: siteName,
   },
   openGraph: {
     type: "website",
     url: "/",
-    siteName: "SmartRecipe",
-    title: appTitle,
-    description: appDescription,
+    siteName,
+    title: siteTitle,
+    description: siteDescription,
     locale: "en_US",
-    alternateLocale: ["pl_PL"],
+    alternateLocale: ["pl_PL", "uk_UA"],
+    images: [
+      {
+        url: "/smart-recipe-icon.svg",
+        alt: `${siteName} logo`,
+      },
+    ],
   },
   twitter: {
     card: "summary",
-    title: appTitle,
-    description: appDescription,
+    title: siteTitle,
+    description: siteDescription,
+    images: ["/smart-recipe-icon.svg"],
   },
   robots: {
     index: true,

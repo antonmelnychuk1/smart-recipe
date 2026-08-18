@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies, headers } from "next/headers";
 import { auth } from "@/lib/auth";
@@ -10,6 +11,15 @@ import { prisma } from "@/lib/prisma";
 
 type VerificationPageProps = {
   searchParams: Promise<{ error?: string; lang?: string; language?: string }>;
+};
+
+export const metadata: Metadata = {
+  title: "E-mail verification",
+  description: "Confirm your SmartRecipe account e-mail address.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const emailVerifiedCopy: Record<

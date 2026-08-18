@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -13,6 +14,15 @@ import { prisma } from "@/lib/prisma";
 import type { Recipe } from "@/lib/recipe-types";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Admin panel",
+  description: "Manage SmartRecipe users, limits, recipe feedback and usage.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";

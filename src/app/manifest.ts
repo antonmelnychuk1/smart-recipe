@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
+import { siteDescription, siteName, siteTitle } from "@/lib/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "SmartRecipe — AI recipe generator",
-    short_name: "SmartRecipe",
-    description:
-      "Create recipes from ingredients you already have, plan meals, build shopping lists and reduce food waste with AI.",
+    name: siteTitle,
+    short_name: siteName,
+    description: siteDescription,
     start_url: "/",
     scope: "/",
     lang: "en",

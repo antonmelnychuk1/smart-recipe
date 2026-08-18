@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -16,6 +17,16 @@ import { prisma } from "@/lib/prisma";
 import type { Recipe } from "@/lib/recipe-types";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Saved recipes",
+  description:
+    "Search, filter and manage recipes saved in your SmartRecipe account.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const savedRecipesCopy: Record<
   UiLanguage,
