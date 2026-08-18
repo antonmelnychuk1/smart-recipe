@@ -3,6 +3,11 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PasswordInput } from "@/components/password-input";
 import { authClient } from "@/lib/auth-client";
+import {
+  formatOptionLabel,
+  homeCopy,
+  type AppLanguage,
+} from "@/lib/i18n";
 
 type AccountSession = {
   token: string;
@@ -56,6 +61,150 @@ const goalOptions = [
 
 const dislikedPrefix = "nie lubię: ";
 
+const accountSettingsCopy = {
+  pl: {
+    saved: "Preferencje zostały zapisane.",
+    saveError: "Błąd zapisu.",
+    passwordMismatch: "Nowe hasła nie są identyczne.",
+    invalidCurrentPassword: "Obecne hasło jest nieprawidłowe.",
+    passwordError: "Nie udało się zmienić hasła.",
+    passwordChanged:
+      "Hasło zostało zmienione, a pozostałe sesje wylogowane.",
+    invalidPassword: "Hasło jest nieprawidłowe.",
+    deleteError: "Nie udało się usunąć konta.",
+    unknownDevice: "Nieznane urządzenie",
+    browser: "Przeglądarka",
+    device: "urządzenie",
+    deleteConfirmation: "USUŃ",
+    personalization: "Personalizacja",
+    cookingPreferences: "Preferencje gotowania",
+    preferencesDescription:
+      "Te ustawienia będą automatycznie używane w generatorze składników i w sekcji „Wpisz, co chcesz ugotować”.",
+    diet: "Dieta:",
+    goal: "Cel:",
+    defaultDiet: "Domyślna dieta",
+    cookingGoal: "Cel gotowania",
+    defaultBudget: "Domyślny budżet",
+    defaultTime: "Domyślny czas",
+    caloriesDaily: "Kalorie dziennie",
+    proteinDaily: "Białko dziennie (g)",
+    allergies: "Alergie i składniki zakazane",
+    allergiesPlaceholder: "np. orzechy, krewetki, seler",
+    allergiesHint:
+      "Wpisz po przecinku. Generator ma całkowicie unikać tych składników w przepisach, krokach i zamiennikach.",
+    disliked: "Produkty, których nie lubisz",
+    dislikedPlaceholder: "np. kolendra, oliwki, pieczarki",
+    dislikedHint:
+      "To nie musi być alergia — po prostu produkty, których aplikacja ma nie proponować.",
+    impactTitle: "Jak to wpłynie na generator?",
+    impactText:
+      "Domyślna dieta, czas, budżet i cel ustawią się automatycznie na stronie głównej. Alergie i nielubiane produkty będą przekazywane do AI przy każdym generowaniu.",
+    saving: "Zapisuję...",
+    savePreferences: "Zapisz preferencje",
+    changePassword: "Zmiana hasła",
+    changePasswordHint:
+      "Po zmianie hasła wszystkie pozostałe urządzenia zostaną wylogowane.",
+    currentPassword: "Obecne hasło",
+    newPassword: "Nowe hasło",
+    repeatPassword: "Powtórz nowe hasło",
+    changing: "Zmieniam...",
+    changePasswordButton: "Zmień hasło",
+    activeSessions: "Aktywne sesje",
+    activeSessionsHint:
+      "Urządzenia, na których Twoje konto jest obecnie zalogowane.",
+    signOutOthers: "Wyloguj pozostałe",
+    loadingSessions: "Wczytuję sesje...",
+    current: "obecna",
+    noData: "brak danych",
+    created: "utworzona",
+    signOut: "Wyloguj",
+    deleteAccount: "Usuń konto",
+    deleteWarning:
+      "Ta operacja trwale usunie konto, przepisy, historię, listę zakupów, planer oraz statystyki. Nie można jej cofnąć.",
+    password: "Hasło",
+    typeConfirmation: "Wpisz",
+    deleting: "Usuwam...",
+    deleteForever: "Usuń konto na zawsze",
+    locale: "pl-PL",
+  },
+  en: {
+    saved: "Preferences saved.",
+    saveError: "Could not save preferences.",
+    passwordMismatch: "The new passwords do not match.",
+    invalidCurrentPassword: "Current password is incorrect.",
+    passwordError: "Could not change password.",
+    passwordChanged:
+      "Password changed and all other sessions have been signed out.",
+    invalidPassword: "Password is incorrect.",
+    deleteError: "Could not delete account.",
+    unknownDevice: "Unknown device",
+    browser: "Browser",
+    device: "device",
+    deleteConfirmation: "DELETE",
+    personalization: "Personalization",
+    cookingPreferences: "Cooking preferences",
+    preferencesDescription:
+      "These settings will be used automatically in the ingredient generator and in the “Type what you want to cook” section.",
+    diet: "Diet:",
+    goal: "Goal:",
+    defaultDiet: "Default diet",
+    cookingGoal: "Cooking goal",
+    defaultBudget: "Default budget",
+    defaultTime: "Default time",
+    caloriesDaily: "Daily calories",
+    proteinDaily: "Daily protein (g)",
+    allergies: "Allergies and forbidden ingredients",
+    allergiesPlaceholder: "e.g. nuts, shrimp, celery",
+    allergiesHint:
+      "Separate items with commas. The generator should avoid these ingredients in recipes, steps and substitutions.",
+    disliked: "Products you dislike",
+    dislikedPlaceholder: "e.g. cilantro, olives, mushrooms",
+    dislikedHint:
+      "This does not have to be an allergy — just products the app should not suggest.",
+    impactTitle: "How will this affect the generator?",
+    impactText:
+      "Default diet, time, budget and goal will be applied automatically on the home page. Allergies and disliked products will be sent to AI with every generation.",
+    saving: "Saving...",
+    savePreferences: "Save preferences",
+    changePassword: "Change password",
+    changePasswordHint:
+      "After changing your password, all other devices will be signed out.",
+    currentPassword: "Current password",
+    newPassword: "New password",
+    repeatPassword: "Repeat new password",
+    changing: "Changing...",
+    changePasswordButton: "Change password",
+    activeSessions: "Active sessions",
+    activeSessionsHint: "Devices where your account is currently signed in.",
+    signOutOthers: "Sign out others",
+    loadingSessions: "Loading sessions...",
+    current: "current",
+    noData: "no data",
+    created: "created",
+    signOut: "Sign out",
+    deleteAccount: "Delete account",
+    deleteWarning:
+      "This permanently deletes your account, recipes, history, shopping list, meal planner and statistics. This cannot be undone.",
+    password: "Password",
+    typeConfirmation: "Type",
+    deleting: "Deleting...",
+    deleteForever: "Delete account forever",
+    locale: "en-US",
+  },
+} as const satisfies Record<AppLanguage, Record<string, string>>;
+
+const goalLabels: Record<AppLanguage, Record<string, string>> = {
+  pl: Object.fromEntries(goalOptions),
+  en: {
+    balanced: "Balanced",
+    quick: "Quick",
+    cheap: "Budget-friendly",
+    healthy: "Healthier",
+    high_protein: "High-protein",
+    use_pantry: "Use what I have",
+  },
+};
+
 function splitPreferenceItems(value: string) {
   return value
     .split(",")
@@ -81,8 +230,11 @@ function splitStoredExcludedIngredients(items: string[] = []) {
   };
 }
 
-function deviceName(userAgent?: string | null) {
-  if (!userAgent) return "Nieznane urządzenie";
+function deviceName(
+  userAgent: string | null | undefined,
+  copy: (typeof accountSettingsCopy)[AppLanguage],
+) {
+  if (!userAgent) return copy.unknownDevice;
 
   const browser = userAgent.includes("Chrome")
     ? "Chrome"
@@ -90,21 +242,28 @@ function deviceName(userAgent?: string | null) {
       ? "Firefox"
       : userAgent.includes("Safari")
         ? "Safari"
-        : "Przeglądarka";
+        : copy.browser;
   const system = userAgent.includes("iPhone")
     ? "iPhone"
     : userAgent.includes("Android")
       ? "Android"
       : userAgent.includes("Mac")
         ? "macOS"
-        : userAgent.includes("Windows")
-          ? "Windows"
-          : "urządzenie";
+      : userAgent.includes("Windows")
+        ? "Windows"
+        : copy.device;
 
   return `${browser} · ${system}`;
 }
 
-export function AccountSettings() {
+type AccountSettingsProps = {
+  language?: AppLanguage;
+};
+
+export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
+  const copy = accountSettingsCopy[language];
+  const optionCopy = homeCopy[language].options;
+  const deleteConfirmation = copy.deleteConfirmation;
   const { data: currentSession } = authClient.useSession();
   const [sessions, setSessions] = useState<AccountSession[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
@@ -189,7 +348,7 @@ export function AccountSettings() {
     const data = (await response.json()) as { error?: string };
     setGoalsPending(false);
     setGoalsMessage(
-      response.ok ? "Preferencje zostały zapisane." : data.error ?? "Błąd zapisu.",
+      response.ok ? copy.saved : data.error ?? copy.saveError,
     );
   }
 
@@ -205,7 +364,7 @@ export function AccountSettings() {
 
     if (newPassword !== repeatedPassword) {
       setPasswordPending(false);
-      setPasswordMessage("Nowe hasła nie są identyczne.");
+      setPasswordMessage(copy.passwordMismatch);
       return;
     }
 
@@ -219,16 +378,14 @@ export function AccountSettings() {
     if (result.error) {
       setPasswordMessage(
         result.error.code === "INVALID_PASSWORD"
-          ? "Obecne hasło jest nieprawidłowe."
-          : result.error.message || "Nie udało się zmienić hasła.",
+          ? copy.invalidCurrentPassword
+          : result.error.message || copy.passwordError,
       );
       return;
     }
 
     form.reset();
-    setPasswordMessage(
-      "Hasło zostało zmienione, a pozostałe sesje wylogowane.",
-    );
+    setPasswordMessage(copy.passwordChanged);
     await loadSessions();
   }
 
@@ -244,7 +401,7 @@ export function AccountSettings() {
 
   async function deleteAccount(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (confirmation !== "USUŃ") return;
+    if (confirmation !== deleteConfirmation) return;
 
     setDeletePending(true);
     setDeleteError("");
@@ -257,8 +414,8 @@ export function AccountSettings() {
       setDeletePending(false);
       setDeleteError(
         result.error.code === "INVALID_PASSWORD"
-          ? "Hasło jest nieprawidłowe."
-          : result.error.message || "Nie udało się usunąć konta.",
+          ? copy.invalidPassword
+          : result.error.message || copy.deleteError,
       );
       return;
     }
@@ -273,56 +430,59 @@ export function AccountSettings() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-              Personalizacja
+              {copy.personalization}
             </p>
             <h2 className="mt-1 font-serif text-2xl font-semibold">
-              Preferencje gotowania
+              {copy.cookingPreferences}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#748078]">
-              Te ustawienia będą automatycznie używane w generatorze składników
-              i w sekcji „Wpisz, co chcesz ugotować”.
+              {copy.preferencesDescription}
             </p>
           </div>
           <div className="rounded-2xl bg-white px-4 py-3 text-xs leading-5 text-[#68736b] shadow-sm ring-1 ring-[#e2eadf]">
             <p>
-              <strong className="text-[#365a46]">Dieta:</strong> {defaultDiet}
+              <strong className="text-[#365a46]">{copy.diet}</strong>{" "}
+              {optionCopy.diets[defaultDiet as keyof typeof optionCopy.diets] ??
+                defaultDiet}
             </p>
             <p>
-              <strong className="text-[#365a46]">Cel:</strong>{" "}
-              {goalOptions.find(([value]) => value === cookingGoal)?.[1] ??
-                "Zbalansowanie"}
+              <strong className="text-[#365a46]">{copy.goal}</strong>{" "}
+              {goalLabels[language][cookingGoal] ?? goalLabels[language].balanced}
             </p>
           </div>
         </div>
         <form onSubmit={saveGoals} className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold">
-            Domyślna dieta
+            {copy.defaultDiet}
             <select
               value={defaultDiet}
               onChange={(event) => setDefaultDiet(event.target.value)}
               className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
             >
               {dietOptions.map((option) => (
-                <option key={option}>{option}</option>
-              ))}
-            </select>
-          </label>
-          <label className="text-sm font-semibold">
-            Cel gotowania
-            <select
-              value={cookingGoal}
-              onChange={(event) => setCookingGoal(event.target.value)}
-              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
-            >
-              {goalOptions.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
+                <option key={option} value={option}>
+                  {optionCopy.diets[option as keyof typeof optionCopy.diets] ??
+                    option}
                 </option>
               ))}
             </select>
           </label>
           <label className="text-sm font-semibold">
-            Domyślny budżet
+            {copy.cookingGoal}
+            <select
+              value={cookingGoal}
+              onChange={(event) => setCookingGoal(event.target.value)}
+              className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
+            >
+              {goalOptions.map(([value]) => (
+                <option key={value} value={value}>
+                  {goalLabels[language][value] ?? value}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-semibold">
+            {copy.defaultBudget}
             <select
               value={defaultBudget}
               onChange={(event) => setDefaultBudget(event.target.value)}
@@ -330,13 +490,13 @@ export function AccountSettings() {
             >
               {budgetOptions.map(([value, label]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {formatOptionLabel(language, "budget", value, label)}
                 </option>
               ))}
             </select>
           </label>
           <label className="text-sm font-semibold">
-            Domyślny czas
+            {copy.defaultTime}
             <select
               value={defaultMaxTime}
               onChange={(event) => setDefaultMaxTime(event.target.value)}
@@ -344,13 +504,13 @@ export function AccountSettings() {
             >
               {timeOptions.map(([value, label]) => (
                 <option key={value} value={value}>
-                  {label}
+                  {formatOptionLabel(language, "time", value, label)}
                 </option>
               ))}
             </select>
           </label>
           <label className="text-sm font-semibold">
-            Kalorie dziennie
+            {copy.caloriesDaily}
             <input
               type="number"
               min="800"
@@ -362,7 +522,7 @@ export function AccountSettings() {
             />
           </label>
           <label className="text-sm font-semibold">
-            Białko dziennie (g)
+            {copy.proteinDaily}
             <input
               type="number"
               min="20"
@@ -374,47 +534,41 @@ export function AccountSettings() {
             />
           </label>
           <label className="text-sm font-semibold sm:col-span-2">
-            Alergie i składniki zakazane
+            {copy.allergies}
             <input
               value={excludedIngredients}
               onChange={(event) => setExcludedIngredients(event.target.value)}
-              placeholder="np. orzechy, krewetki, seler"
+              placeholder={copy.allergiesPlaceholder}
               className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
             />
             <span className="mt-1 block text-xs font-normal leading-5 text-[#748078]">
-              Wpisz po przecinku. Generator ma całkowicie unikać tych
-              składników w przepisach, krokach i zamiennikach.
+              {copy.allergiesHint}
             </span>
           </label>
           <label className="text-sm font-semibold sm:col-span-2">
-            Produkty, których nie lubisz
+            {copy.disliked}
             <input
               value={dislikedIngredients}
               onChange={(event) => setDislikedIngredients(event.target.value)}
-              placeholder="np. kolendra, oliwki, pieczarki"
+              placeholder={copy.dislikedPlaceholder}
               className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none"
             />
             <span className="mt-1 block text-xs font-normal leading-5 text-[#748078]">
-              To nie musi być alergia — po prostu produkty, których aplikacja
-              ma nie proponować.
+              {copy.dislikedHint}
             </span>
           </label>
           <div className="rounded-2xl bg-white p-4 text-xs leading-5 text-[#68736b] ring-1 ring-[#e2eadf] sm:col-span-2">
             <p className="font-semibold text-[#365a46]">
-              Jak to wpłynie na generator?
+              {copy.impactTitle}
             </p>
-            <p className="mt-1">
-              Domyślna dieta, czas, budżet i cel ustawią się automatycznie na
-              stronie głównej. Alergie i nielubiane produkty będą przekazywane
-              do AI przy każdym generowaniu.
-            </p>
+            <p className="mt-1">{copy.impactText}</p>
           </div>
           <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
             <button
               disabled={goalsPending}
               className="h-11 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white disabled:opacity-50"
             >
-              {goalsPending ? "Zapisuję..." : "Zapisz preferencje"}
+              {goalsPending ? copy.saving : copy.savePreferences}
             </button>
             {goalsMessage && <p className="text-sm text-[#59675f]">{goalsMessage}</p>}
           </div>
@@ -422,13 +576,15 @@ export function AccountSettings() {
       </section>
 
       <section className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-sm sm:p-8">
-        <h2 className="font-serif text-2xl font-semibold">Zmiana hasła</h2>
+        <h2 className="font-serif text-2xl font-semibold">
+          {copy.changePassword}
+        </h2>
         <p className="mt-2 text-sm leading-6 text-[#748078]">
-          Po zmianie hasła wszystkie pozostałe urządzenia zostaną wylogowane.
+          {copy.changePasswordHint}
         </p>
         <form onSubmit={changePassword} className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold sm:col-span-2">
-            Obecne hasło
+            {copy.currentPassword}
             <PasswordInput
               required
               name="currentPassword"
@@ -437,7 +593,7 @@ export function AccountSettings() {
             />
           </label>
           <label className="text-sm font-semibold">
-            Nowe hasło
+            {copy.newPassword}
             <PasswordInput
               required
               minLength={8}
@@ -447,7 +603,7 @@ export function AccountSettings() {
             />
           </label>
           <label className="text-sm font-semibold">
-            Powtórz nowe hasło
+            {copy.repeatPassword}
             <PasswordInput
               required
               minLength={8}
@@ -461,7 +617,7 @@ export function AccountSettings() {
               disabled={passwordPending}
               className="h-11 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white disabled:opacity-50"
             >
-              {passwordPending ? "Zmieniam..." : "Zmień hasło"}
+              {passwordPending ? copy.changing : copy.changePasswordButton}
             </button>
             {passwordMessage && (
               <p className="text-sm text-[#59675f]">{passwordMessage}</p>
@@ -473,9 +629,11 @@ export function AccountSettings() {
       <section className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 shadow-sm sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="font-serif text-2xl font-semibold">Aktywne sesje</h2>
+            <h2 className="font-serif text-2xl font-semibold">
+              {copy.activeSessions}
+            </h2>
             <p className="mt-2 text-sm leading-6 text-[#748078]">
-              Urządzenia, na których Twoje konto jest obecnie zalogowane.
+              {copy.activeSessionsHint}
             </p>
           </div>
           {sessions.length > 1 && (
@@ -483,14 +641,14 @@ export function AccountSettings() {
               onClick={revokeOtherSessions}
               className="rounded-xl border border-[#ccd7cf] px-4 py-2.5 text-xs font-semibold text-[#356248]"
             >
-              Wyloguj pozostałe
+              {copy.signOutOthers}
             </button>
           )}
         </div>
 
         <div className="mt-6 space-y-3">
           {sessionsLoading ? (
-            <p className="text-sm text-[#7a857e]">Wczytuję sesje...</p>
+            <p className="text-sm text-[#7a857e]">{copy.loadingSessions}</p>
           ) : (
             sessions.map((session) => {
               const isCurrent =
@@ -503,16 +661,16 @@ export function AccountSettings() {
                 >
                   <div>
                     <p className="text-sm font-semibold">
-                      {deviceName(session.userAgent)}
+                      {deviceName(session.userAgent, copy)}
                       {isCurrent && (
                         <span className="ml-2 rounded-full bg-[#dfeae1] px-2 py-0.5 text-[10px] text-[#356248]">
-                          obecna
+                          {copy.current}
                         </span>
                       )}
                     </p>
                     <p className="mt-1 text-xs text-[#7a857e]">
-                      IP: {session.ipAddress || "brak danych"} · utworzona{" "}
-                      {new Intl.DateTimeFormat("pl-PL", {
+                      IP: {session.ipAddress || copy.noData} · {copy.created}{" "}
+                      {new Intl.DateTimeFormat(copy.locale, {
                         day: "numeric",
                         month: "short",
                         hour: "2-digit",
@@ -525,7 +683,7 @@ export function AccountSettings() {
                       onClick={() => revokeSession(session.token)}
                       className="text-xs font-semibold text-[#a45c45] hover:underline"
                     >
-                      Wyloguj
+                      {copy.signOut}
                     </button>
                   )}
                 </div>
@@ -537,15 +695,14 @@ export function AccountSettings() {
 
       <section className="rounded-[1.7rem] border border-[#e4bdb5] bg-[#fff9f6] p-4 shadow-sm sm:p-8">
         <h2 className="font-serif text-2xl font-semibold text-[#913f32]">
-          Usuń konto
+          {copy.deleteAccount}
         </h2>
         <p className="mt-2 text-sm leading-6 text-[#805f58]">
-          Ta operacja trwale usunie konto, przepisy, historię, listę zakupów,
-          planer oraz statystyki. Nie można jej cofnąć.
+          {copy.deleteWarning}
         </p>
         <form onSubmit={deleteAccount} className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold text-[#704d47]">
-            Hasło
+            {copy.password}
             <PasswordInput
               required
               name="password"
@@ -554,7 +711,7 @@ export function AccountSettings() {
             />
           </label>
           <label className="text-sm font-semibold text-[#704d47]">
-            Wpisz „USUŃ”
+            {copy.typeConfirmation} “{deleteConfirmation}”
             <input
               required
               value={confirmation}
@@ -564,10 +721,10 @@ export function AccountSettings() {
           </label>
           <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
             <button
-              disabled={deletePending || confirmation !== "USUŃ"}
+              disabled={deletePending || confirmation !== deleteConfirmation}
               className="h-11 rounded-xl bg-[#a74738] px-5 text-sm font-semibold text-white disabled:opacity-40"
             >
-              {deletePending ? "Usuwam..." : "Usuń konto na zawsze"}
+              {deletePending ? copy.deleting : copy.deleteForever}
             </button>
             {deleteError && (
               <p className="text-sm text-[#a74738]">{deleteError}</p>

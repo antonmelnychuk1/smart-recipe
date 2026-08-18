@@ -89,7 +89,7 @@ export default async function SettingsPage() {
           </div>
         </section>
 
-        <AccountSettings />
+        <AccountSettings language={language} />
       </div>
     </main>
   );
