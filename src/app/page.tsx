@@ -27,6 +27,11 @@ const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
 
 const suggestions = ["jajka", "ryż", "kurczak", "pomidor", "szpinak"];
+const defaultIngredientsByLanguage: Record<AppLanguage, string[]> = {
+  pl: ["jajka", "ryż", "kurczak"],
+  en: ["eggs", "rice", "chicken"],
+};
+const defaultIngredientSets = Object.values(defaultIngredientsByLanguage);
 
 const dietOptions = [
   "Bez ograniczeń",
@@ -191,6 +196,13 @@ function daysUntilExpiry(date: string) {
   today.setHours(0, 0, 0, 0);
   return Math.ceil(
     (new Date(`${date}T00:00:00`).getTime() - today.getTime()) / 86_400_000,
+  );
+}
+
+function sameIngredients(first: string[], second: string[]) {
+  return (
+    first.length === second.length &&
+    first.every((ingredient, index) => ingredient === second[index])
   );
 }
 
@@ -437,7 +449,7 @@ export default function Home() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [language, setLanguage] = useState<AppLanguage>("pl");
   const [languageLoaded, setLanguageLoaded] = useState(false);
-  const [ingredients, setIngredients] = useState(["jajka", "ryż", "kurczak"]);
+  const [ingredients, setIngredients] = useState(defaultIngredientsByLanguage.pl);
   const [input, setInput] = useState("");
   const [diet, setDiet] = useState("Bez ograniczeń");
   const [maxTime, setMaxTime] = useState("0");
@@ -647,6 +659,11 @@ export default function Home() {
     setLanguage(nextLanguage);
     setLanguageLoaded(true);
     setSampleRecipes(getSampleRecipes(nextLanguage));
+    setIngredients((current) =>
+      defaultIngredientSets.some((items) => sameIngredients(current, items))
+        ? defaultIngredientsByLanguage[nextLanguage]
+        : current,
+    );
     document.cookie = `${languageCookieName}=${nextLanguage}; path=/; max-age=31536000; samesite=lax`;
   }
 
@@ -662,6 +679,11 @@ export default function Home() {
 
       setLanguage(nextLanguage);
       setSampleRecipes(getSampleRecipes(nextLanguage));
+      setIngredients((current) =>
+        defaultIngredientSets.some((items) => sameIngredients(current, items))
+          ? defaultIngredientsByLanguage[nextLanguage]
+          : current,
+      );
       setLanguageLoaded(true);
       document.documentElement.lang = nextLanguage;
       document.cookie = `${languageCookieName}=${nextLanguage}; path=/; max-age=31536000; samesite=lax`;
