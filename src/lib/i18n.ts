@@ -200,6 +200,17 @@ const baseHomeCopy = {
       ["02", "Ustaw preferencje", "Dieta, czas i poziom trudności są po Twojej stronie.",],
       ["03", "Gotuj bez resztek", "Wybierz pomysł i wykorzystaj produkty do końca.",],
     ],
+    value: {
+      eyebrow: "Więcej niż generator",
+      title: "Od pomysłu do gotowania w jednym miejscu",
+      description:
+        "SmartRecipe łączy przepisy AI, spiżarnię, listę zakupów i planer posiłków, żeby codzienne gotowanie było prostsze.",
+      items: [
+        ["🥘", "Przepisy z proporcjami", "Każdy pomysł zawiera ilości, kroki, kalorie, makro i brakujące produkty."],
+        ["🛒", "Lista zakupów bez chaosu", "Dodajesz czyste nazwy produktów, a kupione rzeczy możesz przenieść do spiżarni."],
+        ["📅", "Plan tygodnia", "Układasz posiłki na dni tygodnia i od razu widzisz brakujące składniki."],
+      ],
+    },
     dish: {
       eyebrow: "Masz ochotę na konkretne danie?",
       title: "Wpisz, co chcesz ugotować",
@@ -464,6 +475,17 @@ const baseHomeCopy = {
       ["02", "Set preferences", "Diet, time and difficulty are up to you."],
       ["03", "Cook with less waste", "Choose an idea and use your products fully."],
     ],
+    value: {
+      eyebrow: "More than a generator",
+      title: "From idea to cooking in one place",
+      description:
+        "SmartRecipe combines AI recipes, pantry tracking, shopping lists and meal planning to make everyday cooking easier.",
+      items: [
+        ["🥘", "Recipes with proportions", "Every idea includes quantities, steps, calories, macros and missing products."],
+        ["🛒", "Shopping list without chaos", "Add clean product names and move bought items into your pantry."],
+        ["📅", "Weekly meal plan", "Plan meals across the week and see missing ingredients right away."],
+      ],
+    },
     dish: {
       eyebrow: "Craving a specific dish?",
       title: "Type what you want to cook",
@@ -725,6 +747,17 @@ const baseHomeCopy = {
       ["02", "Налаштуй вподобання", "Дієта, час і складність — на твоєму боці."],
       ["03", "Готуй без залишків", "Обери ідею та використай продукти до кінця."],
     ],
+    value: {
+      eyebrow: "Більше ніж генератор",
+      title: "Від ідеї до готування в одному місці",
+      description:
+        "SmartRecipe поєднує AI-рецепти, комору, список покупок і планер страв, щоб щоденне готування було простішим.",
+      items: [
+        ["🥘", "Рецепти з пропорціями", "Кожна ідея містить кількості, кроки, калорії, макро та відсутні продукти."],
+        ["🛒", "Список покупок без хаосу", "Додавай чисті назви продуктів і перенось куплене до комори."],
+        ["📅", "План тижня", "Плануй страви на тиждень і одразу бач відсутні інгредієнти."],
+      ],
+    },
     dish: {
       eyebrow: "Хочеш конкретну страву?",
       title: "Введи, що хочеш приготувати",

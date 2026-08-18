@@ -2730,6 +2730,43 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="bg-[#f7f4ed] px-4 py-8 sm:px-8 sm:py-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+                {copy.value.eyebrow}
+              </p>
+              <h2 className="mt-2 max-w-xl font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+                {copy.value.title}
+              </h2>
+            </div>
+            <p className="max-w-2xl text-sm leading-6 text-[#68736b] sm:text-base lg:justify-self-end">
+              {copy.value.description}
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-3 sm:gap-4">
+            {copy.value.items.map(([icon, title, text]) => (
+              <article
+                key={title}
+                className="rounded-[1.4rem] border border-[#e2dfd6] bg-white/85 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5"
+              >
+                <span className="grid size-10 place-items-center rounded-2xl bg-[#edf3ee] text-xl">
+                  {icon}
+                </span>
+                <h3 className="mt-3 font-serif text-xl font-semibold">
+                  {title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-[#748078]">
+                  {text}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-8 sm:px-8 sm:py-14">
         <div className="mx-auto max-w-7xl grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
