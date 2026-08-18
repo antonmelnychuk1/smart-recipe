@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { z } from "zod";
+import { apiError, getRequestLanguage } from "@/lib/api-language";
 import { auth } from "@/lib/auth";
 import { getCurrentAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
@@ -42,14 +43,23 @@ function startOfUtcDay() {
 }
 
 export async function POST(request: Request) {
+  const language = getRequestLanguage(request);
   const admin = await getCurrentAdmin();
   if (!admin) {
-    return Response.json({ error: "Brak uprawnień." }, { status: 403 });
+    return apiError(
+      request,
+      { pl: "Brak uprawnień.", en: "Unauthorized." },
+      403,
+    );
   }
 
   const parsed = actionSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return Response.json({ error: "Niepoprawne dane." }, { status: 400 });
+    return apiError(
+      request,
+      { pl: "Niepoprawne dane.", en: "Invalid data." },
+      400,
+    );
   }
 
   const data = parsed.data;
@@ -59,14 +69,22 @@ export async function POST(request: Request) {
   });
 
   if (!target) {
-    return Response.json({ error: "Użytkownik nie istnieje." }, { status: 404 });
+    return apiError(
+      request,
+      { pl: "Użytkownik nie istnieje.", en: "User does not exist." },
+      404,
+    );
   }
 
   const modifiesIdentity = ["set-role", "ban", "delete"].includes(data.action);
   if (target.id === admin.id && modifiesIdentity) {
-    return Response.json(
-      { error: "Nie możesz zablokować, zdegradować ani usunąć własnego konta." },
-      { status: 400 },
+    return apiError(
+      request,
+      {
+        pl: "Nie możesz zablokować, zdegradować ani usunąć własnego konta.",
+        en: "You cannot ban, downgrade or delete your own account.",
+      },
+      400,
     );
   }
 
@@ -98,7 +116,11 @@ export async function POST(request: Request) {
         headers: requestHeaders,
         body: {
           userId: target.id,
-          banReason: data.reason || "Zablokowany przez administratora",
+          banReason:
+            data.reason ||
+            (language === "en"
+              ? "Banned by administrator"
+              : "Zablokowany przez administratora"),
         },
       });
       break;

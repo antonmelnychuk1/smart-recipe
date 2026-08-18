@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { z } from "zod";
+import { apiError } from "@/lib/api-language";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { Recipe, RecipeFeedback } from "@/lib/recipe-types";
@@ -126,11 +127,15 @@ async function getUserId() {
   return session?.user.id ?? null;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const userId = await getUserId();
 
   if (!userId) {
-    return Response.json({ error: "Zaloguj się, aby pobrać dane." }, { status: 401 });
+    return apiError(
+      request,
+      { pl: "Zaloguj się, aby pobrać dane.", en: "Log in to load data." },
+      401,
+    );
   }
 
   const [favorites, history, shoppingItems, pantryItems, feedbackItems] =
@@ -199,13 +204,21 @@ export async function POST(request: Request) {
   const userId = await getUserId();
 
   if (!userId) {
-    return Response.json({ error: "Zaloguj się, aby zapisać dane." }, { status: 401 });
+    return apiError(
+      request,
+      { pl: "Zaloguj się, aby zapisać dane.", en: "Log in to save data." },
+      401,
+    );
   }
 
   const body = actionSchema.safeParse(await request.json().catch(() => null));
 
   if (!body.success) {
-    return Response.json({ error: "Niepoprawne dane." }, { status: 400 });
+    return apiError(
+      request,
+      { pl: "Niepoprawne dane.", en: "Invalid data." },
+      400,
+    );
   }
 
   const data = body.data;

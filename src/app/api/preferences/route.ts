@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { z } from "zod";
+import { apiError } from "@/lib/api-language";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -28,9 +29,15 @@ async function getUserId() {
   return session?.user.id ?? null;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const userId = await getUserId();
-  if (!userId) return Response.json({ error: "Brak uprawnień." }, { status: 401 });
+  if (!userId) {
+    return apiError(
+      request,
+      { pl: "Brak uprawnień.", en: "Unauthorized." },
+      401,
+    );
+  }
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -50,11 +57,21 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const userId = await getUserId();
-  if (!userId) return Response.json({ error: "Brak uprawnień." }, { status: 401 });
+  if (!userId) {
+    return apiError(
+      request,
+      { pl: "Brak uprawnień.", en: "Unauthorized." },
+      401,
+    );
+  }
 
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return Response.json({ error: "Niepoprawne cele." }, { status: 400 });
+    return apiError(
+      request,
+      { pl: "Niepoprawne cele.", en: "Invalid goals." },
+      400,
+    );
   }
 
   const user = await prisma.user.update({

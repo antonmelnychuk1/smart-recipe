@@ -54,7 +54,7 @@ export const auth = betterAuth({
       defaultRole: "user",
       adminRoles: ["admin"],
       bannedUserMessage:
-        "To konto zostało zablokowane. Skontaktuj się z administratorem.",
+        "This account has been blocked. Contact the administrator. / To konto zostało zablokowane. Skontaktuj się z administratorem.",
     }),
   ],
 });

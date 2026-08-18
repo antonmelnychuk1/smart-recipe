@@ -5,6 +5,7 @@ import {
   consumeGenerationLimit,
   refundGenerationLimit,
 } from "@/lib/generation-limit";
+import { apiError } from "@/lib/api-language";
 import { attachRecipePhotos } from "@/lib/pexels";
 
 const ingredientsRequestSchema = z.object({
@@ -106,9 +107,13 @@ const dishResponseSchema = z.object({
 
 export async function POST(request: Request) {
   if (!process.env.OPENAI_API_KEY) {
-    return Response.json(
-      { error: "Brakuje OPENAI_API_KEY w pliku .env.local." },
-      { status: 500 },
+    return apiError(
+      request,
+      {
+        pl: "Brakuje OPENAI_API_KEY w pliku .env.local.",
+        en: "OPENAI_API_KEY is missing in .env.local.",
+      },
+      500,
     );
   }
 
@@ -116,9 +121,13 @@ export async function POST(request: Request) {
   const parsedRequest = requestSchema.safeParse(body);
 
   if (!parsedRequest.success) {
-    return Response.json(
-      { error: "Podaj przynajmniej jeden poprawny składnik." },
-      { status: 400 },
+    return apiError(
+      request,
+      {
+        pl: "Podaj przynajmniej jeden poprawny składnik.",
+        en: "Enter at least one valid ingredient.",
+      },
+      400,
     );
   }
 
@@ -127,6 +136,27 @@ export async function POST(request: Request) {
   const { diet, maxTime } = requestData;
   const language = requestData.language;
   const isEnglish = language === "en";
+  const apiCopy =
+    language === "en"
+      ? {
+          dailyLimit:
+            "Today's generation limit has been used. Try again tomorrow.",
+          emptyModel: "The model did not return ready recipes. Try again.",
+          invalidKey: "The API key is invalid.",
+          apiLimit: "The API limit has been reached. Check limits or billing.",
+          apiUnavailable: "OpenAI API is temporarily unavailable. Try again.",
+          fallback: "Could not generate recipes.",
+        }
+      : {
+          dailyLimit:
+            "Dzisiejszy limit generowania został wykorzystany. Spróbuj ponownie jutro.",
+          emptyModel:
+            "Model nie zwrócił gotowych przepisów. Spróbuj ponownie.",
+          invalidKey: "Klucz API jest nieprawidłowy.",
+          apiLimit: "Limit API został osiągnięty. Sprawdź limity lub billing.",
+          apiUnavailable: "OpenAI API chwilowo nie odpowiada. Spróbuj ponownie.",
+          fallback: "Nie udało się wygenerować przepisów.",
+        };
   const dietLabels: Record<string, string> = {
     "Bez ograniczeń": isEnglish ? "No restrictions" : "Bez ograniczeń",
     Wegetariańska: isEnglish ? "Vegetarian" : "Wegetariańska",
@@ -306,7 +336,7 @@ Przykładowy format imageQuery:
     return Response.json(
       {
         error:
-          "Dzisiejszy limit generowania został wykorzystany. Spróbuj ponownie jutro.",
+          apiCopy.dailyLimit,
         usage: {
           limit: usage.limit,
           remaining: usage.remaining,
@@ -360,7 +390,7 @@ ${generationRules}`,
     if (!response.output_parsed) {
       await refundGenerationLimit(usage.identifier);
       return Response.json(
-        { error: "Model nie zwrócił gotowych przepisów. Spróbuj ponownie." },
+        { error: apiCopy.emptyModel },
         { status: 502 },
       );
     }
@@ -387,16 +417,16 @@ ${generationRules}`,
     if (error instanceof OpenAI.APIError) {
       const message =
         error.status === 401
-          ? "Klucz API jest nieprawidłowy."
+          ? apiCopy.invalidKey
           : error.status === 429
-            ? "Limit API został osiągnięty. Sprawdź limity lub billing."
-            : "OpenAI API chwilowo nie odpowiada. Spróbuj ponownie.";
+            ? apiCopy.apiLimit
+            : apiCopy.apiUnavailable;
 
       return Response.json({ error: message }, { status: error.status ?? 500 });
     }
 
     return Response.json(
-      { error: "Nie udało się wygenerować przepisów." },
+      { error: apiCopy.fallback },
       { status: 500 },
     );
   }
