@@ -119,7 +119,7 @@ export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          redirectTo: "/reset-password",
+          redirectTo: `/reset-password?lang=${language}`,
         }),
       });
       const result = (await response.json().catch(() => null)) as {
@@ -151,7 +151,7 @@ export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
             name: String(formData.get("name")),
             email,
             password,
-            callbackURL: "/email-verified",
+            callbackURL: `/email-verified?lang=${language}`,
           })
         : await authClient.signIn.email({
             email,

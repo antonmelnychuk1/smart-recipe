@@ -1887,7 +1887,7 @@ export default function Home() {
     setVerificationMessage("");
     const result = await authClient.sendVerificationEmail({
       email: session.user.email,
-      callbackURL: "/email-verified",
+      callbackURL: `/email-verified?lang=${language}`,
     });
     setVerificationPending(false);
 

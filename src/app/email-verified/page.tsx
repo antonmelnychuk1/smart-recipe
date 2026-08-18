@@ -9,7 +9,7 @@ import {
 import { prisma } from "@/lib/prisma";
 
 type VerificationPageProps = {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; lang?: string; language?: string }>;
 };
 
 const emailVerifiedCopy: Record<
@@ -63,9 +63,9 @@ const emailVerifiedCopy: Record<
 export default async function EmailVerifiedPage({
   searchParams,
 }: VerificationPageProps) {
-  const { error } = await searchParams;
+  const { error, lang, language: queryLanguage } = await searchParams;
   const language = normalizeLanguage(
-    (await cookies()).get(languageCookieName)?.value,
+    lang ?? queryLanguage ?? (await cookies()).get(languageCookieName)?.value,
   );
   const copy = emailVerifiedCopy[language];
   const session = await auth.api.getSession({ headers: await headers() });

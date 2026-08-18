@@ -10,6 +10,8 @@ type ResetPasswordPageProps = {
   searchParams: Promise<{
     token?: string | string[];
     error?: string | string[];
+    lang?: string | string[];
+    language?: string | string[];
   }>;
 };
 
@@ -63,7 +65,9 @@ export default async function ResetPasswordPage({
 }: ResetPasswordPageProps) {
   const params = await searchParams;
   const language = normalizeLanguage(
-    (await cookies()).get(languageCookieName)?.value,
+    getFirstParam(params.lang) ??
+      getFirstParam(params.language) ??
+      (await cookies()).get(languageCookieName)?.value,
   );
   const copy = resetPageCopy[language];
   const token = getFirstParam(params.token) ?? "";
