@@ -36,7 +36,13 @@ import { getSampleRecipes } from "@/lib/sample-recipes";
 const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
 
-const suggestions = ["jajka", "ryż", "kurczak", "pomidor", "szpinak"];
+const polishIngredientSuggestions = [
+  "jajka",
+  "ryż",
+  "kurczak",
+  "pomidor",
+  "szpinak",
+];
 const defaultIngredientsByLanguage: Record<AppLanguage, string[]> = {
   pl: ["jajka", "ryż", "kurczak"],
   en: ["eggs", "rice", "chicken"],
@@ -618,7 +624,7 @@ export default function Home() {
   const pageCopy =
     language === "pl"
       ? {
-          suggestions,
+          suggestions: polishIngredientSuggestions,
           confirmCloseTimer: "Timer nadal działa. Zamknąć tryb gotowania?",
           shareFailed: "Nie udało się udostępnić przepisu.",
           shareCopied: "Przepis jest publiczny. Link został skopiowany.",

@@ -7,7 +7,9 @@ import {
   formatOptionLabel,
   getUiLanguage,
   homeCopy,
+  normalizeCurrency,
   type AppLanguage,
+  type CurrencyCode,
   type UiLanguage,
 } from "@/lib/i18n";
 
@@ -353,6 +355,11 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
   const [defaultDiet, setDefaultDiet] = useState("Bez ograniczeń");
   const [defaultMaxTime, setDefaultMaxTime] = useState("0");
   const [defaultBudget, setDefaultBudget] = useState("0");
+  const [currency] = useState<CurrencyCode>(() =>
+    typeof window === "undefined"
+      ? "PLN"
+      : normalizeCurrency(window.localStorage.getItem("smart-recipe:currency")),
+  );
   const [cookingGoal, setCookingGoal] = useState("balanced");
   const [excludedIngredients, setExcludedIngredients] = useState("");
   const [dislikedIngredients, setDislikedIngredients] = useState("");
@@ -567,7 +574,7 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
             >
               {budgetOptions.map(([value, label]) => (
                 <option key={value} value={value}>
-                  {formatOptionLabel(language, "budget", value, label)}
+                  {formatOptionLabel(language, "budget", value, label, currency)}
                 </option>
               ))}
             </select>

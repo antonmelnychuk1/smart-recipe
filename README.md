@@ -146,12 +146,16 @@ OPENAI_MODEL
 DATABASE_URL
 BETTER_AUTH_SECRET
 BETTER_AUTH_URL
+RESEND_API_KEY
+EMAIL_FROM
+NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED
+PEXELS_API_KEY
 ```
 
 `BETTER_AUTH_URL` must point to the public application URL, for example:
 
 ```env
-BETTER_AUTH_URL=https://smart-recipe.vercel.app
+BETTER_AUTH_URL=https://smartrecipeapp.com
 ```
 
 Apply Prisma migrations whenever the production database schema changes.
