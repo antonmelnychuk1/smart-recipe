@@ -657,6 +657,11 @@ export default function Home() {
           preferencesText:
             "Dieta, budżet, czas i wykluczone składniki będą automatycznie używane przy generowaniu przepisów.",
           completeNow: "Uzupełnij teraz",
+          onboardingSteps: [
+            "Wybierz dietę",
+            "Dodaj alergie",
+            "Ustaw czas i budżet",
+          ],
           userPanel: "Panel użytkownika",
           hello: "Cześć",
           dashboardText:
@@ -721,6 +726,11 @@ export default function Home() {
             preferencesText:
               "Дієта, бюджет, час і виключені інгредієнти автоматично використовуватимуться під час генерації рецептів.",
             completeNow: "Заповнити зараз",
+            onboardingSteps: [
+              "Вибери дієту",
+              "Додай алергії",
+              "Налаштуй час і бюджет",
+            ],
             userPanel: "Панель користувача",
             hello: "Привіт",
             dashboardText:
@@ -779,6 +789,11 @@ export default function Home() {
           preferencesText:
             "Diet, budget, time and excluded ingredients will be used automatically when generating recipes.",
           completeNow: "Complete now",
+          onboardingSteps: [
+            "Choose diet",
+            "Add allergies",
+            "Set time and budget",
+          ],
           userPanel: "User panel",
           hello: "Hi",
           dashboardText:
@@ -2365,24 +2380,36 @@ export default function Home() {
       )}
 
       {session?.user && !preferencesCompleted && (
-        <div className="border-y border-[#d6e2d8] bg-[#eef6ef] px-4 py-3 sm:px-8">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-[#365a46]">
-                {pageCopy.setPreferences}
-              </p>
-              <p className="mt-0.5 text-xs leading-5 text-[#68736b]">
-                {pageCopy.preferencesText}
-              </p>
+        <section className="px-4 pt-4 sm:px-8 sm:pt-6">
+          <div className="mx-auto max-w-7xl overflow-hidden rounded-[1.5rem] border border-[#d6e2d8] bg-[#eef6ef] p-4 shadow-sm sm:p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[#365a46]">
+                  {pageCopy.setPreferences}
+                </p>
+                <p className="mt-1 max-w-3xl text-xs leading-5 text-[#68736b] sm:text-sm">
+                  {pageCopy.preferencesText}
+                </p>
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+                  {pageCopy.onboardingSteps.map((step, index) => (
+                    <span
+                      key={step}
+                      className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#365a46] shadow-sm"
+                    >
+                      {index + 1}. {step}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <Link
+                href="/settings"
+                className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#285840]"
+              >
+                {pageCopy.completeNow}
+              </Link>
             </div>
-            <Link
-              href="/settings"
-              className="rounded-lg bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white"
-            >
-              {pageCopy.completeNow}
-            </Link>
           </div>
-        </div>
+        </section>
       )}
 
       {session?.user && (
