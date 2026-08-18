@@ -2768,7 +2768,7 @@ export default function Home() {
                             : "bg-[#f6f3ec] text-[#748078] hover:bg-[#eee9df]"
                         }`}
                       >
-                        {option.label}
+                        {copy.feedback[option.value]}
                       </button>
                     );
                   })}

@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { CopyButton, CopyRecipeLink } from "@/components/copy-recipe-link";
 import { auth } from "@/lib/auth";
+import {
+  languageCookieName,
+  normalizeLanguage,
+  type AppLanguage,
+} from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 import type { Recipe } from "@/lib/recipe-types";
 
@@ -34,17 +39,116 @@ function truncate(value: string, maxLength = 155) {
     : value;
 }
 
-function recipeText(recipe: Recipe, section: "ingredients" | "steps") {
+const recipePageCopy = {
+  pl: {
+    sharedTitle: "Udostępniony przepis · SmartRecipe",
+    sharedDescription: "Przepis przygotowany w aplikacji SmartRecipe.",
+    ingredientsTitle: "Składniki",
+    preparationTitle: "Przygotowanie",
+    backSaved: "← Wróć do zapisanych",
+    home: "Strona główna",
+    photo: "Zdjęcie:",
+    public: "Publiczny",
+    private: "Prywatny",
+    toBuy: "do dokupienia",
+    details: "Szczegóły przepisu",
+    sharedBy: "Udostępnia:",
+    calories: "Kalorie",
+    protein: "Białko",
+    carbs: "Węglowodany",
+    fat: "Tłuszcz",
+    time: "Czas",
+    prep: "przygotowanie",
+    cost: "Koszt",
+    approx: "ok.",
+    noData: "brak danych",
+    estimate: "szacunek",
+    match: "Dopasowanie",
+    toIngredients: "do składników",
+    servings: "Porcje",
+    baseAmount: "bazowa ilość",
+    copyLink: "Kopiuj link",
+    copiedLink: "✓ Link skopiowany",
+    copyIngredients: "Kopiuj składniki",
+    copyInstructions: "Kopiuj instrukcje",
+    copied: "✓ Skopiowano",
+    openApp: "Otwórz aplikację",
+    nutrition: "Wartości odżywcze",
+    perServing: "Szacunek na 1 porcję",
+    macro: "makro",
+    items: "pozycji",
+    missing: "Do dokupienia",
+    missingHint:
+      "Same nazwy produktów — bez gramów i łyżek, żeby lista zakupów była praktyczna.",
+    steps: "kroków",
+    around: "około",
+    copySteps: "Kopiuj kroki",
+    substitutions: "Zamienniki",
+  },
+  en: {
+    sharedTitle: "Shared recipe · SmartRecipe",
+    sharedDescription: "Recipe prepared in the SmartRecipe app.",
+    ingredientsTitle: "Ingredients",
+    preparationTitle: "Preparation",
+    backSaved: "← Back to saved",
+    home: "Home",
+    photo: "Photo:",
+    public: "Public",
+    private: "Private",
+    toBuy: "to buy",
+    details: "Recipe details",
+    sharedBy: "Shared by:",
+    calories: "Calories",
+    protein: "Protein",
+    carbs: "Carbs",
+    fat: "Fat",
+    time: "Time",
+    prep: "preparation",
+    cost: "Cost",
+    approx: "approx.",
+    noData: "no data",
+    estimate: "estimate",
+    match: "Match",
+    toIngredients: "to ingredients",
+    servings: "Servings",
+    baseAmount: "base amount",
+    copyLink: "Copy link",
+    copiedLink: "✓ Link copied",
+    copyIngredients: "Copy ingredients",
+    copyInstructions: "Copy instructions",
+    copied: "✓ Copied",
+    openApp: "Open app",
+    nutrition: "Nutrition",
+    perServing: "Estimate per 1 serving",
+    macro: "macro",
+    items: "items",
+    missing: "To buy",
+    missingHint:
+      "Product names only — without grams or tablespoons, so the shopping list stays practical.",
+    steps: "steps",
+    around: "around",
+    copySteps: "Copy steps",
+    substitutions: "Substitutions",
+  },
+} as const;
+
+function recipeText(
+  recipe: Recipe,
+  section: "ingredients" | "steps",
+  language: AppLanguage,
+) {
+  const copy = recipePageCopy[language];
+
   if (section === "ingredients") {
     return [
-      `Składniki — ${recipe.title}`,
+      `${copy.ingredientsTitle} — ${recipe.title}`,
       "",
       ...recipe.ingredients.map((ingredient) => `- ${ingredient}`),
     ].join("\n");
   }
 
   return [
-    `Przygotowanie — ${recipe.title}`,
+    `${copy.preparationTitle} — ${recipe.title}`,
     "",
     ...recipe.steps.map((step, index) => `${index + 1}. ${step}`),
   ].join("\n");
@@ -58,8 +162,8 @@ export async function generateMetadata({
 
   if (!savedRecipe?.isPublic) {
     return {
-      title: "Udostępniony przepis · SmartRecipe",
-      description: "Przepis przygotowany w aplikacji SmartRecipe.",
+      title: recipePageCopy.pl.sharedTitle,
+      description: recipePageCopy.pl.sharedDescription,
     };
   }
 
@@ -93,10 +197,13 @@ export async function generateMetadata({
 
 export default async function RecipePage({ params }: RecipePageProps) {
   const { id } = await params;
-  const [savedRecipe, session] = await Promise.all([
+  const [savedRecipe, session, cookieStore] = await Promise.all([
     getSavedRecipe(id),
     auth.api.getSession({ headers: await headers() }),
+    cookies(),
   ]);
+  const language = normalizeLanguage(cookieStore.get(languageCookieName)?.value);
+  const copy = recipePageCopy[language];
 
   if (
     !savedRecipe ||
@@ -107,20 +214,22 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
   const recipe = savedRecipe.recipe as Recipe;
   const nutrition = [
-    ["Kalorie", `${recipe.calories} kcal`],
-    ["Białko", `${recipe.protein} g`],
-    ["Węglowodany", `${recipe.carbs} g`],
-    ["Tłuszcz", `${recipe.fat} g`],
+    [copy.calories, `${recipe.calories} kcal`],
+    [copy.protein, `${recipe.protein} g`],
+    [copy.carbs, `${recipe.carbs} g`],
+    [copy.fat, `${recipe.fat} g`],
   ];
   const summary = [
-    ["Czas", `${recipe.time} min`, "przygotowanie"],
+    [copy.time, `${recipe.time} min`, copy.prep],
     [
-      "Koszt",
-      recipe.estimatedCost ? `ok. ${recipe.estimatedCost} zł` : "brak danych",
-      "szacunek",
+      copy.cost,
+      recipe.estimatedCost
+        ? `${copy.approx} ${recipe.estimatedCost} zł`
+        : copy.noData,
+      copy.estimate,
     ],
-    ["Dopasowanie", `${recipe.match}%`, "do składników"],
-    ["Porcje", "2", "bazowa ilość"],
+    [copy.match, `${recipe.match}%`, copy.toIngredients],
+    [copy.servings, "2", copy.baseAmount],
   ];
   const missingCount = recipe.missing.length;
   const structuredData = {
@@ -159,13 +268,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
           href="/recipes"
           className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-3 text-sm font-semibold text-[#365a46] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
         >
-          ← Wróć do zapisanych
+          {copy.backSaved}
         </Link>
         <Link
           href="/"
           className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-3 text-sm font-semibold text-[#365a46] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
         >
-          Strona główna
+          {copy.home}
         </Link>
       </div>
       <article className="mx-auto max-w-6xl overflow-hidden rounded-[1.6rem] border border-[#dedbd2] bg-[#fffdf8] shadow-xl sm:rounded-[2rem]">
@@ -188,7 +297,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                   rel="noreferrer"
                   className="absolute bottom-4 left-4 rounded-full bg-black/45 px-3 py-1.5 text-xs font-medium text-white backdrop-blur hover:underline sm:left-5"
                 >
-                  Zdjęcie: {recipe.image.photographer} · Pexels
+                  {copy.photo} {recipe.image.photographer} · Pexels
                 </a>
               </>
             ) : (
@@ -198,11 +307,11 @@ export default async function RecipePage({ params }: RecipePageProps) {
             )}
             <div className="absolute left-4 top-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#356248] backdrop-blur">
-                {savedRecipe.isPublic ? "Publiczny" : "Prywatny"}
+                {savedRecipe.isPublic ? copy.public : copy.private}
               </span>
               {missingCount > 0 && (
                 <span className="rounded-full bg-[#fff0e8]/95 px-3 py-1.5 text-xs font-bold text-[#a45c45] backdrop-blur">
-                  {missingCount} do dokupienia
+                  {missingCount} {copy.toBuy}
                 </span>
               )}
             </div>
@@ -219,7 +328,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
             </div>
 
             <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
-              Szczegóły przepisu
+              {copy.details}
             </p>
             <h1 className="break-anywhere mt-2 font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
               {recipe.title}
@@ -228,7 +337,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
               {recipe.description}
             </p>
             <p className="mt-3 text-xs text-[#929a94]">
-              Udostępnia: {savedRecipe.user.name}
+              {copy.sharedBy} {savedRecipe.user.name}
             </p>
 
             <div className="mt-6 grid grid-cols-2 gap-2 sm:gap-3">
@@ -249,22 +358,29 @@ export default async function RecipePage({ params }: RecipePageProps) {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2">
-              {savedRecipe.isPublic && <CopyRecipeLink />}
+              {savedRecipe.isPublic && (
+                <CopyRecipeLink
+                  idleLabel={copy.copyLink}
+                  copiedLabel={copy.copiedLink}
+                />
+              )}
               <CopyButton
-                text={recipeText(recipe, "ingredients")}
-                idleLabel="Kopiuj składniki"
+                text={recipeText(recipe, "ingredients", language)}
+                idleLabel={copy.copyIngredients}
+                copiedLabel={copy.copied}
                 className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               />
               <CopyButton
-                text={recipeText(recipe, "steps")}
-                idleLabel="Kopiuj instrukcje"
+                text={recipeText(recipe, "steps", language)}
+                idleLabel={copy.copyInstructions}
+                copiedLabel={copy.copied}
                 className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               />
               <Link
                 href="/"
                 className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               >
-                Otwórz aplikację
+                {copy.openApp}
               </Link>
             </div>
           </div>
@@ -276,14 +392,14 @@ export default async function RecipePage({ params }: RecipePageProps) {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="font-serif text-2xl font-semibold">
-                    Wartości odżywcze
+                    {copy.nutrition}
                   </h2>
                   <p className="mt-1 text-xs text-[#7a857e]">
-                    Szacunek na 1 porcję
+                    {copy.perServing}
                   </p>
                 </div>
                 <span className="rounded-full bg-[#eef6ef] px-3 py-1 text-xs font-bold text-[#356248]">
-                  makro
+                  {copy.macro}
                 </span>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
@@ -302,9 +418,11 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
             <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-white p-4 shadow-sm sm:p-5">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="font-serif text-2xl font-semibold">Składniki</h2>
+                <h2 className="font-serif text-2xl font-semibold">
+                  {copy.ingredientsTitle}
+                </h2>
                 <span className="text-xs font-semibold text-[#7a857e]">
-                  {recipe.ingredients.length} pozycji
+                  {recipe.ingredients.length} {copy.items}
                 </span>
               </div>
               <ul className="mt-4 space-y-2 text-sm leading-6 text-[#59675f]">
@@ -326,15 +444,14 @@ export default async function RecipePage({ params }: RecipePageProps) {
               <section className="rounded-[1.5rem] border border-[#f0d8c7] bg-[#fff8f4] p-4 shadow-sm sm:p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="font-serif text-2xl font-semibold">
-                    Do dokupienia
+                    {copy.missing}
                   </h2>
                   <span className="text-xs font-semibold text-[#a45c45]">
                     {missingCount}
                   </span>
                 </div>
                 <p className="mt-1 text-xs leading-5 text-[#9b6a58]">
-                  Same nazwy produktów — bez gramów i łyżek, żeby lista zakupów
-                  była praktyczna.
+                  {copy.missingHint}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {recipe.missing.map((item) => (
@@ -355,15 +472,17 @@ export default async function RecipePage({ params }: RecipePageProps) {
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <h2 className="font-serif text-2xl font-semibold">
-                    Przygotowanie
+                    {copy.preparationTitle}
                   </h2>
                   <p className="mt-1 text-xs text-[#7a857e]">
-                    {recipe.steps.length} kroków · około {recipe.time} min
+                    {recipe.steps.length} {copy.steps} · {copy.around}{" "}
+                    {recipe.time} min
                   </p>
                 </div>
                 <CopyButton
-                  text={recipeText(recipe, "steps")}
-                  idleLabel="Kopiuj kroki"
+                  text={recipeText(recipe, "steps", language)}
+                  idleLabel={copy.copySteps}
+                  copiedLabel={copy.copied}
                   className="rounded-xl bg-[#eef6ef] px-3 py-2 text-xs font-semibold text-[#356248] transition hover:bg-[#e3efe5]"
                 />
               </div>
@@ -386,7 +505,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
               <section className="rounded-[1.5rem] border border-[#e5e0d7] bg-[#f8fbf7] p-4 shadow-sm sm:p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="font-serif text-2xl font-semibold">
-                    Zamienniki
+                    {copy.substitutions}
                   </h2>
                   <span className="text-xs font-semibold text-[#7a857e]">
                     {recipe.substitutions.length}

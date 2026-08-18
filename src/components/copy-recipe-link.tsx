@@ -35,12 +35,18 @@ export function CopyButton({
   );
 }
 
-export function CopyRecipeLink() {
+export function CopyRecipeLink({
+  idleLabel = "Kopiuj link",
+  copiedLabel = "✓ Link skopiowany",
+}: {
+  idleLabel?: string;
+  copiedLabel?: string;
+}) {
   return (
     <CopyButton
       text={() => window.location.href}
-      idleLabel="Kopiuj link"
-      copiedLabel="✓ Link skopiowany"
+      idleLabel={idleLabel}
+      copiedLabel={copiedLabel}
     />
   );
 }
