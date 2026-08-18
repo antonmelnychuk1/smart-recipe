@@ -193,6 +193,71 @@ const accountSettingsCopy = {
     deleteForever: "Delete account forever",
     locale: "en-US",
   },
+  uk: {
+    saved: "Налаштування збережено.",
+    saveError: "Помилка збереження.",
+    passwordMismatch: "Нові паролі не збігаються.",
+    invalidCurrentPassword: "Поточний пароль неправильний.",
+    passwordError: "Не вдалося змінити пароль.",
+    passwordChanged:
+      "Пароль змінено, а всі інші сесії завершено.",
+    invalidPassword: "Пароль неправильний.",
+    deleteError: "Не вдалося видалити акаунт.",
+    unknownDevice: "Невідомий пристрій",
+    browser: "Браузер",
+    device: "пристрій",
+    deleteConfirmation: "ВИДАЛИТИ",
+    personalization: "Персоналізація",
+    cookingPreferences: "Кулінарні вподобання",
+    preferencesDescription:
+      "Ці налаштування автоматично використовуватимуться в генераторі інгредієнтів і в секції «Введи, що хочеш приготувати».",
+    diet: "Дієта:",
+    goal: "Ціль:",
+    defaultDiet: "Типова дієта",
+    cookingGoal: "Ціль готування",
+    defaultBudget: "Типовий бюджет",
+    defaultTime: "Типовий час",
+    caloriesDaily: "Калорії на день",
+    proteinDaily: "Білки на день (г)",
+    allergies: "Алергії та заборонені інгредієнти",
+    allergiesPlaceholder: "наприклад, горіхи, креветки, селера",
+    allergiesHint:
+      "Вводь через кому. Генератор має повністю уникати цих інгредієнтів у рецептах, кроках і замінниках.",
+    disliked: "Продукти, які ти не любиш",
+    dislikedPlaceholder: "наприклад, кінза, оливки, печериці",
+    dislikedHint:
+      "Це не обов’язково алергія — просто продукти, які застосунок не має пропонувати.",
+    impactTitle: "Як це вплине на генератор?",
+    impactText:
+      "Типова дієта, час, бюджет і ціль автоматично встановляться на головній сторінці. Алергії та небажані продукти надсилатимуться AI під час кожної генерації.",
+    saving: "Зберігаю...",
+    savePreferences: "Зберегти вподобання",
+    changePassword: "Зміна пароля",
+    changePasswordHint:
+      "Після зміни пароля всі інші пристрої будуть виведені з акаунта.",
+    currentPassword: "Поточний пароль",
+    newPassword: "Новий пароль",
+    repeatPassword: "Повтори новий пароль",
+    changing: "Змінюю...",
+    changePasswordButton: "Змінити пароль",
+    activeSessions: "Активні сесії",
+    activeSessionsHint:
+      "Пристрої, на яких твій акаунт зараз активний.",
+    signOutOthers: "Вийти з інших",
+    loadingSessions: "Завантажую сесії...",
+    current: "поточна",
+    noData: "немає даних",
+    created: "створена",
+    signOut: "Вийти",
+    deleteAccount: "Видалити акаунт",
+    deleteWarning:
+      "Ця операція назавжди видалить акаунт, рецепти, історію, список покупок, планер і статистику. Її не можна скасувати.",
+    password: "Пароль",
+    typeConfirmation: "Введи",
+    deleting: "Видаляю...",
+    deleteForever: "Видалити акаунт назавжди",
+    locale: "uk-UA",
+  },
 } as const satisfies Record<UiLanguage, Record<string, string>>;
 
 const goalLabels: Record<UiLanguage, Record<string, string>> = {
@@ -204,6 +269,14 @@ const goalLabels: Record<UiLanguage, Record<string, string>> = {
     healthy: "Healthier",
     high_protein: "High-protein",
     use_pantry: "Use what I have",
+  },
+  uk: {
+    balanced: "Збалансовано",
+    quick: "Швидко",
+    cheap: "Бюджетно",
+    healthy: "Здоровіше",
+    high_protein: "Високобілково",
+    use_pantry: "З того, що маю",
   },
 };
 

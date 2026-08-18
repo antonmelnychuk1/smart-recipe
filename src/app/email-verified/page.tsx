@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import {
   languageCookieName,
   normalizeLanguage,
+  type UiLanguage,
 } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 
@@ -12,7 +13,7 @@ type VerificationPageProps = {
 };
 
 const emailVerifiedCopy: Record<
-  "pl" | "en",
+  UiLanguage,
   {
     successTitle: string;
     failedTitle: string;
@@ -57,6 +58,23 @@ const emailVerifiedCopy: Record<
       INVALID_ORIGIN: "The redirect address was not accepted.",
     },
   },
+  uk: {
+    successTitle: "E-mail підтверджено",
+    failedTitle: "Не вдалося підтвердити e-mail",
+    success: (email) => `Адресу ${email} успішно підтверджено.`,
+    failed:
+      "Акаунт усе ще не підтверджено. Повернись до застосунку й надішли нове посилання.",
+    unknownFailed: "Верифікація не вдалася",
+    back: "Назад до застосунку",
+    errors: {
+      INVALID_TOKEN:
+        "Посилання для верифікації неправильне. Надішли новий лист і використай найновіше посилання.",
+      TOKEN_EXPIRED:
+        "Посилання для верифікації прострочене. Надішли новий лист із застосунку.",
+      USER_NOT_FOUND: "Не знайдено акаунт, пов’язаний із цією e-mail адресою.",
+      INVALID_ORIGIN: "Адресу перенаправлення не прийнято.",
+    },
+  },
 };
 
 export default async function EmailVerifiedPage({
@@ -66,7 +84,7 @@ export default async function EmailVerifiedPage({
   const language = normalizeLanguage(
     lang ?? queryLanguage ?? (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = emailVerifiedCopy[language === "uk" ? "en" : language];
+  const copy = emailVerifiedCopy[language];
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user.id
     ? await prisma.user.findUnique({

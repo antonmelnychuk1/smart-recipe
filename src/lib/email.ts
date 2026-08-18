@@ -58,6 +58,26 @@ const emailCopy = {
     resetFooter:
       "The link expires in 1 hour. If you did not request a password reset, you can ignore this message.",
   },
+  uk: {
+    verificationSubject: "Підтвердь свою e-mail адресу в SmartRecipe",
+    verificationText: (name: string, url: string) =>
+      `Привіт, ${name}! Підтвердь свою e-mail адресу, відкривши це посилання: ${url}`,
+    verificationTitle: "Підтвердь свою e-mail адресу",
+    verificationIntro: (name: string) =>
+      `Привіт, ${name}! Натисни кнопку нижче, щоб підтвердити e-mail адресу та захистити свій акаунт.`,
+    verificationButton: "Підтвердити e-mail",
+    verificationFooter:
+      "Якщо ти не створював акаунт SmartRecipe, можеш проігнорувати цей лист.",
+    resetSubject: "Скинь пароль у SmartRecipe",
+    resetText: (name: string, url: string) =>
+      `Привіт, ${name}! Встанови новий пароль, відкривши це посилання: ${url}. Посилання діє 1 годину.`,
+    resetTitle: "Скидання пароля",
+    resetIntro: (name: string) =>
+      `Привіт, ${name}! Натисни кнопку нижче, щоб встановити новий пароль для свого акаунта.`,
+    resetButton: "Встановити новий пароль",
+    resetFooter:
+      "Посилання діє 1 годину. Якщо ти не просив скинути пароль, можеш проігнорувати цей лист.",
+  },
 } as const;
 
 export async function sendVerificationEmail({

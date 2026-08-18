@@ -37,6 +37,19 @@ const resetPasswordCopy = {
     submit: "Set new password",
     back: "Back to app",
   },
+  uk: {
+    mismatch: "Паролі не збігаються.",
+    invalidToken:
+      "Посилання неправильне або прострочене. Надішли нове посилання для скидання.",
+    failed: "Не вдалося встановити новий пароль.",
+    success:
+      "Пароль змінено. Можеш повернутися до застосунку й увійти знову.",
+    password: "Новий пароль",
+    repeatPassword: "Повтори пароль",
+    saving: "Зберігаю...",
+    submit: "Встановити новий пароль",
+    back: "Назад до застосунку",
+  },
 } as const;
 
 export function ResetPasswordForm({

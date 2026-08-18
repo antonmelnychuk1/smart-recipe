@@ -33,6 +33,12 @@ const savedRecipesCopy: Record<
     history: "History",
     back: "← Back to app",
   },
+  uk: {
+    title: "Збережені рецепти",
+    description: "Шукай, фільтруй і керуй своїми улюбленими рецептами.",
+    history: "Історія",
+    back: "← Назад до застосунку",
+  },
 };
 
 export default async function SavedRecipesPage() {

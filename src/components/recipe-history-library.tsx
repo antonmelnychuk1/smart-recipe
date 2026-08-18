@@ -51,6 +51,26 @@ const historyLibraryCopy = {
     noHistory: "No matching history",
     noHistoryHint: "Change filters or generate new recipes in the app.",
   },
+  uk: {
+    locale: "uk-UA",
+    search: "Шукай за стравою, інгредієнтом або описом",
+    allTypes: "Усі типи",
+    fromIngredients: "З інгредієнтів",
+    byDish: "За назвою страви",
+    allDiets: "Будь-яка дієта",
+    anyTime: "Будь-який час",
+    newest: "Найновіші",
+    oldest: "Найстаріші",
+    mostRecipes: "Найбільше рецептів",
+    entries: "записів історії",
+    dish: "Страва",
+    ingredients: "Інгредієнти",
+    dishPrefix: "Страва:",
+    upTo: "до",
+    openResults: "Відкрити результати",
+    noHistory: "Немає відповідної історії",
+    noHistoryHint: "Зміни фільтри або згенеруй нові рецепти в застосунку.",
+  },
 } as const;
 
 function formatDate(date: string, language: AppLanguage) {

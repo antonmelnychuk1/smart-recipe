@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { AdminUsersPanel } from "@/components/admin-users-panel";
 import { getCurrentAdmin } from "@/lib/admin";
 import {
+  getUiLanguage,
   languageCookieName,
   normalizeLanguage,
   type AppLanguage,
@@ -113,6 +114,54 @@ const adminPageCopy = {
       "“Total” includes successful generations saved in the limits table. History shows up to 50 latest saved searches per account.",
     locale: "en-US",
   },
+  uk: {
+    feedbackLabels: {
+      liked: "👍 Супер",
+      too_expensive: "Занадто дорого",
+      too_hard: "Занадто складно",
+      too_caloric: "Забагато калорій",
+      bad_photo: "Фото не підходить",
+    },
+    noActivity: "Немає активності",
+    dishPrefix: "Страва:",
+    title: "Панель адміністратора",
+    signedInAs: "Увійшов як",
+    back: "← Назад до застосунку",
+    users: "Користувачі",
+    totalGenerations: "Генерацій усього",
+    todayGenerations: "Генерацій сьогодні",
+    activeToday: "Активні сьогодні",
+    atLimit: "На ліміті",
+    favorites: "Улюблені рецепти",
+    mealPlans: "Заплановані страви",
+    recipeRatings: "Оцінки рецептів",
+    guestGenerations: "Генерації гостей",
+    averagePerUser: "У середньому на користувача",
+    recipeQuality: "Якість рецептів",
+    userFeedback: "Відгуки користувачів",
+    ratings: "оцінок",
+    latestSignals: "Останні сигнали",
+    latestRatings: "Найновіші оцінки",
+    noRatings:
+      "Оцінок ще немає. Коли користувачі почнуть натискати відгуки біля рецептів, ти побачиш їх тут.",
+    trends: "Тренди",
+    trendsTitle: "Що користувачі генерують найчастіше",
+    trendsDescription:
+      "Останні пошуки та оцінки допомагають швидко побачити, чого люди шукають і які рецепти потребують покращення.",
+    historyEntries: "записів історії",
+    topSearches: "Найчастіші запити",
+    topIngredients: "Найчастіші інгредієнти",
+    topRecipes: "Найчастіше генеровані рецепти",
+    recipesToImprove: "Рецепти для покращення",
+    noData: "Немає даних.",
+    latestSearches: "Найновіші пошуки",
+    noSearchHistory: "Немає збереженої історії пошуків.",
+    minutesPrefix: "до",
+    minutesSuffix: "хв",
+    footnote:
+      "«Усього» включає успішні генерації, збережені в таблиці лімітів. Історія показує максимум 50 останніх збережених пошуків на акаунт.",
+    locale: "uk-UA",
+  },
 } as const;
 
 const feedbackLabelKeys = {
@@ -143,7 +192,7 @@ function startOfUtcDay() {
 }
 
 function formatDate(date: Date | null, language: AppLanguage) {
-  const copy = adminPageCopy[language === "uk" ? "en" : language];
+  const copy = adminPageCopy[getUiLanguage(language)];
   if (!date) return copy.noActivity;
 
   return new Intl.DateTimeFormat(copy.locale, {
@@ -179,7 +228,7 @@ function topEntries(map: Map<string, number>, limit = 6) {
 }
 
 function feedbackLabel(
-  labels: (typeof adminPageCopy)["pl" | "en"]["feedbackLabels"],
+  labels: (typeof adminPageCopy)[AppLanguage]["feedbackLabels"],
   value: string,
 ) {
   return labels[value as keyof typeof labels] ?? value;
@@ -191,7 +240,7 @@ export default async function AdminPage() {
   const language = normalizeLanguage(
     (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = adminPageCopy[language === "uk" ? "en" : language];
+  const copy = adminPageCopy[getUiLanguage(language)];
   const feedbackLabels = copy.feedbackLabels;
 
   const today = startOfUtcDay();

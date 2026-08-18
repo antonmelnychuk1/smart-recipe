@@ -32,6 +32,13 @@ const historyCopy: Record<
     saved: "Saved",
     back: "← Back to app",
   },
+  uk: {
+    title: "Історія рецептів",
+    description:
+      "Переглядай попередні генерації, фільтруй результати та повертайся до рецептів одним кліком.",
+    saved: "Збережені",
+    back: "← Назад до застосунку",
+  },
 };
 
 export default async function RecipeHistoryPage() {

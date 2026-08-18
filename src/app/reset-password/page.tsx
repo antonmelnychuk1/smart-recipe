@@ -55,6 +55,21 @@ const resetPageCopy: Record<
       INVALID_ORIGIN: "The redirect address was not accepted.",
     },
   },
+  uk: {
+    title: "Встанови новий пароль",
+    description:
+      "Введи новий пароль для свого акаунта. Після зміни старі сесії будуть завершені для безпеки.",
+    missingToken:
+      "Бракує токена скидання. Відкрий найновіше посилання з e-mail.",
+    failed: "Не вдалося скинути пароль",
+    errors: {
+      INVALID_TOKEN:
+        "Посилання для скидання неправильне або прострочене. Повернись до застосунку й надішли нове посилання.",
+      TOKEN_EXPIRED:
+        "Посилання для скидання прострочене. Повернись до застосунку й надішли нове посилання.",
+      INVALID_ORIGIN: "Адресу перенаправлення не прийнято.",
+    },
+  },
 };
 
 function getFirstParam(value: string | string[] | undefined) {

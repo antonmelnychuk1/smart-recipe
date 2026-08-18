@@ -57,6 +57,27 @@ const adminActionCopy = {
     currentAdminInfo:
       "Your own admin account cannot be banned, deleted or downgraded.",
   },
+  uk: {
+    genericError: "Операція не вдалася.",
+    manage: "Керувати",
+    ariaManage: (name: string) => `Керувати акаунтом ${name}`,
+    accountManagement: "Керування акаунтом",
+    close: "Закрити",
+    dailyLimit: "Денний ліміт",
+    save: "Зберегти",
+    resetLimit: "Скинути ліміт",
+    removeAdmin: "Забрати адміна",
+    makeAdmin: "Надати адміна",
+    unban: "Розблокувати",
+    ban: "Заблокувати",
+    deleteAccount: "Видалити акаунт",
+    banConfirm: (name: string) =>
+      `Заблокувати акаунт користувача ${name}? Активні сесії будуть завершені.`,
+    deleteConfirm: (name: string) =>
+      `Назавжди видалити акаунт ${name} і всі його дані? Цю операцію не можна скасувати.`,
+    currentAdminInfo:
+      "Власний акаунт адміністратора не можна заблокувати, видалити або понизити.",
+  },
 } as const satisfies Record<
   UiLanguage,
   Record<string, string | ((value: string) => string)>

@@ -95,6 +95,47 @@ const authCopy = {
         "The account has been created. Check your inbox and confirm your e-mail address.",
     },
   },
+  uk: {
+    labels: {
+      login: "Вхід",
+      register: "Реєстрація",
+      forgot: "Відновлення пароля",
+      close: "Закрити",
+      name: "Ім’я",
+      email: "E-mail",
+      password: "Пароль",
+    },
+    titles: {
+      login: "Раді бачити знову",
+      register: "Створи акаунт",
+      forgot: "Віднови пароль",
+    },
+    forgotText:
+      "Введи e-mail акаунта, і ми надішлемо посилання для встановлення нового пароля.",
+    buttons: {
+      pending: "Хвилинку...",
+      login: "Увійти",
+      register: "Створити акаунт",
+      forgot: "Надіслати посилання",
+      forgotPassword: "Не пам’ятаєш пароль?",
+      toRegister: "Немає акаунта? Зареєструйся",
+      toLogin: "Вже маєш акаунт? Увійди",
+      backToLogin: "Назад до входу",
+    },
+    errors: {
+      resetFailed:
+        "Не вдалося надіслати посилання для скидання. Спробуй ще раз.",
+      userExists: "Акаунт із цією адресою вже існує.",
+      invalidLogin: "Неправильний e-mail або пароль.",
+      registerFailed: "Не вдалося створити акаунт.",
+    },
+    messages: {
+      resetSent:
+        "Якщо акаунт із цією адресою існує, ми надіслали посилання для встановлення нового пароля.",
+      registered:
+        "Акаунт створено. Перевір пошту й підтвердь e-mail адресу.",
+    },
+  },
 } as const;
 
 export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {

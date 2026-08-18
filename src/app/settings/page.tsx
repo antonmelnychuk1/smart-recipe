@@ -6,12 +6,13 @@ import { auth } from "@/lib/auth";
 import {
   languageCookieName,
   normalizeLanguage,
+  type UiLanguage,
 } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
 const settingsCopy: Record<
-  "pl" | "en",
+  UiLanguage,
   {
     title: string;
     back: string;
@@ -36,6 +37,14 @@ const settingsCopy: Record<
     mobileText:
       "On iPhone, use the share button in Safari and choose “Add to Home Screen”. On Android, open the browser menu and choose “Install app” or “Add to Home screen”.",
   },
+  uk: {
+    title: "Налаштування акаунта",
+    back: "← Назад до застосунку",
+    mobileEyebrow: "Мобільний застосунок",
+    mobileTitle: "Додай SmartRecipe на головний екран",
+    mobileText:
+      "На iPhone скористайся кнопкою поширення в Safari та вибери «Додати на початковий екран». На Android відкрий меню браузера й вибери «Встановити застосунок» або «Додати на головний екран».",
+  },
 };
 
 export default async function SettingsPage() {
@@ -44,7 +53,7 @@ export default async function SettingsPage() {
   const language = normalizeLanguage(
     (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = settingsCopy[language === "uk" ? "en" : language];
+  const copy = settingsCopy[language];
 
   return (
     <main className="min-h-screen bg-[#f7f4ed] px-4 py-5 text-[#25322b] sm:px-8 sm:py-8">
