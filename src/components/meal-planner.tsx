@@ -151,6 +151,7 @@ const plannerCopy = {
 } as const;
 
 const mealTypeKeys: MealType[] = ["breakfast", "lunch", "dinner"];
+const plannerContainerClass = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
 
 type MealPlannerProps = {
   recipes: Recipe[];
@@ -452,9 +453,9 @@ export function MealPlanner({
   return (
     <section
       id="meal-planner"
-      className="scroll-mt-8 border-t border-[#e5e0d7] bg-[#faf8f3] px-4 py-8 sm:px-8 sm:py-20"
+      className="scroll-mt-8 border-t border-[#e5e0d7] bg-[#faf8f3] py-8 sm:py-20"
     >
-      <div className="mx-auto max-w-7xl">
+      <div className={plannerContainerClass}>
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">

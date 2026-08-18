@@ -183,6 +183,8 @@ const storageKeys = {
   priceRegion: "smart-recipe:price-region",
 };
 
+const pageContainerClass = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
+
 const feedbackOptions: {
   value: RecipeFeedback;
   label: string;
@@ -2130,7 +2132,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f7f4ed] text-[#25322b]">
-      <nav className="relative z-40 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8 sm:py-6">
+      <nav
+        className={`${pageContainerClass} relative z-40 flex items-center justify-between py-4 sm:py-6`}
+      >
         <a href="#" className="flex items-center gap-2 text-lg font-bold">
           <Image
             src="/smart-recipe-icon.svg"
@@ -2334,8 +2338,10 @@ export default function Home() {
       {emailVerificationEnabled &&
         session?.user &&
         !session.user.emailVerified && (
-        <div className="border-y border-[#efd4a8] bg-[#fff5df] px-5 py-3 sm:px-8">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 text-sm text-[#795d2f]">
+        <div className="border-y border-[#efd4a8] bg-[#fff5df] py-3">
+          <div
+            className={`${pageContainerClass} flex flex-wrap items-center justify-between gap-3 text-sm text-[#795d2f]`}
+          >
             <p>
               {pageCopy.verifyPrefix} <strong>{session.user.email}</strong>,{" "}
               {pageCopy.verifySuffix}
@@ -2357,8 +2363,10 @@ export default function Home() {
         )}
 
       {(expiringPantryItems.length > 0 || expiredPantryItems.length > 0) && (
-        <div className="border-y border-[#efd5ab] bg-[#fff8e9] px-4 py-3 sm:px-8">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
+        <div className="border-y border-[#efd5ab] bg-[#fff8e9] py-3">
+          <div
+            className={`${pageContainerClass} flex flex-wrap items-center justify-between gap-3`}
+          >
             <p className="text-sm text-[#795d2f]">
               <strong>{pageCopy.checkPantry}</strong>{" "}
               {expiredPantryItems.length > 0 &&
@@ -2380,40 +2388,42 @@ export default function Home() {
       )}
 
       {session?.user && !preferencesCompleted && (
-        <section className="px-4 pt-4 sm:px-8 sm:pt-6">
-          <div className="mx-auto max-w-7xl overflow-hidden rounded-[1.5rem] border border-[#d6e2d8] bg-[#eef6ef] p-4 shadow-sm sm:p-5">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-[#365a46]">
-                  {pageCopy.setPreferences}
-                </p>
-                <p className="mt-1 max-w-3xl text-xs leading-5 text-[#68736b] sm:text-sm">
-                  {pageCopy.preferencesText}
-                </p>
-                <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
-                  {pageCopy.onboardingSteps.map((step, index) => (
-                    <span
-                      key={step}
-                      className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#365a46] shadow-sm"
-                    >
-                      {index + 1}. {step}
-                    </span>
-                  ))}
+        <section className="pt-4 sm:pt-6">
+          <div className={pageContainerClass}>
+            <div className="overflow-hidden rounded-[1.5rem] border border-[#d6e2d8] bg-[#eef6ef] p-4 shadow-sm sm:p-5">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[#365a46]">
+                    {pageCopy.setPreferences}
+                  </p>
+                  <p className="mt-1 max-w-3xl text-xs leading-5 text-[#68736b] sm:text-sm">
+                    {pageCopy.preferencesText}
+                  </p>
+                  <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+                    {pageCopy.onboardingSteps.map((step, index) => (
+                      <span
+                        key={step}
+                        className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#365a46] shadow-sm"
+                      >
+                        {index + 1}. {step}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+                <Link
+                  href="/settings"
+                  className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#285840]"
+                >
+                  {pageCopy.completeNow}
+                </Link>
               </div>
-              <Link
-                href="/settings"
-                className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#285840]"
-              >
-                {pageCopy.completeNow}
-              </Link>
             </div>
           </div>
         </section>
       )}
 
       {session?.user && (
-        <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-8 sm:pt-6">
+        <section className={`${pageContainerClass} pt-4 sm:pt-6`}>
           <div className="min-w-0 overflow-hidden rounded-2xl border border-[#dfe4dc] bg-white/85 p-3 shadow-[0_12px_36px_rgba(53,68,58,0.07)] backdrop-blur sm:p-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
@@ -2744,7 +2754,9 @@ export default function Home() {
       </section>
 
       <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
-        <div className="max-w-7xl mx-auto grid gap-5 px-4 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:px-8 sm:py-8">
+        <div
+          className={`${pageContainerClass} grid gap-5 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:py-8`}
+        >
           {copy.how.map(([number, title, text]) => (
             <div key={number} className="flex items-start gap-4 text-left">
               <span className="font-serif text-3xl italic text-[#d46c4c]">{number}</span>
@@ -2757,8 +2769,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#f7f4ed] px-4 py-8 sm:px-8 sm:py-14">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-[#f7f4ed] py-8 sm:py-14">
+        <div className={pageContainerClass}>
           <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
@@ -2794,8 +2806,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] px-4 py-8 sm:px-8 sm:py-14">
-        <div className="mx-auto max-w-7xl grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
+      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] py-8 sm:py-14">
+        <div
+          className={`${pageContainerClass} grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12`}
+        >
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
               {copy.dish.eyebrow}
@@ -2899,7 +2913,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="results" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-8 sm:px-8 sm:py-20">
+      <section
+        id="results"
+        className={`${pageContainerClass} scroll-mt-8 py-8 sm:py-20`}
+      >
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
@@ -3146,9 +3163,9 @@ export default function Home() {
 
       <section
         id="my-kitchen"
-        className="scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] px-4 py-8 sm:px-8 sm:py-20"
+        className="scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] py-8 sm:py-20"
       >
-        <div className="mx-auto max-w-7xl">
+        <div className={pageContainerClass}>
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
               {copy.kitchen.eyebrow}
@@ -4202,8 +4219,10 @@ export default function Home() {
         </div>
       )}
 
-      <footer className="bg-[#23362c] px-4 py-6 text-center text-sm text-[#b8c3bc] sm:px-5 sm:py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+      <footer className="bg-[#23362c] py-6 text-center text-sm text-[#b8c3bc] sm:py-8">
+        <div
+          className={`${pageContainerClass} flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap`}
+        >
           <span>{copy.footer.text}</span>
           <span className="hidden text-white/25 sm:inline">·</span>
           <a
