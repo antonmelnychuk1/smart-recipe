@@ -1,4 +1,4 @@
-import type { CurrencyCode } from "@/lib/i18n";
+import type { CurrencyCode, PriceRegionCode } from "@/lib/i18n";
 
 export type Recipe = {
   title: string;
@@ -11,6 +11,7 @@ export type Recipe = {
   fat: number;
   estimatedCost?: number;
   currency?: CurrencyCode;
+  priceRegion?: PriceRegionCode;
   match: number;
   ingredients: string[];
   missing: string[];

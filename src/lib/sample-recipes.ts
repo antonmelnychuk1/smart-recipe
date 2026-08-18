@@ -3,6 +3,7 @@ import {
   convertPrice,
   type AppLanguage,
   type CurrencyCode,
+  type PriceRegionCode,
 } from "@/lib/i18n";
 
 export const sampleRecipes: Recipe[] = [
@@ -269,6 +270,7 @@ export const sampleRecipesByLanguage: Record<AppLanguage, Recipe[]> = {
 export function getSampleRecipes(
   language: AppLanguage,
   currency: CurrencyCode = "PLN",
+  priceRegion: PriceRegionCode = "PL",
 ) {
   return sampleRecipesByLanguage[language].map((recipe) => ({
     ...recipe,
@@ -276,5 +278,6 @@ export function getSampleRecipes(
       ? convertPrice(recipe.estimatedCost, "PLN", currency)
       : undefined,
     currency,
+    priceRegion,
   }));
 }

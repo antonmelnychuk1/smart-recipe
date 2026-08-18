@@ -15,6 +15,9 @@ const recipeSchema = z.object({
   fat: z.number(),
   estimatedCost: z.number().optional(),
   currency: z.enum(["PLN", "EUR", "USD", "GBP"]).optional(),
+  priceRegion: z
+    .enum(["PL", "US", "GB", "DE", "FR", "ES", "IT", "NL", "CA", "AU"])
+    .optional(),
   match: z.number(),
   ingredients: z.array(z.string()),
   missing: z.array(z.string()),

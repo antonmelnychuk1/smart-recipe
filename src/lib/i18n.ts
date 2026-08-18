@@ -1,5 +1,16 @@
 export type AppLanguage = "pl" | "en";
 export type CurrencyCode = "PLN" | "EUR" | "USD" | "GBP";
+export type PriceRegionCode =
+  | "PL"
+  | "US"
+  | "GB"
+  | "DE"
+  | "FR"
+  | "ES"
+  | "IT"
+  | "NL"
+  | "CA"
+  | "AU";
 
 export const languageCookieName = "smart-recipe:language";
 
@@ -24,6 +35,23 @@ export const currencyOptions: {
   { value: "GBP", label: "GBP", symbol: "£" },
 ];
 
+export const priceRegionOptions: {
+  value: PriceRegionCode;
+  label: string;
+  currency: CurrencyCode;
+}[] = [
+  { value: "PL", label: "Poland", currency: "PLN" },
+  { value: "US", label: "United States", currency: "USD" },
+  { value: "GB", label: "United Kingdom", currency: "GBP" },
+  { value: "DE", label: "Germany", currency: "EUR" },
+  { value: "FR", label: "France", currency: "EUR" },
+  { value: "ES", label: "Spain", currency: "EUR" },
+  { value: "IT", label: "Italy", currency: "EUR" },
+  { value: "NL", label: "Netherlands", currency: "EUR" },
+  { value: "CA", label: "Canada", currency: "USD" },
+  { value: "AU", label: "Australia", currency: "USD" },
+];
+
 const currencyRatesToPln: Record<CurrencyCode, number> = {
   PLN: 1,
   EUR: 4.3,
@@ -37,6 +65,14 @@ export function normalizeLanguage(value: string | undefined | null): AppLanguage
 
 export function normalizeCurrency(value: string | undefined | null): CurrencyCode {
   return value === "EUR" || value === "USD" || value === "GBP" ? value : "PLN";
+}
+
+export function normalizePriceRegion(
+  value: string | undefined | null,
+): PriceRegionCode {
+  return priceRegionOptions.some((option) => option.value === value)
+    ? (value as PriceRegionCode)
+    : "PL";
 }
 
 export function getCurrencyForLocale(locale: string | undefined): CurrencyCode {
@@ -64,6 +100,39 @@ export function getCurrencyForLocale(locale: string | undefined): CurrencyCode {
   }
 
   return "USD";
+}
+
+export function getPriceRegionForLocale(locale: string | undefined) {
+  const normalized = locale?.toLocaleLowerCase() ?? "";
+
+  if (normalized.startsWith("pl")) return "PL";
+  if (normalized.startsWith("en-us")) return "US";
+  if (normalized.startsWith("en-gb")) return "GB";
+  if (normalized.startsWith("de")) return "DE";
+  if (normalized.startsWith("fr")) return "FR";
+  if (normalized.startsWith("es")) return "ES";
+  if (normalized.startsWith("it")) return "IT";
+  if (normalized.startsWith("nl")) return "NL";
+  if (normalized.startsWith("en-ca") || normalized.startsWith("fr-ca")) {
+    return "CA";
+  }
+  if (normalized.startsWith("en-au")) return "AU";
+
+  return "US";
+}
+
+export function getCurrencyForPriceRegion(region: PriceRegionCode) {
+  return (
+    priceRegionOptions.find((option) => option.value === region)?.currency ??
+    "USD"
+  );
+}
+
+export function getPriceRegionLabel(region: PriceRegionCode) {
+  return (
+    priceRegionOptions.find((option) => option.value === region)?.label ??
+    "United States"
+  );
 }
 
 export const homeCopy = {

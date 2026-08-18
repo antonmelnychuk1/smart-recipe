@@ -6,6 +6,7 @@ import {
   refundGenerationLimit,
 } from "@/lib/generation-limit";
 import { apiError } from "@/lib/api-language";
+import { getPriceRegionLabel } from "@/lib/i18n";
 import { attachRecipePhotos } from "@/lib/pexels";
 
 const ingredientsRequestSchema = z.object({
@@ -19,6 +20,9 @@ const ingredientsRequestSchema = z.object({
   maxTime: z.number().int().min(0).max(240),
   maxBudget: z.number().int().min(0).max(1000),
   currency: z.enum(["PLN", "EUR", "USD", "GBP"]).default("PLN"),
+  priceRegion: z
+    .enum(["PL", "US", "GB", "DE", "FR", "ES", "IT", "NL", "CA", "AU"])
+    .default("PL"),
   language: z.enum(["pl", "en"]).default("pl"),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
@@ -38,6 +42,9 @@ const dishRequestSchema = z.object({
   maxTime: z.number().int().min(0).max(240),
   maxBudget: z.number().int().min(0).max(1000),
   currency: z.enum(["PLN", "EUR", "USD", "GBP"]).default("PLN"),
+  priceRegion: z
+    .enum(["PL", "US", "GB", "DE", "FR", "ES", "IT", "NL", "CA", "AU"])
+    .default("PL"),
   language: z.enum(["pl", "en"]).default("pl"),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
@@ -139,6 +146,7 @@ export async function POST(request: Request) {
   const { diet, maxTime } = requestData;
   const language = requestData.language;
   const currency = requestData.currency;
+  const priceRegion = getPriceRegionLabel(requestData.priceRegion);
   const isEnglish = language === "en";
   const apiCopy =
     language === "en"
@@ -236,6 +244,9 @@ export async function POST(request: Request) {
       : isEnglish
         ? `Maximum ${maxTime} minutes`
         : `Maksymalnie ${maxTime} minut`;
+  const priceRegionRequirement = isEnglish
+    ? `Estimate ingredient prices for ${priceRegion}. Use typical consumer grocery prices for this region.`
+    : `Szacuj ceny składników dla regionu: ${priceRegion}. Używaj typowych konsumenckich cen spożywczych dla tego regionu.`;
   let responseSchema;
   let requestPrompt;
 
@@ -247,6 +258,8 @@ export async function POST(request: Request) {
 Diet: ${localizedDiet}
 Preparation time: ${timeRequirement}
 Budget: ${budgetRequirement}
+Price region: ${priceRegion}
+${priceRegionRequirement}
 ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
@@ -257,6 +270,8 @@ Each variant must clearly differ in ingredients, flavor or preparation method wh
 Dieta: ${localizedDiet}
 Czas przygotowania: ${timeRequirement}
 Budżet: ${budgetRequirement}
+Region cen: ${priceRegion}
+${priceRegionRequirement}
 ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
@@ -274,6 +289,8 @@ Products close to expiry that should be used first: ${
 Diet: ${localizedDiet}
 Preparation time: ${timeRequirement}
 Budget: ${budgetRequirement}
+Price region: ${priceRegion}
+${priceRegionRequirement}
 ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
@@ -288,6 +305,8 @@ Produkty z krótką datą ważności, które należy wykorzystać w pierwszej ko
 Dieta: ${localizedDiet}
 Czas przygotowania: ${timeRequirement}
 Budżet: ${budgetRequirement}
+Region cen: ${priceRegion}
+${priceRegionRequirement}
 ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
@@ -308,7 +327,7 @@ The missing field is ONLY a shopping list. Each missing item must be a short pro
 
 In preparation steps, include the amount and unit the first time each ingredient is used, e.g. “Add 250 g flour and 300 ml milk”. Do not omit proportions in instructions.
 
-estimatedCost is a realistic total estimated ingredient cost for 2 servings in whole ${currency}. Set currency exactly to "${currency}". Respect the budget if provided. Nutrition goals are a hint for one meal, not whole-day values.
+estimatedCost is a realistic total estimated ingredient cost for 2 servings in whole ${currency}, based on typical grocery prices in ${priceRegion}. Set currency exactly to "${currency}". Respect the budget if provided. Nutrition goals are a hint for one meal, not whole-day values.
 
 substitutions must contain 2–5 practical swaps for ingredients users may want to replace or that are often problematic. Each item must mention the original recipe ingredient and 1–3 substitutes with short quantities, e.g. “150 g Greek yogurt” instead of “150 g sour cream”. Substitutes must fit the chosen diet and cannot break user restrictions.
 
@@ -324,7 +343,7 @@ Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing mus
 
 W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
 
-Pole estimatedCost to realistyczny, całkowity szacowany koszt składników dla 2 porcji w pełnych jednostkach waluty ${currency}. Pole currency ustaw dokładnie na "${currency}". Przestrzegaj budżetu, jeśli został podany. Cele żywieniowe traktuj jako wskazówkę dla jednego posiłku, nie jako wartości całego dnia.
+Pole estimatedCost to realistyczny, całkowity szacowany koszt składników dla 2 porcji w pełnych jednostkach waluty ${currency}, oparty o typowe ceny spożywcze w regionie ${priceRegion}. Pole currency ustaw dokładnie na "${currency}". Przestrzegaj budżetu, jeśli został podany. Cele żywieniowe traktuj jako wskazówkę dla jednego posiłku, nie jako wartości całego dnia.
 
 Pole substitutions ma zawierać 2–5 praktycznych zamienników dla składników, które użytkownik może chcieć podmienić lub które często są problematyczne. Każdy element ma wskazywać oryginalny składnik z przepisu oraz 1–3 zamienniki z krótką ilością, np. „150 g jogurtu greckiego” zamiast „150 g śmietany”. Zamienniki muszą pasować do wybranej diety i nie mogą łamać ograniczeń użytkownika.
 
@@ -404,7 +423,10 @@ ${generationRules}`,
     );
 
     return Response.json({
-      recipes: recipesWithPhotos,
+      recipes: recipesWithPhotos.map((recipe) => ({
+        ...recipe,
+        priceRegion: requestData.priceRegion,
+      })),
       usage: {
         limit: usage.limit,
         remaining: usage.remaining,

@@ -11,13 +11,18 @@ import {
   currencyOptions,
   type CurrencyCode,
   getCurrencyForLocale,
+  getCurrencyForPriceRegion,
+  getPriceRegionForLocale,
   formatOptionLabel,
   formatPrice,
   homeCopy,
   languageCookieName,
   languageOptions,
   normalizeCurrency,
+  normalizePriceRegion,
+  priceRegionOptions,
   type AppLanguage,
+  type PriceRegionCode,
 } from "@/lib/i18n";
 import type {
   PantryItem,
@@ -174,6 +179,7 @@ const storageKeys = {
   restoreHistory: "smart-recipe:restore-history",
   language: "smart-recipe:language",
   currency: "smart-recipe:currency",
+  priceRegion: "smart-recipe:price-region",
 };
 
 const feedbackOptions: {
@@ -484,10 +490,44 @@ function CurrencySwitcher({
   );
 }
 
+function PriceRegionSwitcher({
+  language,
+  region,
+  onChange,
+  compact = false,
+}: {
+  language: AppLanguage;
+  region: PriceRegionCode;
+  onChange: (region: PriceRegionCode) => void;
+  compact?: boolean;
+}) {
+  return (
+    <label
+      className={`inline-flex items-center gap-2 rounded-full border border-[#d9d7cd] bg-white px-3 py-1.5 text-xs font-bold text-[#667168] shadow-sm ${
+        compact ? "w-full justify-between" : ""
+      }`}
+    >
+      <span>{language === "pl" ? "Region" : "Prices"}</span>
+      <select
+        value={region}
+        onChange={(event) => onChange(normalizePriceRegion(event.target.value))}
+        className="max-w-28 bg-transparent text-xs font-bold text-[#25322b] outline-none"
+      >
+        {priceRegionOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 export default function Home() {
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [language, setLanguage] = useState<AppLanguage>("pl");
   const [currency, setCurrency] = useState<CurrencyCode>("PLN");
+  const [priceRegion, setPriceRegion] = useState<PriceRegionCode>("PL");
   const [languageLoaded, setLanguageLoaded] = useState(false);
   const [ingredients, setIngredients] = useState(defaultIngredientsByLanguage.pl);
   const [input, setInput] = useState("");
@@ -698,7 +738,7 @@ export default function Home() {
   function changeLanguage(nextLanguage: AppLanguage) {
     setLanguage(nextLanguage);
     setLanguageLoaded(true);
-    setSampleRecipes(getSampleRecipes(nextLanguage, currency));
+    setSampleRecipes(getSampleRecipes(nextLanguage, currency, priceRegion));
     setIngredients((current) =>
       defaultIngredientSets.some((items) => sameIngredients(current, items))
         ? defaultIngredientsByLanguage[nextLanguage]
@@ -709,7 +749,14 @@ export default function Home() {
 
   function changeCurrency(nextCurrency: CurrencyCode) {
     setCurrency(nextCurrency);
-    setSampleRecipes(getSampleRecipes(language, nextCurrency));
+    setSampleRecipes(getSampleRecipes(language, nextCurrency, priceRegion));
+  }
+
+  function changePriceRegion(nextRegion: PriceRegionCode) {
+    const nextCurrency = getCurrencyForPriceRegion(nextRegion);
+    setPriceRegion(nextRegion);
+    setCurrency(nextCurrency);
+    setSampleRecipes(getSampleRecipes(language, nextCurrency, nextRegion));
   }
 
   useEffect(() => {
@@ -717,6 +764,9 @@ export default function Home() {
       const storedLanguage = window.localStorage.getItem(storageKeys.language);
       const storedCurrency = normalizeCurrency(
         window.localStorage.getItem(storageKeys.currency),
+      );
+      const storedRegion = normalizePriceRegion(
+        window.localStorage.getItem(storageKeys.priceRegion),
       );
       const nextLanguage =
         storedLanguage === "pl" || storedLanguage === "en"
@@ -728,10 +778,15 @@ export default function Home() {
         window.localStorage.getItem(storageKeys.currency) === null
           ? getCurrencyForLocale(window.navigator.language)
           : storedCurrency;
+      const nextRegion =
+        window.localStorage.getItem(storageKeys.priceRegion) === null
+          ? getPriceRegionForLocale(window.navigator.language)
+          : storedRegion;
 
       setLanguage(nextLanguage);
+      setPriceRegion(nextRegion);
       setCurrency(nextCurrency);
-      setSampleRecipes(getSampleRecipes(nextLanguage, nextCurrency));
+      setSampleRecipes(getSampleRecipes(nextLanguage, nextCurrency, nextRegion));
       setIngredients((current) =>
         defaultIngredientSets.some((items) => sameIngredients(current, items))
           ? defaultIngredientsByLanguage[nextLanguage]
@@ -750,14 +805,17 @@ export default function Home() {
 
     window.localStorage.setItem(storageKeys.language, language);
     window.localStorage.setItem(storageKeys.currency, currency);
+    window.localStorage.setItem(storageKeys.priceRegion, priceRegion);
     document.documentElement.lang = language;
     document.cookie = `${languageCookieName}=${language}; path=/; max-age=31536000; samesite=lax`;
-  }, [currency, language, languageLoaded]);
+  }, [currency, language, languageLoaded, priceRegion]);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`/api/sample-recipes?v=2&language=${language}&currency=${currency}`)
+    fetch(
+      `/api/sample-recipes?v=2&language=${language}&currency=${currency}&priceRegion=${priceRegion}`,
+    )
       .then((response) => {
         if (!response.ok) throw new Error("Sample photos request failed");
         return response.json() as Promise<{ recipes: Recipe[] }>;
@@ -772,7 +830,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [currency, language]);
+  }, [currency, language, priceRegion]);
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -1780,6 +1838,7 @@ export default function Home() {
           maxTime: Number(maxTime),
           maxBudget: Number(maxBudget),
           currency,
+          priceRegion,
           language,
           calorieTarget,
           proteinTarget,
@@ -1891,6 +1950,7 @@ export default function Home() {
           maxTime: Number(desiredDishMaxTime),
           maxBudget: Number(desiredDishBudget),
           currency,
+          priceRegion,
           language,
           calorieTarget,
           proteinTarget,
@@ -2031,6 +2091,11 @@ export default function Home() {
             currency={currency}
             onChange={changeCurrency}
           />
+          <PriceRegionSwitcher
+            language={language}
+            region={priceRegion}
+            onChange={changePriceRegion}
+          />
           {sessionPending ? (
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
           ) : session?.user ? (
@@ -2138,6 +2203,14 @@ export default function Home() {
                 language={language}
                 currency={currency}
                 onChange={changeCurrency}
+                compact
+              />
+            </div>
+            <div className="mb-3">
+              <PriceRegionSwitcher
+                language={language}
+                region={priceRegion}
+                onChange={changePriceRegion}
                 compact
               />
             </div>
