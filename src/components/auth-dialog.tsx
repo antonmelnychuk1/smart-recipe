@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { PasswordInput } from "@/components/password-input";
-import type { AppLanguage } from "@/lib/i18n";
+import { getUiLanguage, type AppLanguage } from "@/lib/i18n";
 
 const emailVerificationEnabled =
   process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED === "true";
@@ -98,7 +98,7 @@ const authCopy = {
 } as const;
 
 export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
-  const copy = authCopy[language];
+  const copy = authCopy[getUiLanguage(language)];
   const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");

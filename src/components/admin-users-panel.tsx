@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AdminUserActions } from "@/components/admin-user-actions";
-import type { AppLanguage } from "@/lib/i18n";
+import { getUiLanguage, type AppLanguage, type UiLanguage } from "@/lib/i18n";
 
 export type AdminPanelUser = {
   id: string;
@@ -123,10 +123,10 @@ const adminUsersCopy = {
     clearFilters: "Clear filters",
     locale: "en-US",
   },
-} as const satisfies Record<AppLanguage, Record<string, string>>;
+} as const satisfies Record<UiLanguage, Record<string, string>>;
 
 function formatDate(date: string | null, language: AppLanguage) {
-  const copy = adminUsersCopy[language];
+  const copy = adminUsersCopy[getUiLanguage(language)];
   if (!date) return copy.noActivity;
 
   return new Intl.DateTimeFormat(copy.locale, {
@@ -154,7 +154,7 @@ export function AdminUsersPanel({
   emailVerificationEnabled,
   language = "pl",
 }: AdminUsersPanelProps) {
-  const copy = adminUsersCopy[language];
+  const copy = adminUsersCopy[getUiLanguage(language)];
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("all");
   const [status, setStatus] = useState("all");

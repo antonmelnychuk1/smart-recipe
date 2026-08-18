@@ -9,7 +9,12 @@ import {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const requestedLanguage = url.searchParams.get("language");
-  const language: AppLanguage = requestedLanguage === "en" ? "en" : "pl";
+  const language: AppLanguage =
+    requestedLanguage === "en"
+      ? "en"
+      : requestedLanguage === "uk"
+        ? "uk"
+        : "pl";
   const currency = normalizeCurrency(url.searchParams.get("currency"));
   const priceRegion = normalizePriceRegion(url.searchParams.get("priceRegion"));
   const recipes = await attachRecipePhotos(

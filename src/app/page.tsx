@@ -40,6 +40,7 @@ const suggestions = ["jajka", "ryż", "kurczak", "pomidor", "szpinak"];
 const defaultIngredientsByLanguage: Record<AppLanguage, string[]> = {
   pl: ["jajka", "ryż", "kurczak"],
   en: ["eggs", "rice", "chicken"],
+  uk: ["яйця", "рис", "курка"],
 };
 const defaultIngredientSets = Object.values(defaultIngredientsByLanguage);
 
@@ -459,7 +460,13 @@ function LocaleSettings({
           aria-label={homeCopy[language].nav.language}
           value={language}
           onChange={(event) =>
-            onLanguageChange(event.target.value === "en" ? "en" : "pl")
+            onLanguageChange(
+              event.target.value === "en"
+                ? "en"
+                : event.target.value === "uk"
+                  ? "uk"
+                  : "pl",
+            )
           }
           className="min-w-0 bg-transparent text-xs font-bold text-[#25322b] outline-none"
         >
@@ -758,10 +765,14 @@ export default function Home() {
         window.localStorage.getItem(storageKeys.priceRegion),
       );
       const nextLanguage =
-        storedLanguage === "pl" || storedLanguage === "en"
+        storedLanguage === "pl" ||
+        storedLanguage === "en" ||
+        storedLanguage === "uk"
           ? storedLanguage
           : window.navigator.language.toLocaleLowerCase().startsWith("en")
             ? "en"
+            : window.navigator.language.toLocaleLowerCase().startsWith("uk")
+              ? "uk"
             : "pl";
       const nextCurrency =
         window.localStorage.getItem(storageKeys.currency) === null

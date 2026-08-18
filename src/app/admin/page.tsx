@@ -143,7 +143,7 @@ function startOfUtcDay() {
 }
 
 function formatDate(date: Date | null, language: AppLanguage) {
-  const copy = adminPageCopy[language];
+  const copy = adminPageCopy[language === "uk" ? "en" : language];
   if (!date) return copy.noActivity;
 
   return new Intl.DateTimeFormat(copy.locale, {
@@ -179,7 +179,7 @@ function topEntries(map: Map<string, number>, limit = 6) {
 }
 
 function feedbackLabel(
-  labels: (typeof adminPageCopy)[AppLanguage]["feedbackLabels"],
+  labels: (typeof adminPageCopy)["pl" | "en"]["feedbackLabels"],
   value: string,
 ) {
   return labels[value as keyof typeof labels] ?? value;
@@ -191,7 +191,7 @@ export default async function AdminPage() {
   const language = normalizeLanguage(
     (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = adminPageCopy[language];
+  const copy = adminPageCopy[language === "uk" ? "en" : language];
   const feedbackLabels = copy.feedbackLabels;
 
   const today = startOfUtcDay();

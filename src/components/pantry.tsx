@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import type { AppLanguage } from "@/lib/i18n";
+import { getUiLanguage, type AppLanguage } from "@/lib/i18n";
 import type { PantryItem } from "@/lib/recipe-types";
 
 type PantryProps = {
@@ -151,7 +151,7 @@ function daysUntil(date: string) {
 function expiryLabel(expiresAt: string | null, language: AppLanguage) {
   if (!expiresAt) return null;
 
-  const copy = pantryCopy[language];
+  const copy = pantryCopy[getUiLanguage(language)];
   const days = daysUntil(expiresAt);
   if (days < 0) return copy.expiry.expired;
   if (days === 0) return copy.expiry.today;
@@ -264,7 +264,7 @@ function getPantryCategory(label: string) {
 }
 
 function displayCategoryName(category: string, language: AppLanguage) {
-  const copy = pantryCopy[language].categories;
+  const copy = pantryCopy[getUiLanguage(language)].categories;
   const labels: Record<string, string> = {
     "Warzywa i owoce": copy.produce,
     "Mięso, ryby i jajka": copy.meat,
@@ -272,7 +272,7 @@ function displayCategoryName(category: string, language: AppLanguage) {
     "Produkty suche": copy.dry,
     "Przyprawy i sosy": copy.sauces,
     Pozostałe: copy.other,
-    Wszystkie: pantryCopy[language].all,
+    Wszystkie: pantryCopy[getUiLanguage(language)].all,
   };
 
   return labels[category] ?? category;
@@ -290,7 +290,7 @@ export function Pantry({
   isGenerating,
   language = "pl",
 }: PantryProps) {
-  const copy = pantryCopy[language];
+  const copy = pantryCopy[getUiLanguage(language)];
   const [label, setLabel] = useState("");
   const [quantity, setQuantity] = useState("1 szt.");
   const [expiresAt, setExpiresAt] = useState("");

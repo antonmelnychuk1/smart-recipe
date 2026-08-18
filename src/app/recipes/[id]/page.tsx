@@ -8,6 +8,7 @@ import { CopyButton, CopyRecipeLink } from "@/components/copy-recipe-link";
 import { auth } from "@/lib/auth";
 import {
   formatPrice,
+  getUiLanguage,
   languageCookieName,
   normalizeLanguage,
   type AppLanguage,
@@ -138,7 +139,7 @@ function recipeText(
   section: "ingredients" | "steps",
   language: AppLanguage,
 ) {
-  const copy = recipePageCopy[language];
+  const copy = recipePageCopy[getUiLanguage(language)];
 
   if (section === "ingredients") {
     return [
@@ -204,7 +205,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
     cookies(),
   ]);
   const language = normalizeLanguage(cookieStore.get(languageCookieName)?.value);
-  const copy = recipePageCopy[language];
+  const copy = recipePageCopy[getUiLanguage(language)];
 
   if (
     !savedRecipe ||

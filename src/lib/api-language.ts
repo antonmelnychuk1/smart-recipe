@@ -21,12 +21,14 @@ export function getRequestLanguage(request?: Request): AppLanguage {
 
 export function apiError(
   request: Request | undefined,
-  messages: Record<AppLanguage, string>,
+  messages: Partial<Record<AppLanguage, string>> & { pl: string; en: string },
   status: number,
   init?: ResponseInit,
 ) {
+  const language = getRequestLanguage(request);
+
   return Response.json(
-    { error: messages[getRequestLanguage(request)] },
+    { error: messages[language] ?? messages.en },
     { ...init, status },
   );
 }

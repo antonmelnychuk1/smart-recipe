@@ -1,4 +1,5 @@
-export type AppLanguage = "pl" | "en";
+export type AppLanguage = "pl" | "en" | "uk";
+export type UiLanguage = "pl" | "en";
 export type CurrencyCode = "PLN" | "EUR" | "USD" | "GBP";
 export type PriceRegionCode =
   | "PL"
@@ -22,6 +23,7 @@ export const languageOptions: {
 }[] = [
   { value: "pl", label: "PL", flag: "🇵🇱", name: "Polski" },
   { value: "en", label: "EN", flag: "🇬🇧", name: "English" },
+  { value: "uk", label: "UA", flag: "🇺🇦", name: "Українська" },
 ];
 
 export const currencyOptions: {
@@ -60,7 +62,12 @@ const currencyRatesToPln: Record<CurrencyCode, number> = {
 };
 
 export function normalizeLanguage(value: string | undefined | null): AppLanguage {
+  if (value === "uk") return "uk";
   return value === "en" ? "en" : "pl";
+}
+
+export function getUiLanguage(language: AppLanguage): UiLanguage {
+  return language === "pl" ? "pl" : "en";
 }
 
 export function normalizeCurrency(value: string | undefined | null): CurrencyCode {
@@ -135,7 +142,7 @@ export function getPriceRegionLabel(region: PriceRegionCode) {
   );
 }
 
-export const homeCopy = {
+const baseHomeCopy = {
   pl: {
     nav: {
       how: "Jak to działa?",
@@ -669,6 +676,11 @@ export const homeCopy = {
       pexels: "Photos provided by Pexels",
     },
   },
+} as const;
+
+export const homeCopy = {
+  ...baseHomeCopy,
+  uk: baseHomeCopy.en,
 } as const;
 
 export function formatOptionLabel(

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { PasswordInput } from "@/components/password-input";
-import type { AppLanguage } from "@/lib/i18n";
+import { getUiLanguage, type AppLanguage } from "@/lib/i18n";
 
 type ResetPasswordFormProps = {
   token: string;
@@ -44,7 +44,7 @@ export function ResetPasswordForm({
   tokenError,
   language = "pl",
 }: ResetPasswordFormProps) {
-  const copy = resetPasswordCopy[language];
+  const copy = resetPasswordCopy[getUiLanguage(language)];
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState(tokenError ?? "");
   const [message, setMessage] = useState("");

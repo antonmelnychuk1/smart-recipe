@@ -7,6 +7,7 @@ import {
   convertPrice,
   formatPrice,
   getCurrencyForLocale,
+  getUiLanguage,
   normalizeCurrency,
   type AppLanguage,
   type CurrencyCode,
@@ -219,7 +220,7 @@ export function SavedRecipesLibrary({
   initialItems: SavedRecipeListItem[];
   language?: AppLanguage;
 }) {
-  const copy = savedCopy[language];
+  const copy = savedCopy[getUiLanguage(language)];
   const [currency, setCurrency] = useState<CurrencyCode>("PLN");
   const [items, setItems] = useState(initialItems);
   const [search, setSearch] = useState("");

@@ -7,9 +7,10 @@ import {
 } from "@/components/saved-recipes-library";
 import { auth } from "@/lib/auth";
 import {
+  getUiLanguage,
   languageCookieName,
   normalizeLanguage,
-  type AppLanguage,
+  type UiLanguage,
 } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 import type { Recipe } from "@/lib/recipe-types";
@@ -17,7 +18,7 @@ import type { Recipe } from "@/lib/recipe-types";
 export const dynamic = "force-dynamic";
 
 const savedRecipesCopy: Record<
-  AppLanguage,
+  UiLanguage,
   { title: string; description: string; history: string; back: string }
 > = {
   pl: {
@@ -40,7 +41,7 @@ export default async function SavedRecipesPage() {
   const language = normalizeLanguage(
     (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = savedRecipesCopy[language];
+  const copy = savedRecipesCopy[getUiLanguage(language)];
 
   const records = await prisma.favorite.findMany({
     where: { userId: session.user.id },

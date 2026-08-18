@@ -1,9 +1,10 @@
 import { ResetPasswordForm } from "@/components/reset-password-form";
 import { cookies } from "next/headers";
 import {
+  getUiLanguage,
   languageCookieName,
   normalizeLanguage,
-  type AppLanguage,
+  type UiLanguage,
 } from "@/lib/i18n";
 
 type ResetPasswordPageProps = {
@@ -16,7 +17,7 @@ type ResetPasswordPageProps = {
 };
 
 const resetPageCopy: Record<
-  AppLanguage,
+  UiLanguage,
   {
     title: string;
     description: string;
@@ -69,7 +70,7 @@ export default async function ResetPasswordPage({
       getFirstParam(params.language) ??
       (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = resetPageCopy[language];
+  const copy = resetPageCopy[getUiLanguage(language)];
   const token = getFirstParam(params.token) ?? "";
   const error = getFirstParam(params.error);
   const tokenError = error

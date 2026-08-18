@@ -5,8 +5,10 @@ import { PasswordInput } from "@/components/password-input";
 import { authClient } from "@/lib/auth-client";
 import {
   formatOptionLabel,
+  getUiLanguage,
   homeCopy,
   type AppLanguage,
+  type UiLanguage,
 } from "@/lib/i18n";
 
 type AccountSession = {
@@ -191,9 +193,9 @@ const accountSettingsCopy = {
     deleteForever: "Delete account forever",
     locale: "en-US",
   },
-} as const satisfies Record<AppLanguage, Record<string, string>>;
+} as const satisfies Record<UiLanguage, Record<string, string>>;
 
-const goalLabels: Record<AppLanguage, Record<string, string>> = {
+const goalLabels: Record<UiLanguage, Record<string, string>> = {
   pl: Object.fromEntries(goalOptions),
   en: {
     balanced: "Balanced",
@@ -232,7 +234,7 @@ function splitStoredExcludedIngredients(items: string[] = []) {
 
 function deviceName(
   userAgent: string | null | undefined,
-  copy: (typeof accountSettingsCopy)[AppLanguage],
+  copy: (typeof accountSettingsCopy)[UiLanguage],
 ) {
   if (!userAgent) return copy.unknownDevice;
 
@@ -261,7 +263,8 @@ type AccountSettingsProps = {
 };
 
 export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
-  const copy = accountSettingsCopy[language];
+  const uiLanguage = getUiLanguage(language);
+  const copy = accountSettingsCopy[uiLanguage];
   const optionCopy = homeCopy[language].options;
   const deleteConfirmation = copy.deleteConfirmation;
   const { data: currentSession } = authClient.useSession();
@@ -447,7 +450,8 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
             </p>
             <p>
               <strong className="text-[#365a46]">{copy.goal}</strong>{" "}
-              {goalLabels[language][cookingGoal] ?? goalLabels[language].balanced}
+              {goalLabels[uiLanguage][cookingGoal] ??
+                goalLabels[uiLanguage].balanced}
             </p>
           </div>
         </div>
@@ -476,7 +480,7 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
             >
               {goalOptions.map(([value]) => (
                 <option key={value} value={value}>
-                  {goalLabels[language][value] ?? value}
+                  {goalLabels[uiLanguage][value] ?? value}
                 </option>
               ))}
             </select>

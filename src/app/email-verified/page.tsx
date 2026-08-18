@@ -4,7 +4,6 @@ import { auth } from "@/lib/auth";
 import {
   languageCookieName,
   normalizeLanguage,
-  type AppLanguage,
 } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 
@@ -13,7 +12,7 @@ type VerificationPageProps = {
 };
 
 const emailVerifiedCopy: Record<
-  AppLanguage,
+  "pl" | "en",
   {
     successTitle: string;
     failedTitle: string;
@@ -67,7 +66,7 @@ export default async function EmailVerifiedPage({
   const language = normalizeLanguage(
     lang ?? queryLanguage ?? (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = emailVerifiedCopy[language];
+  const copy = emailVerifiedCopy[language === "uk" ? "en" : language];
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user.id
     ? await prisma.user.findUnique({

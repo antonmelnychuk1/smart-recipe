@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { AppLanguage } from "@/lib/i18n";
+import { getUiLanguage, type AppLanguage, type UiLanguage } from "@/lib/i18n";
 
 type AdminUserActionsProps = {
   userId: string;
@@ -58,7 +58,7 @@ const adminActionCopy = {
       "Your own admin account cannot be banned, deleted or downgraded.",
   },
 } as const satisfies Record<
-  AppLanguage,
+  UiLanguage,
   Record<string, string | ((value: string) => string)>
 >;
 
@@ -71,7 +71,7 @@ export function AdminUserActions({
   isCurrentAdmin,
   language = "pl",
 }: AdminUserActionsProps) {
-  const copy = adminActionCopy[language];
+  const copy = adminActionCopy[getUiLanguage(language)];
   const router = useRouter();
   const [limit, setLimit] = useState(String(dailyLimit));
   const [pending, setPending] = useState("");

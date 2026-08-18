@@ -10,6 +10,7 @@ import type {
 import {
   convertPrice,
   formatPrice,
+  getUiLanguage,
   type AppLanguage,
   type CurrencyCode,
 } from "@/lib/i18n";
@@ -161,7 +162,7 @@ export function MealPlanner({
   language = "pl",
   currency = "PLN",
 }: MealPlannerProps) {
-  const copy = plannerCopy[language];
+  const copy = plannerCopy[getUiLanguage(language)];
   const mealTypes = mealTypeKeys.map((key) => ({
     key,
     label: copy.meals[key],

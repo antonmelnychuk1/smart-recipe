@@ -23,7 +23,7 @@ const ingredientsRequestSchema = z.object({
   priceRegion: z
     .enum(["PL", "US", "GB", "DE", "FR", "ES", "IT", "NL", "CA", "AU"])
     .default("PL"),
-  language: z.enum(["pl", "en"]).default("pl"),
+  language: z.enum(["pl", "en", "uk"]).default("pl"),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
   cookingGoal: z
@@ -45,7 +45,7 @@ const dishRequestSchema = z.object({
   priceRegion: z
     .enum(["PL", "US", "GB", "DE", "FR", "ES", "IT", "NL", "CA", "AU"])
     .default("PL"),
-  language: z.enum(["pl", "en"]).default("pl"),
+  language: z.enum(["pl", "en", "uk"]).default("pl"),
   calorieTarget: z.number().int().min(800).max(6000).nullable().optional(),
   proteinTarget: z.number().int().min(20).max(400).nullable().optional(),
   cookingGoal: z
@@ -72,6 +72,10 @@ const recipeSchema = z.object({
     "Easy",
     "Medium",
     "Hard",
+    "Дуже легко",
+    "Легко",
+    "Середньо",
+    "Складно",
   ]),
   calories: z.number().int(),
   protein: z.number().int(),
@@ -148,6 +152,8 @@ export async function POST(request: Request) {
   const currency = requestData.currency;
   const priceRegion = getPriceRegionLabel(requestData.priceRegion);
   const isEnglish = language === "en";
+  const isUkrainian = language === "uk";
+  const usesEnglishPrompt = isEnglish || isUkrainian;
   const apiCopy =
     language === "en"
       ? {
@@ -170,54 +176,58 @@ export async function POST(request: Request) {
           fallback: "Nie udało się wygenerować przepisów.",
         };
   const dietLabels: Record<string, string> = {
-    "Bez ograniczeń": isEnglish ? "No restrictions" : "Bez ograniczeń",
-    Wegetariańska: isEnglish ? "Vegetarian" : "Wegetariańska",
-    Wegańska: isEnglish ? "Vegan" : "Wegańska",
-    Pescetariańska: isEnglish ? "Pescetarian" : "Pescetariańska",
-    Bezglutenowa: isEnglish ? "Gluten-free" : "Bezglutenowa",
-    "Bez laktozy": isEnglish ? "Lactose-free" : "Bez laktozy",
-    Ketogeniczna: isEnglish ? "Keto" : "Ketogeniczna",
-    Niskowęglowodanowa: isEnglish ? "Low-carb" : "Niskowęglowodanowa",
-    Śródziemnomorska: isEnglish ? "Mediterranean" : "Śródziemnomorska",
-    Wysokobiałkowa: isEnglish ? "High-protein" : "Wysokobiałkowa",
+    "Bez ograniczeń": isEnglish || isUkrainian ? "No restrictions" : "Bez ograniczeń",
+    Wegetariańska: isEnglish || isUkrainian ? "Vegetarian" : "Wegetariańska",
+    Wegańska: isEnglish || isUkrainian ? "Vegan" : "Wegańska",
+    Pescetariańska:
+      isEnglish || isUkrainian ? "Pescetarian" : "Pescetariańska",
+    Bezglutenowa: isEnglish || isUkrainian ? "Gluten-free" : "Bezglutenowa",
+    "Bez laktozy": isEnglish || isUkrainian ? "Lactose-free" : "Bez laktozy",
+    Ketogeniczna: isEnglish || isUkrainian ? "Keto" : "Ketogeniczna",
+    Niskowęglowodanowa:
+      isEnglish || isUkrainian ? "Low-carb" : "Niskowęglowodanowa",
+    Śródziemnomorska:
+      isEnglish || isUkrainian ? "Mediterranean" : "Śródziemnomorska",
+    Wysokobiałkowa:
+      isEnglish || isUkrainian ? "High-protein" : "Wysokobiałkowa",
   };
   const localizedDiet = dietLabels[diet] ?? diet;
   const budgetRequirement =
     requestData.maxBudget === 0
-      ? isEnglish
+      ? usesEnglishPrompt
         ? "No budget limit"
         : "Bez ograniczeń budżetowych"
-      : isEnglish
+      : usesEnglishPrompt
         ? `Maximum ${requestData.maxBudget} ${currency} for 2 servings`
         : `Maksymalnie ${requestData.maxBudget} ${currency} za 2 porcje`;
   const goalLabels: Record<typeof requestData.cookingGoal, string> = {
-    balanced: isEnglish ? "a balanced meal" : "zbalansowany posiłek",
-    quick: isEnglish
+    balanced: usesEnglishPrompt ? "a balanced meal" : "zbalansowany posiłek",
+    quick: usesEnglishPrompt
       ? "the fastest possible preparation"
       : "jak najszybsze przygotowanie",
-    cheap: isEnglish ? "the lowest possible cost" : "jak najniższy koszt",
-    healthy: isEnglish
+    cheap: usesEnglishPrompt ? "the lowest possible cost" : "jak najniższy koszt",
+    healthy: usesEnglishPrompt
       ? "a healthier, lighter composition"
       : "zdrowszy, lekki skład",
-    high_protein: isEnglish
+    high_protein: usesEnglishPrompt
       ? "high protein content"
       : "wysoka zawartość białka",
-    use_pantry: isEnglish
+    use_pantry: usesEnglishPrompt
       ? "maximum use of the user's products"
       : "maksymalne wykorzystanie produktów użytkownika",
   };
-  const cookingGoalRequirement = isEnglish
+  const cookingGoalRequirement = usesEnglishPrompt
     ? `User priority: ${goalLabels[requestData.cookingGoal]}.`
     : `Priorytet użytkownika: ${goalLabels[requestData.cookingGoal]}.`;
   const excludedRequirement =
     requestData.excludedIngredients.length > 0
-      ? isEnglish
+      ? usesEnglishPrompt
         ? `Excluded products, allergies or disliked ingredients: ${requestData.excludedIngredients.join(", ")}. Do not use them in ingredients, missing, steps or substitutions.`
         : `Produkty wykluczone, alergie lub nielubiane składniki: ${requestData.excludedIngredients.join(", ")}. Nie używaj ich w składnikach, missing, krokach ani zamiennikach.`
-      : isEnglish
+      : usesEnglishPrompt
         ? "No additional exclusions or disliked ingredients."
         : "Brak dodatkowych wykluczeń i nielubianych składników.";
-  const nutritionGoals = isEnglish
+  const nutritionGoals = usesEnglishPrompt
     ? `User daily goals: ${
         requestData.calorieTarget
           ? `${requestData.calorieTarget} kcal`
@@ -238,13 +248,13 @@ export async function POST(request: Request) {
       }.`;
   const timeRequirement =
     maxTime === 0
-      ? isEnglish
+      ? usesEnglishPrompt
         ? "No time limit"
         : "Bez ograniczeń czasowych"
-      : isEnglish
+      : usesEnglishPrompt
         ? `Maximum ${maxTime} minutes`
         : `Maksymalnie ${maxTime} minut`;
-  const priceRegionRequirement = isEnglish
+  const priceRegionRequirement = usesEnglishPrompt
     ? `Estimate ingredient prices for ${priceRegion}. Use typical consumer grocery prices for this region.`
     : `Szacuj ceny składników dla regionu: ${priceRegion}. Używaj typowych konsumenckich cen spożywczych dla tego regionu.`;
   let responseSchema;
@@ -252,7 +262,7 @@ export async function POST(request: Request) {
 
   if (requestData.mode === "dish") {
     responseSchema = dishResponseSchema;
-    requestPrompt = isEnglish
+    requestPrompt = usesEnglishPrompt
       ? `Prepare exactly 3 different recipes or variants of the dish described by the user: ${requestData.dish}.
 
 Diet: ${localizedDiet}
@@ -279,7 +289,7 @@ ${nutritionGoals}
 Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tylko czyste nazwy produktów do kupienia bez ilości i jednostek, a pole match ustaw na 0.`;
   } else {
     responseSchema = ingredientsResponseSchema;
-    requestPrompt = isEnglish
+    requestPrompt = usesEnglishPrompt
       ? `Generate exactly 3 different recipes.
 
 Available ingredients: ${requestData.ingredients.join(", ")}
@@ -313,11 +323,11 @@ ${nutritionGoals}
 
 Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Jeśli podano produkty z krótką datą ważności, wykorzystaj je w możliwie wielu propozycjach. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
   }
-  const systemPrompt = isEnglish
-    ? "You are an experienced chef and dietitian. Create safe, realistic recipes in English. Nutrition estimates are for one serving. Do not claim that a dish is safe for people with allergies. Basic pantry products such as water, salt, pepper and a small amount of oil can be included in recipe ingredients, but do not add them to the missing shopping list."
+  const systemPrompt = usesEnglishPrompt
+    ? `You are an experienced chef and dietitian. Create safe, realistic recipes in ${isUkrainian ? "Ukrainian" : "English"}. Nutrition estimates are for one serving. Do not claim that a dish is safe for people with allergies. Basic pantry products such as water, salt, pepper and a small amount of oil can be included in recipe ingredients, but do not add them to the missing shopping list.`
     : "Jesteś doświadczonym kucharzem i dietetykiem. Tworzysz bezpieczne, realne przepisy po polsku. Szacunki wartości odżywczych dotyczą jednej porcji. Nie deklaruj, że danie jest bezpieczne dla alergika. Podstawowe produkty spiżarniane, takie jak woda, sól, pieprz i niewielka ilość oleju, mogą być w składnikach przepisu, ale nie dodawaj ich do listy brakujących zakupów.";
-  const generationRules = isEnglish
-    ? `Respond in English. The only exception is imageQuery, which must also be an English Pexels search phrase.
+  const generationRules = usesEnglishPrompt
+    ? `Respond in ${isUkrainian ? "Ukrainian" : "English"}. The only exception is imageQuery, which must always be an English Pexels search phrase.
 
 The imageQuery field must contain an English phrase for finding a matching food photo in Pexels. Use 6–10 specific words describing the dish name, visible key ingredients, serving style and optionally angle or style. Do not use the words photo, image or photography. Do not add punctuation.
 

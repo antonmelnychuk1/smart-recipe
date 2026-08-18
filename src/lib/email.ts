@@ -1,5 +1,9 @@
 import { Resend } from "resend";
-import { normalizeLanguage, type AppLanguage } from "@/lib/i18n";
+import {
+  getUiLanguage,
+  normalizeLanguage,
+  type AppLanguage,
+} from "@/lib/i18n";
 
 type VerificationEmail = {
   email: string;
@@ -72,7 +76,7 @@ export async function sendVerificationEmail({
   const from =
     normalizeEnvironmentValue(process.env.EMAIL_FROM) ??
     "SmartRecipe <onboarding@resend.dev>";
-  const copy = emailCopy[getLanguageFromUrl(verificationUrl)];
+  const copy = emailCopy[getUiLanguage(getLanguageFromUrl(verificationUrl))];
   const safeName = escapeHtml(name);
   const safeVerificationUrl = escapeHtml(verificationUrl);
 
@@ -126,7 +130,7 @@ export async function sendPasswordResetEmail({
   const from =
     normalizeEnvironmentValue(process.env.EMAIL_FROM) ??
     "SmartRecipe <onboarding@resend.dev>";
-  const copy = emailCopy[getLanguageFromUrl(resetUrl)];
+  const copy = emailCopy[getUiLanguage(getLanguageFromUrl(resetUrl))];
   const safeName = escapeHtml(name);
   const safeResetUrl = escapeHtml(resetUrl);
 

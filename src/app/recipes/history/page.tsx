@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 import { RecipeHistoryLibrary } from "@/components/recipe-history-library";
 import { auth } from "@/lib/auth";
 import {
+  getUiLanguage,
   languageCookieName,
   normalizeLanguage,
-  type AppLanguage,
+  type UiLanguage,
 } from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 import type { Recipe, SearchHistoryEntry } from "@/lib/recipe-types";
@@ -14,7 +15,7 @@ import type { Recipe, SearchHistoryEntry } from "@/lib/recipe-types";
 export const dynamic = "force-dynamic";
 
 const historyCopy: Record<
-  AppLanguage,
+  UiLanguage,
   { title: string; description: string; saved: string; back: string }
 > = {
   pl: {
@@ -39,7 +40,7 @@ export default async function RecipeHistoryPage() {
   const language = normalizeLanguage(
     (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = historyCopy[language];
+  const copy = historyCopy[getUiLanguage(language)];
 
   const records = await prisma.searchHistory.findMany({
     where: { userId: session.user.id },

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import type { AppLanguage } from "@/lib/i18n";
+import { getUiLanguage, type AppLanguage } from "@/lib/i18n";
 import type { SearchHistoryEntry } from "@/lib/recipe-types";
 
 type RecipeHistoryLibraryProps = {
@@ -54,7 +54,7 @@ const historyLibraryCopy = {
 } as const;
 
 function formatDate(date: string, language: AppLanguage) {
-  return new Intl.DateTimeFormat(historyLibraryCopy[language].locale, {
+  return new Intl.DateTimeFormat(historyLibraryCopy[getUiLanguage(language)].locale, {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -64,8 +64,10 @@ function formatDate(date: string, language: AppLanguage) {
 }
 
 function entryTitle(entry: SearchHistoryEntry, language: AppLanguage) {
+  const copy = historyLibraryCopy[getUiLanguage(language)];
+
   return entry.mode === "dish" && entry.query
-    ? `${historyLibraryCopy[language].dishPrefix} ${entry.query}`
+    ? `${copy.dishPrefix} ${entry.query}`
     : entry.ingredients.join(", ");
 }
 
@@ -73,7 +75,7 @@ export function RecipeHistoryLibrary({
   initialEntries,
   language = "pl",
 }: RecipeHistoryLibraryProps) {
-  const copy = historyLibraryCopy[language];
+  const copy = historyLibraryCopy[getUiLanguage(language)];
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState("all");
   const [diet, setDiet] = useState("all");

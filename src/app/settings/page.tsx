@@ -6,13 +6,12 @@ import { auth } from "@/lib/auth";
 import {
   languageCookieName,
   normalizeLanguage,
-  type AppLanguage,
 } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
 const settingsCopy: Record<
-  AppLanguage,
+  "pl" | "en",
   {
     title: string;
     back: string;
@@ -45,7 +44,7 @@ export default async function SettingsPage() {
   const language = normalizeLanguage(
     (await cookies()).get(languageCookieName)?.value,
   );
-  const copy = settingsCopy[language];
+  const copy = settingsCopy[language === "uk" ? "en" : language];
 
   return (
     <main className="min-h-screen bg-[#f7f4ed] px-4 py-5 text-[#25322b] sm:px-8 sm:py-8">
