@@ -605,7 +605,7 @@ export default async function AdminPage() {
                       </p>
                     </div>
                     <span
-                      className={`w-fit rounded-full px-2.5 py-1 text-xs font-bold ${
+                      className={`inline-flex w-fit items-center justify-center self-center rounded-full px-2.5 py-1 text-xs font-bold leading-none ${
                         feedbackStyles[item.feedback] ??
                         "bg-[#edf1ec] text-[#536159]"
                       }`}
