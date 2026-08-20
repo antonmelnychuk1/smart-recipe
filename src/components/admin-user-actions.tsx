@@ -145,7 +145,7 @@ export function AdminUserActions({
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#fc5726]">
                   {copy.accountManagement}
                 </p>
                 <h3 className="mt-1 font-serif text-2xl font-semibold">
@@ -181,7 +181,7 @@ export function AdminUserActions({
                       dailyLimit: Number(limit),
                     })
                   }
-                  className="rounded-lg bg-[#356248] px-4 text-xs font-semibold text-white disabled:opacity-40"
+                  className="rounded-lg bg-[#025026] px-4 text-xs font-semibold text-white disabled:opacity-40"
                 >
                   {copy.save}
                 </button>

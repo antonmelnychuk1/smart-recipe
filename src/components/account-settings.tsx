@@ -512,7 +512,7 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
       <section className="rounded-[1.7rem] border border-[#ced9cf] bg-[#f8fbf7] p-4 shadow-sm sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               {copy.personalization}
             </p>
             <h2 className="mt-1 font-serif text-2xl font-semibold">
@@ -650,7 +650,7 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
           <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
             <button
               disabled={goalsPending}
-              className="h-11 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white disabled:opacity-50"
+              className="h-11 rounded-xl bg-[#025026] px-5 text-sm font-semibold text-white disabled:opacity-50"
             >
               {goalsPending ? copy.saving : copy.savePreferences}
             </button>
@@ -699,7 +699,7 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
           <div className="flex flex-wrap items-center gap-4 sm:col-span-2">
             <button
               disabled={passwordPending}
-              className="h-11 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white disabled:opacity-50"
+              className="h-11 rounded-xl bg-[#025026] px-5 text-sm font-semibold text-white disabled:opacity-50"
             >
               {passwordPending ? copy.changing : copy.changePasswordButton}
             </button>
@@ -723,7 +723,7 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
           {sessions.length > 1 && (
             <button
               onClick={revokeOtherSessions}
-              className="rounded-xl border border-[#ccd7cf] px-4 py-2.5 text-xs font-semibold text-[#356248]"
+              className="rounded-xl border border-[#ccd7cf] px-4 py-2.5 text-xs font-semibold text-[#025026]"
             >
               {copy.signOutOthers}
             </button>
@@ -747,7 +747,7 @@ export function AccountSettings({ language = "pl" }: AccountSettingsProps) {
                     <p className="text-sm font-semibold">
                       {deviceName(session.userAgent, copy)}
                       {isCurrent && (
-                        <span className="ml-2 rounded-full bg-[#dfeae1] px-2 py-0.5 text-[10px] text-[#356248]">
+                        <span className="ml-2 rounded-full bg-[#dfeae1] px-2 py-0.5 text-[10px] text-[#025026]">
                           {copy.current}
                         </span>
                       )}

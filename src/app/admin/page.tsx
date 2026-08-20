@@ -183,7 +183,7 @@ const feedbackLabelKeys = {
 };
 
 const feedbackStyles: Record<string, string> = {
-  liked: "bg-[#e8efe9] text-[#356248]",
+  liked: "bg-[#e8efe9] text-[#025026]",
   too_expensive: "bg-[#fff5df] text-[#9c6a16]",
   too_hard: "bg-[#fff0e8] text-[#a45c45]",
   too_caloric: "bg-[#f4ece8] text-[#8a5a43]",
@@ -461,7 +461,7 @@ export default async function AdminPage() {
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               SmartRecipe
             </p>
             <h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -526,14 +526,14 @@ export default async function AdminPage() {
           <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#fc5726]">
                   {copy.recipeQuality}
                 </p>
                 <h2 className="mt-1 font-serif text-2xl font-semibold">
                   {copy.userFeedback}
                 </h2>
               </div>
-              <span className="rounded-full bg-[#eef2ec] px-3 py-1.5 text-xs font-bold text-[#356248]">
+              <span className="rounded-full bg-[#eef2ec] px-3 py-1.5 text-xs font-bold text-[#025026]">
                 {totalFeedback} {copy.ratings}
               </span>
             </div>
@@ -562,7 +562,7 @@ export default async function AdminPage() {
                     </div>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eeeae2]">
                       <div
-                        className="h-full rounded-full bg-[#d26849]"
+                        className="h-full rounded-full bg-[#fc5726]"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -575,7 +575,7 @@ export default async function AdminPage() {
           <article className="rounded-[1.7rem] border border-[#dedbd2] bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#fc5726]">
                   {copy.latestSignals}
                 </p>
                 <h2 className="mt-1 font-serif text-2xl font-semibold">
@@ -622,7 +622,7 @@ export default async function AdminPage() {
         <section className="mt-6 rounded-[1.7rem] border border-[#dedbd2] bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#fc5726]">
                 {copy.trends}
               </p>
               <h2 className="mt-1 font-serif text-2xl font-semibold">
@@ -632,7 +632,7 @@ export default async function AdminPage() {
                 {copy.trendsDescription}
               </p>
             </div>
-            <span className="rounded-full bg-[#eef2ec] px-3 py-1.5 text-xs font-bold text-[#356248]">
+            <span className="rounded-full bg-[#eef2ec] px-3 py-1.5 text-xs font-bold text-[#025026]">
               {recentSearches.length} {copy.historyEntries}
             </span>
           </div>
@@ -663,7 +663,7 @@ export default async function AdminPage() {
                             {index + 1}. {label}
                           </p>
                         </div>
-                        <span className="shrink-0 rounded-full bg-[#eef2ec] px-2 py-1 text-xs font-bold text-[#356248]">
+                        <span className="shrink-0 rounded-full bg-[#eef2ec] px-2 py-1 text-xs font-bold text-[#025026]">
                           {count}
                         </span>
                       </div>

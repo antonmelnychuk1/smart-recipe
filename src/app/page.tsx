@@ -2150,7 +2150,7 @@ export default function Home() {
             priority
             className="size-9 rounded-xl object-contain sm:size-10"
           />
-          Smart<span className="-ml-2 text-[#dc704d]">Recipe</span>
+          Smart<span className="-ml-2 text-[#fc5726]">Recipe</span>
         </a>
         <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] xl:flex xl:gap-5 xl:text-sm">
           <a className="transition hover:text-[#25322b]" href="#how">
@@ -2206,7 +2206,7 @@ export default function Home() {
                   setIsAdmin(false);
                   void authClient.signOut();
                 }}
-                className="text-xs text-[#7a857e] hover:text-[#2f684f]"
+                className="text-xs text-[#7a857e] hover:text-[#025026]"
               >
                 {copy.nav.logout}
               </button>
@@ -2270,7 +2270,7 @@ export default function Home() {
                 key={href}
                 href={href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-4 py-3 transition hover:bg-[#f3f6f2] hover:text-[#2f684f]"
+                className="rounded-xl px-4 py-3 transition hover:bg-[#f3f6f2] hover:text-[#025026]"
               >
                 {label}
               </Link>
@@ -2303,7 +2303,7 @@ export default function Home() {
                 </div>
                 <a
                   href="/settings"
-                  className="rounded-xl bg-[#f3f6f2] px-4 py-3 text-sm font-semibold text-[#356248]"
+                  className="rounded-xl bg-[#f3f6f2] px-4 py-3 text-sm font-semibold text-[#025026]"
                 >
                   {copy.nav.accountSettings}
                 </a>
@@ -2332,7 +2332,7 @@ export default function Home() {
                   setMobileMenuOpen(false);
                   setAuthOpen(true);
                 }}
-                className="h-11 w-full rounded-xl bg-[#2f684f] text-sm font-semibold text-white"
+                className="h-11 w-full rounded-xl bg-[#025026] text-sm font-semibold text-white"
               >
                 {copy.nav.loginOrCreate}
               </button>
@@ -2418,7 +2418,7 @@ export default function Home() {
                 </div>
                 <Link
                   href="/settings"
-                  className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#285840]"
+                  className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#013d1d]"
                 >
                   {pageCopy.completeNow}
                 </Link>
@@ -2433,7 +2433,7 @@ export default function Home() {
           <div className="min-w-0 overflow-hidden rounded-2xl border border-[#dfe4dc] bg-white/85 p-3 shadow-[0_12px_36px_rgba(53,68,58,0.07)] backdrop-blur sm:p-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
                   {pageCopy.userPanel}
                 </p>
                 <h2 className="mt-0.5 truncate font-serif text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -2446,7 +2446,7 @@ export default function Home() {
               <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
                 <a
                   href="#generator"
-                  className="shrink-0 rounded-xl bg-[#2f684f] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#275b44]"
+                  className="shrink-0 rounded-xl bg-[#025026] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#013d1d]"
                 >
                   {pageCopy.generateRecipe}
                 </a>
@@ -2513,7 +2513,7 @@ export default function Home() {
                     className="mt-2 w-full truncate rounded-lg bg-white px-3 py-2 text-left text-xs font-semibold text-[#25322b] shadow-sm transition hover:bg-[#f9fbf8]"
                   >
                     {copy.kitchen.lastSaved}{" "}
-                    <span className="text-[#d26849]">{latestFavorite.title}</span>
+                    <span className="text-[#fc5726]">{latestFavorite.title}</span>
                   </button>
                 )}
               </div>
@@ -2530,7 +2530,7 @@ export default function Home() {
                   <>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
                       <div
-                        className="h-full rounded-full bg-[#d66a49]"
+                        className="h-full rounded-full bg-[#fc5726]"
                         style={{ width: `${usagePercent}%` }}
                       />
                     </div>
@@ -2561,7 +2561,7 @@ export default function Home() {
           </div>
           <h1 className="font-serif text-5xl font-semibold leading-[1.02] tracking-[-0.04em] text-[#203128] sm:text-7xl">
             {copy.hero.title}
-            <span className="block italic text-[#d66a49]">
+            <span className="block italic text-[#fc5726]">
               {copy.hero.titleAccent}
             </span>
           </h1>
@@ -2673,7 +2673,7 @@ export default function Home() {
             </label>
             <button
               disabled={ingredients.length === 0 || isLoading}
-              className="mt-auto flex h-12 items-center justify-center gap-2 rounded-xl bg-[#2f684f] px-6 font-semibold text-white shadow-lg shadow-[#2f684f]/20 transition hover:-translate-y-0.5 hover:bg-[#275b44] disabled:cursor-not-allowed disabled:opacity-40"
+              className="mt-auto flex h-12 items-center justify-center gap-2 rounded-xl bg-[#025026] px-6 font-semibold text-white shadow-lg shadow-[#025026]/20 transition hover:-translate-y-0.5 hover:bg-[#013d1d] disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Icon name="spark" />{" "}
               {isLoading ? copy.generator.generating : copy.generator.generate}
@@ -2711,7 +2711,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setAuthOpen(true)}
-                className="font-semibold text-[#2f684f] hover:underline"
+                className="font-semibold text-[#025026] hover:underline"
               >
                 {copy.generator.createAccount}
               </button>
@@ -2779,7 +2779,7 @@ export default function Home() {
         <div className={pageContainerClass}>
           <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
                 {copy.value.eyebrow}
               </p>
               <h2 className="mt-2 max-w-xl font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -2817,7 +2817,7 @@ export default function Home() {
           className={`${pageContainerClass} grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12`}
         >
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               {copy.dish.eyebrow}
             </p>
             <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -2890,7 +2890,7 @@ export default function Home() {
               </label>
               <button
                 disabled={desiredDish.trim().length < 2 || desiredDishLoading}
-                className="mt-auto flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#d66a49] px-5 font-semibold text-white shadow-lg shadow-[#d66a49]/20 transition hover:-translate-y-0.5 hover:bg-[#c35d3e] disabled:cursor-not-allowed disabled:opacity-40"
+                className="mt-auto flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#fc5726] px-5 font-semibold text-white shadow-lg shadow-[#fc5726]/20 transition hover:-translate-y-0.5 hover:bg-[#d94318] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Icon name="spark" />
                 {desiredDishLoading ? copy.dish.creating : copy.dish.create}
@@ -2925,7 +2925,7 @@ export default function Home() {
       >
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               {generationInProgress
                 ? copy.results.cooking
                 : generationMode === "dish"
@@ -2958,7 +2958,7 @@ export default function Home() {
               generationInProgress
                 ? "bg-[#fff5df] text-[#9c6a16]"
                 : generated
-                  ? "bg-[#e8efe9] text-[#356248]"
+                  ? "bg-[#e8efe9] text-[#025026]"
                   : "bg-[#edf1ec] text-[#536159]"
             }`}
           >
@@ -3014,7 +3014,7 @@ export default function Home() {
                     {recipe.emoji}
                   </span>
                 )}
-                <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#356248] backdrop-blur">
+                <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#025026] backdrop-blur">
                   {generationMode === "dish"
                     ? copy.results.fullRecipe
                     : `${recipe.match}% ${copy.results.match}`}
@@ -3065,7 +3065,7 @@ export default function Home() {
                         className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
                           active
                             ? option.tone === "positive"
-                              ? "bg-[#dfeae1] text-[#356248]"
+                              ? "bg-[#dfeae1] text-[#025026]"
                               : "bg-[#fff0e8] text-[#a45c45]"
                             : "bg-[#f6f3ec] text-[#748078] hover:bg-[#eee9df]"
                         }`}
@@ -3091,7 +3091,7 @@ export default function Home() {
                           disabled={added}
                           className={`break-anywhere max-w-full whitespace-normal rounded-full px-2.5 py-1 text-left text-xs font-medium transition-all duration-200 ${
                             added
-                              ? "bg-[#e3eee5] text-[#356248]"
+                              ? "bg-[#e3eee5] text-[#025026]"
                               : "bg-[#f7eee8] text-[#a45c45] hover:-translate-y-0.5 hover:bg-[#f2ded3] hover:shadow-sm"
                           }`}
                         >
@@ -3136,7 +3136,7 @@ export default function Home() {
                 )}
                 <button
                   onClick={() => openRecipe(recipe)}
-                  className="mt-6 w-full rounded-xl border border-[#ccd7cf] py-3 text-sm font-semibold text-[#356248] transition hover:bg-[#edf3ee]"
+                  className="mt-6 w-full rounded-xl border border-[#ccd7cf] py-3 text-sm font-semibold text-[#025026] transition hover:bg-[#edf3ee]"
                 >
                   {copy.results.viewRecipe}
                 </button>
@@ -3173,7 +3173,7 @@ export default function Home() {
       >
         <div className={pageContainerClass}>
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               {copy.kitchen.eyebrow}
             </p>
             <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-5xl">
@@ -3187,7 +3187,7 @@ export default function Home() {
             {!session?.user && (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="mt-5 rounded-xl bg-[#2f684f] px-5 py-3 text-sm font-semibold text-white"
+                className="mt-5 rounded-xl bg-[#025026] px-5 py-3 text-sm font-semibold text-white"
               >
                 {copy.kitchen.login}
               </button>
@@ -3272,7 +3272,7 @@ export default function Home() {
                       <button
                         onClick={() => toggleFavorite(recipe)}
                         aria-label={`${copy.results.removeFavorite}: ${recipe.title}`}
-                        className="text-xl text-[#d26849]"
+                        className="text-xl text-[#fc5726]"
                       >
                         ×
                       </button>
@@ -3295,7 +3295,7 @@ export default function Home() {
                   {session?.user && history.length > 0 && (
                     <Link
                       href="/recipes/history"
-                      className="text-xs font-semibold text-[#356248] hover:underline"
+                      className="text-xs font-semibold text-[#025026] hover:underline"
                     >
                       {copy.kitchen.fullHistory}
                     </Link>
@@ -3365,7 +3365,7 @@ export default function Home() {
                     <button
                       onClick={copyShoppingList}
                       disabled={pendingShoppingCount === 0}
-                      className="rounded-full bg-[#edf3ee] px-3 py-1.5 text-xs font-semibold text-[#356248] transition hover:bg-[#dfece2]"
+                      className="rounded-full bg-[#edf3ee] px-3 py-1.5 text-xs font-semibold text-[#025026] transition hover:bg-[#dfece2]"
                     >
                       {copy.shopping.copy}
                     </button>
@@ -3373,7 +3373,7 @@ export default function Home() {
                       <>
                         <button
                           onClick={moveBoughtShoppingItemsToPantry}
-                          className="rounded-full bg-[#2f684f] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#275b44]"
+                          className="rounded-full bg-[#025026] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#013d1d]"
                         >
                           {copy.shopping.boughtToPantry}
                         </button>
@@ -3412,7 +3412,7 @@ export default function Home() {
                 />
                 <button
                   disabled={shoppingInput.trim().length === 0}
-                  className="h-11 rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white transition hover:bg-[#275b44] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="h-11 rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white transition hover:bg-[#013d1d] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {copy.shopping.add}
                 </button>
@@ -3433,7 +3433,7 @@ export default function Home() {
                         }
                         className={`rounded-xl px-2 py-2 transition ${
                           shoppingFilter === value
-                            ? "bg-white text-[#2f684f] shadow-sm"
+                            ? "bg-white text-[#025026] shadow-sm"
                             : "text-[#68736b] hover:bg-white/60"
                         }`}
                       >
@@ -3472,12 +3472,12 @@ export default function Home() {
                       <div className="mb-3 flex items-center justify-between gap-3 px-1">
                         <p
                           className={`text-xs font-bold uppercase tracking-[0.14em] ${
-                            section.checked ? "text-[#356248]" : "text-[#7a857e]"
+                            section.checked ? "text-[#025026]" : "text-[#7a857e]"
                           }`}
                         >
                           {section.title}
                         </p>
-                        <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-[#356248]">
+                        <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-[#025026]">
                           {section.count}
                         </span>
                       </div>
@@ -3519,7 +3519,7 @@ export default function Home() {
                                             event.currentTarget.checked,
                                           )
                                         }
-                                        className="size-4 shrink-0 accent-[#356248]"
+                                        className="size-4 shrink-0 accent-[#025026]"
                                       />
 
                                       {editingShoppingItem === item ? (
@@ -3560,7 +3560,7 @@ export default function Home() {
                                         <>
                                           <button
                                             onClick={saveEditedShoppingItem}
-                                            className="rounded-lg bg-[#2f684f] px-2 py-1.5 text-[11px] font-semibold text-white"
+                                            className="rounded-lg bg-[#025026] px-2 py-1.5 text-[11px] font-semibold text-white"
                                           >
                                             {copy.shopping.save}
                                           </button>
@@ -3585,7 +3585,7 @@ export default function Home() {
                                             onClick={() =>
                                               moveShoppingItemToPantry(item)
                                             }
-                                            className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#356248] transition hover:bg-[#dfeae1]"
+                                            className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-[#025026] transition hover:bg-[#dfeae1]"
                                           >
                                             {copy.shopping.toPantry}
                                           </button>
@@ -3718,7 +3718,7 @@ export default function Home() {
                       className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                         active
                           ? option.tone === "positive"
-                            ? "bg-[#dfeae1] text-[#356248]"
+                            ? "bg-[#dfeae1] text-[#025026]"
                             : "bg-[#fff0e8] text-[#a45c45]"
                           : "bg-[#f6f3ec] text-[#748078] hover:bg-[#eee9df]"
                       }`}
@@ -3754,13 +3754,13 @@ export default function Home() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={startCookingMode}
-                  className="rounded-xl bg-[#d66a49] px-4 py-2.5 text-xs font-semibold text-white"
+                  className="rounded-xl bg-[#fc5726] px-4 py-2.5 text-xs font-semibold text-white"
                 >
                   {copy.recipeModal.cookingMode}
                 </button>
                 <button
                   onClick={() => consumeRecipePantryItems(selectedRecipe)}
-                  className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-xs font-semibold text-[#356248]"
+                  className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-xs font-semibold text-[#025026]"
                 >
                   {copy.recipeModal.markUsed}
                 </button>
@@ -3773,7 +3773,7 @@ export default function Home() {
                   <button
                     disabled={sharePending}
                     onClick={() => shareRecipe(selectedRecipe)}
-                    className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
+                    className="rounded-xl bg-[#025026] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
                   >
                     {sharePending
                       ? copy.recipeModal.processing
@@ -3783,7 +3783,7 @@ export default function Home() {
                     href={`/recipes/${selectedRecipe.savedId}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="rounded-xl border border-[#ccd7cf] px-4 py-2.5 text-xs font-semibold text-[#356248]"
+                    className="rounded-xl border border-[#ccd7cf] px-4 py-2.5 text-xs font-semibold text-[#025026]"
                   >
                     {copy.recipeModal.openPublic}
                   </a>
@@ -3799,7 +3799,7 @@ export default function Home() {
                 <button
                   disabled={sharePending}
                   onClick={() => shareRecipe(selectedRecipe)}
-                  className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
+                  className="rounded-xl bg-[#025026] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
                 >
                   {sharePending
                     ? copy.recipeModal.sharing
@@ -3829,7 +3829,7 @@ export default function Home() {
                         disabled={added}
                         className={`break-anywhere max-w-full whitespace-normal rounded-full px-3 py-1.5 text-left text-xs font-semibold transition-all ${
                           added
-                            ? "bg-[#e3eee5] text-[#356248]"
+                            ? "bg-[#e3eee5] text-[#025026]"
                             : "bg-white text-[#a45c45] shadow-sm hover:-translate-y-0.5 hover:shadow-md"
                         }`}
                       >
@@ -3873,7 +3873,7 @@ export default function Home() {
                 <ul className="mt-4 space-y-2 text-sm leading-6 text-[#59675f]">
                   {selectedRecipe.ingredients.map((ingredient) => (
                     <li key={ingredient} className="flex gap-2">
-                      <span className="text-[#d26849]">•</span>{" "}
+                      <span className="text-[#fc5726]">•</span>{" "}
                       {scaleIngredient(ingredient, servings / 2)}
                     </li>
                   ))}
@@ -3886,7 +3886,7 @@ export default function Home() {
                 <ol className="mt-4 space-y-4 text-sm leading-6 text-[#59675f]">
                   {selectedRecipe.steps.map((step, index) => (
                     <li key={step} className="flex gap-3">
-                      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#dce9df] text-xs font-bold text-[#356248]">
+                      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#dce9df] text-xs font-bold text-[#025026]">
                         {index + 1}
                       </span>
                       {step}
@@ -3909,7 +3909,7 @@ export default function Home() {
           <div className="modal-panel-safe-tall w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-8">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
                   {copy.cookingMode.step} {cookingStep + 1}{" "}
                   {copy.cookingMode.of} {selectedRecipe.steps.length}
                 </p>
@@ -3942,7 +3942,7 @@ export default function Home() {
               </div>
               <div className="h-3 overflow-hidden rounded-full bg-[#e5e2da]">
                 <div
-                  className="h-full rounded-full bg-[#d66a49] transition-all"
+                  className="h-full rounded-full bg-[#fc5726] transition-all"
                   style={{
                     width: `${((cookingStep + 1) / selectedRecipe.steps.length) * 100}%`,
                   }}
@@ -3985,7 +3985,7 @@ export default function Home() {
                       }
                       className={`flex items-start gap-2 rounded-xl px-3 py-2 text-left transition ${
                         checked
-                          ? "bg-[#dfeae1] text-[#356248]"
+                          ? "bg-[#dfeae1] text-[#025026]"
                           : "bg-[#f6f3ec] hover:bg-[#eee9df]"
                       }`}
                     >
@@ -4018,7 +4018,7 @@ export default function Home() {
                     onClick={() =>
                       setCookingTimerSeconds((current) => current + 60)
                     }
-                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#356248]"
+                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#025026]"
                   >
                     +1 min
                   </button>
@@ -4029,7 +4029,7 @@ export default function Home() {
                       )
                     }
                     disabled={cookingTimerSeconds === 0}
-                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#356248] disabled:opacity-40"
+                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#025026] disabled:opacity-40"
                   >
                     -1 min
                   </button>
@@ -4037,7 +4037,7 @@ export default function Home() {
                     onClick={() =>
                       setCookingTimerSeconds((current) => current + 300)
                     }
-                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#356248]"
+                    className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#025026]"
                   >
                     +5 min
                   </button>
@@ -4048,7 +4048,7 @@ export default function Home() {
                       )
                     }
                     disabled={cookingTimerSeconds === 0}
-                    className="h-10 rounded-xl bg-[#2f684f] px-3 text-xs font-semibold text-white disabled:opacity-40"
+                    className="h-10 rounded-xl bg-[#025026] px-3 text-xs font-semibold text-white disabled:opacity-40"
                   >
                     {cookingTimerRunning && cookingTimerSeconds > 0
                       ? copy.cookingMode.pause
@@ -4069,7 +4069,7 @@ export default function Home() {
 
             {cookingFinished ? (
               <div className="my-6 rounded-[1.7rem] border border-[#dfeae1] bg-[#f4faf5] p-6 text-center sm:p-8">
-                <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#2f684f] text-2xl text-white">
+                <div className="mx-auto grid size-14 place-items-center rounded-full bg-[#025026] text-2xl text-white">
                   ✓
                 </div>
                 <h3 className="mt-4 font-serif text-3xl font-semibold">
@@ -4084,13 +4084,13 @@ export default function Home() {
                       consumeRecipePantryItems(selectedRecipe);
                       closeCookingMode();
                     }}
-                    className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-sm font-semibold text-white"
+                    className="rounded-xl bg-[#025026] px-4 py-2.5 text-sm font-semibold text-white"
                   >
                     {copy.cookingMode.markUsed}
                   </button>
                   <button
                     onClick={closeCookingMode}
-                    className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248]"
+                    className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#025026]"
                   >
                     {copy.cookingMode.closeWithoutChanges}
                   </button>
@@ -4101,7 +4101,7 @@ export default function Home() {
                 {selectedRecipe.substitutions &&
                   selectedRecipe.substitutions.length > 0 && (
                   <details className="mt-3 rounded-2xl border border-[#dde7dc] bg-[#f6faf5] p-4">
-                    <summary className="cursor-pointer text-sm font-bold text-[#356248]">
+                    <summary className="cursor-pointer text-sm font-bold text-[#025026]">
                       {copy.cookingMode.showSubstitutions}
                     </summary>
                     <div className="mt-3 space-y-2 text-sm text-[#59675f]">
@@ -4119,7 +4119,7 @@ export default function Home() {
 
                 <div className="my-6 min-h-44 rounded-2xl bg-[#edf2ed] p-6 sm:p-8">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="grid size-10 place-items-center rounded-full bg-[#2f684f] text-sm font-bold text-white">
+                    <span className="grid size-10 place-items-center rounded-full bg-[#025026] text-sm font-bold text-white">
                       {cookingStep + 1}
                     </span>
                     <button
@@ -4131,8 +4131,8 @@ export default function Home() {
                       }
                       className={`rounded-xl px-3 py-2 text-xs font-semibold ${
                         checkedCookingSteps[cookingStep]
-                          ? "bg-[#dfeae1] text-[#356248]"
-                          : "bg-white text-[#356248]"
+                          ? "bg-[#dfeae1] text-[#025026]"
+                          : "bg-white text-[#025026]"
                       }`}
                     >
                       {checkedCookingSteps[cookingStep]
@@ -4152,9 +4152,9 @@ export default function Home() {
                       aria-label={`${copy.cookingMode.goToStep} ${index + 1}`}
                       className={`grid size-9 place-items-center rounded-full text-xs font-bold transition ${
                         cookingStep === index
-                          ? "bg-[#d66a49] text-white"
+                          ? "bg-[#fc5726] text-white"
                           : checkedCookingSteps[index]
-                            ? "bg-[#dfeae1] text-[#356248]"
+                            ? "bg-[#dfeae1] text-[#025026]"
                             : "bg-[#eeeae2] text-[#59675f]"
                       }`}
                     >
@@ -4172,14 +4172,14 @@ export default function Home() {
                 onClick={() =>
                   setCookingStep((current) => Math.max(0, current - 1))
                 }
-                className="h-12 flex-1 rounded-xl border border-[#ccd7cf] px-5 text-sm font-semibold text-[#356248] disabled:opacity-30"
+                className="h-12 flex-1 rounded-xl border border-[#ccd7cf] px-5 text-sm font-semibold text-[#025026] disabled:opacity-30"
               >
                 {copy.cookingMode.previous}
               </button>
               {cookingStep === selectedRecipe.steps.length - 1 ? (
                 <button
                   onClick={finishCookingMode}
-                  className="h-12 flex-1 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
+                  className="h-12 flex-1 rounded-xl bg-[#025026] px-5 text-sm font-semibold text-white"
                 >
                   {copy.cookingMode.done}
                 </button>
@@ -4194,7 +4194,7 @@ export default function Home() {
                       Math.min(selectedRecipe.steps.length - 1, current + 1),
                     );
                   }}
-                  className="h-12 flex-1 rounded-xl bg-[#2f684f] px-5 text-sm font-semibold text-white"
+                  className="h-12 flex-1 rounded-xl bg-[#025026] px-5 text-sm font-semibold text-white"
                 >
                   {copy.cookingMode.next}
                 </button>

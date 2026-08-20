@@ -92,7 +92,7 @@ export default async function RecipeHistoryPage() {
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               SmartRecipe
             </p>
             <h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">

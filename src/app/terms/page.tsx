@@ -137,7 +137,7 @@ export default async function TermsPage() {
   return (
     <main className="min-h-screen bg-[#f7f4ed] px-4 py-6 text-[#25322b] sm:px-8 sm:py-10">
       <article className="mx-auto max-w-3xl rounded-[2rem] border border-[#e2dfd6] bg-[#fffdf8] p-5 shadow-sm sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
           {siteName}
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">
@@ -163,7 +163,7 @@ export default async function TermsPage() {
 
         <Link
           href="/"
-          className="mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white"
+          className="mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white"
         >
           {copy.back}
         </Link>

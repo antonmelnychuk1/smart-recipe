@@ -107,10 +107,10 @@ export default async function ResetPasswordPage({
   return (
     <main className="grid min-h-screen place-items-center bg-[#f7f4ed] px-5 py-8 text-[#25322b]">
       <section className="w-full max-w-lg rounded-[2rem] border border-[#e2dfd6] bg-[#fffdf8] p-8 text-center shadow-xl sm:p-10">
-        <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#e3eee5] text-3xl text-[#2f684f]">
+        <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#e3eee5] text-3xl text-[#025026]">
           🔐
         </div>
-        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
           SmartRecipe
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">

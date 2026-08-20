@@ -13,7 +13,7 @@ export function CopyButton({
   text,
   idleLabel,
   copiedLabel = "✓ Skopiowano",
-  className = "rounded-xl bg-[#2f684f] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#275b44]",
+  className = "rounded-xl bg-[#025026] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#013d1d]",
 }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 

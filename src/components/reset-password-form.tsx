@@ -146,14 +146,14 @@ export function ResetPasswordForm({
         </p>
       )}
       {message && (
-        <p role="status" className="rounded-xl bg-[#e9f2eb] p-3 text-sm text-[#356248]">
+        <p role="status" className="rounded-xl bg-[#e9f2eb] p-3 text-sm text-[#025026]">
           {message}
         </p>
       )}
 
       <button
         disabled={isPending || !token || Boolean(message)}
-        className="h-12 w-full rounded-xl bg-[#2f684f] font-semibold text-white disabled:opacity-50"
+        className="h-12 w-full rounded-xl bg-[#025026] font-semibold text-white disabled:opacity-50"
       >
         {isPending ? copy.saving : copy.submit}
       </button>

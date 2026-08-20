@@ -60,7 +60,7 @@ export default async function NotFound() {
         <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#fff0e8] text-2xl font-bold text-[#a45c45]">
           {copy.eyebrow}
         </div>
-        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
           SmartRecipe
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">
@@ -72,13 +72,13 @@ export default async function NotFound() {
         <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">
           <Link
             href="/"
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white"
           >
             {copy.home}
           </Link>
           <Link
             href="/recipes"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-4 text-sm font-semibold text-[#356248]"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-4 text-sm font-semibold text-[#025026]"
           >
             {copy.recipes}
           </Link>

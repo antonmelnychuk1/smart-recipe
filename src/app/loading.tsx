@@ -15,7 +15,7 @@ export default function Loading() {
             <div className="h-5 w-32 animate-pulse rounded-full bg-[#e5ded2]" />
             <div className="mt-4 h-12 animate-pulse rounded-2xl bg-[#eee8dd]" />
             <div className="mt-3 h-12 animate-pulse rounded-2xl bg-[#eee8dd]" />
-            <div className="mt-5 h-12 animate-pulse rounded-xl bg-[#2f684f]/25" />
+            <div className="mt-5 h-12 animate-pulse rounded-xl bg-[#025026]/25" />
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (

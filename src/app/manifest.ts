@@ -14,7 +14,7 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     orientation: "portrait",
     background_color: "#f7f4ed",
-    theme_color: "#2f684f",
+    theme_color: "#025026",
     categories: ["food", "lifestyle", "productivity", "health"],
     shortcuts: [
       {

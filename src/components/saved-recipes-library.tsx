@@ -550,7 +550,7 @@ export function SavedRecipesLibrary({
         <span>
           {visibleItems.length} / {items.length} {copy.recipes}
         </span>
-        {message && <span className="font-semibold text-[#356248]">{message}</span>}
+        {message && <span className="font-semibold text-[#025026]">{message}</span>}
       </div>
 
       {visibleItems.length > 0 ? (
@@ -575,7 +575,7 @@ export function SavedRecipesLibrary({
                 <span
                   className={`absolute left-3 top-3 rounded-full px-3 py-1.5 text-xs font-bold backdrop-blur ${
                     item.isPublic
-                      ? "bg-[#dfeae1]/95 text-[#356248]"
+                      ? "bg-[#dfeae1]/95 text-[#025026]"
                       : "bg-white/95 text-[#68736b]"
                   }`}
                 >
@@ -617,7 +617,7 @@ export function SavedRecipesLibrary({
                     .map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full bg-[#eef6ef] px-2.5 py-1 text-[0.68rem] font-semibold text-[#356248]"
+                        className="rounded-full bg-[#eef6ef] px-2.5 py-1 text-[0.68rem] font-semibold text-[#025026]"
                       >
                         {copy.tags[tag as keyof typeof copy.tags]}
                       </span>
@@ -627,7 +627,7 @@ export function SavedRecipesLibrary({
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-[#eeeae2] pt-3">
                   <Link
                     href={`/recipes/${item.id}`}
-                    className="inline-flex h-9 items-center justify-center rounded-xl bg-[#2f684f] px-3 text-xs font-semibold text-white"
+                    className="inline-flex h-9 items-center justify-center rounded-xl bg-[#025026] px-3 text-xs font-semibold text-white"
                   >
                     {copy.open}
                   </Link>
@@ -635,7 +635,7 @@ export function SavedRecipesLibrary({
                     <button
                       onClick={() => copyLink(item)}
                       aria-label={`${copy.copyPublicAria} ${item.recipe.title}`}
-                      className="rounded-xl bg-[#edf1ec] px-3 py-2 text-xs font-semibold text-[#356248]"
+                      className="rounded-xl bg-[#edf1ec] px-3 py-2 text-xs font-semibold text-[#025026]"
                     >
                       {copy.copyLink}
                     </button>
@@ -680,7 +680,7 @@ export function SavedRecipesLibrary({
           {items.length === 0 && (
             <Link
               href="/#generator"
-              className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white"
+              className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white"
             >
               {copy.backToGenerator}
             </Link>

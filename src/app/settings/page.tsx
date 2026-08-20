@@ -70,7 +70,7 @@ export default async function SettingsPage() {
       <div className="mx-auto max-w-4xl">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               SmartRecipe
             </p>
             <h1 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -91,7 +91,7 @@ export default async function SettingsPage() {
         <section className="mt-6 rounded-[1.7rem] border border-[#ced9cf] bg-[#f8fbf7] p-4 shadow-sm sm:mt-10 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
                 {copy.mobileEyebrow}
               </p>
               <h2 className="mt-1 font-serif text-2xl font-semibold">
@@ -101,7 +101,7 @@ export default async function SettingsPage() {
                 {copy.mobileText}
               </p>
             </div>
-            <span className="grid size-12 place-items-center rounded-2xl bg-[#2f684f] text-2xl text-white">
+            <span className="grid size-12 place-items-center rounded-2xl bg-[#025026] text-2xl text-white">
               🍳
             </span>
           </div>

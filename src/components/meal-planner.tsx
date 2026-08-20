@@ -458,7 +458,7 @@ export function MealPlanner({
       <div className={plannerContainerClass}>
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               {copy.eyebrow}
             </p>
             <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
@@ -540,7 +540,7 @@ export function MealPlanner({
           <div className="grid min-w-[1050px] grid-cols-7 gap-3">
             {copy.days.map((day, dayIndex) => (
               <div key={day} className="space-y-3">
-                <div className="rounded-xl bg-[#2f684f] px-3 py-3 text-center text-white">
+                <div className="rounded-xl bg-[#025026] px-3 py-3 text-center text-white">
                   <div>
                     <p className="text-sm font-bold">{day}</p>
                     <p className="mt-0.5 text-xs text-white/70">
@@ -610,7 +610,7 @@ export function MealPlanner({
                                   mealType: meal.key,
                                 })
                               }
-                              className="text-[#356248] hover:underline"
+                              className="text-[#025026] hover:underline"
                             >
                               {copy.change}
                             </button>
@@ -653,7 +653,7 @@ export function MealPlanner({
               {!isSignedIn && ` · ${copy.local}`}
             </p>
             {plannerMessage && (
-              <p className="mt-1 text-xs font-semibold text-[#356248]">
+              <p className="mt-1 text-xs font-semibold text-[#025026]">
                 {plannerMessage}
               </p>
             )}
@@ -661,7 +661,7 @@ export function MealPlanner({
           {missingIngredients.length > 0 && (
             <button
               onClick={() => onAddToShoppingList(missingIngredients)}
-              className="rounded-xl bg-[#e8efe9] px-4 py-2.5 text-sm font-semibold text-[#356248]"
+              className="rounded-xl bg-[#e8efe9] px-4 py-2.5 text-sm font-semibold text-[#025026]"
             >
               {copy.addMissing} ({missingIngredients.length})
             </button>
@@ -683,7 +683,7 @@ export function MealPlanner({
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
                   {copy.title}
                 </p>
                 <h3 className="mt-2 font-serif text-3xl font-semibold">

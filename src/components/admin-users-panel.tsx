@@ -266,7 +266,7 @@ export function AdminUsersPanel({
       <div className="border-b border-[#ebe8e0] p-4 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#d26849]">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#fc5726]">
               {copy.accountsAndLimits}
             </p>
             <h2 className="mt-1 font-serif text-2xl font-semibold">
@@ -276,7 +276,7 @@ export function AdminUsersPanel({
               {copy.description}
             </p>
           </div>
-          <span className="rounded-full bg-[#e8efe9] px-3 py-1.5 text-xs font-bold text-[#356248]">
+          <span className="rounded-full bg-[#e8efe9] px-3 py-1.5 text-xs font-bold text-[#025026]">
             {visibleUsers.length} / {users.length} {copy.accounts}
           </span>
         </div>
@@ -407,7 +407,7 @@ export function AdminUsersPanel({
                   className={`rounded-full px-2.5 py-1 text-xs font-bold ${
                     user.banned
                       ? "bg-[#fff0e8] text-[#a45c45]"
-                      : "bg-[#e8efe9] text-[#356248]"
+                      : "bg-[#e8efe9] text-[#025026]"
                   }`}
                   title={user.banReason ?? undefined}
                 >
@@ -476,7 +476,7 @@ export function AdminUsersPanel({
             <p className="mt-2 text-sm text-[#7a857e]">{copy.noUsersHint}</p>
             <button
               onClick={resetFilters}
-              className="mt-5 rounded-xl bg-[#2f684f] px-4 py-2.5 text-sm font-semibold text-white"
+              className="mt-5 rounded-xl bg-[#025026] px-4 py-2.5 text-sm font-semibold text-white"
             >
               {copy.clearFilters}
             </button>

@@ -467,7 +467,7 @@ export function Pantry({
             <h3 className="font-serif text-2xl font-semibold">
               {copy.headerTitle}
             </h3>
-            <span className="rounded-full bg-[#dfeae1] px-3 py-1 text-xs font-bold text-[#356248]">
+            <span className="rounded-full bg-[#dfeae1] px-3 py-1 text-xs font-bold text-[#025026]">
               {items.length}
             </span>
           </div>
@@ -499,14 +499,14 @@ export function Pantry({
             )}
             <button
               onClick={() => onUseIngredients(items.map((item) => item.label))}
-              className="rounded-xl bg-[#2f684f] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#275b44]"
+              className="rounded-xl bg-[#025026] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#013d1d]"
             >
               {copy.addAllToGenerator}
             </button>
             <button
               onClick={onCookFromPantry}
               disabled={isGenerating}
-              className="rounded-xl bg-[#d66a49] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#c35d3e] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-[#fc5726] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#d94318] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isGenerating ? copy.aiCooking : copy.cookFromPantry}
             </button>
@@ -560,7 +560,7 @@ export function Pantry({
               {copy.cancel}
             </button>
           )}
-          <button className="h-11 flex-1 rounded-xl bg-[#356248] px-5 text-sm font-semibold text-white transition hover:bg-[#2b553d]">
+          <button className="h-11 flex-1 rounded-xl bg-[#025026] px-5 text-sm font-semibold text-white transition hover:bg-[#013d1d]">
             {editingId ? copy.save : copy.addProduct}
           </button>
         </div>
@@ -605,7 +605,7 @@ export function Pantry({
                     onClick={() => setActiveCategory(category.name)}
                     className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                       activeCategory === category.name
-                        ? "bg-[#356248] text-white"
+                        ? "bg-[#025026] text-white"
                         : "bg-[#f6f5ef] text-[#59675f] hover:bg-[#edf1ec]"
                     }`}
                   >
@@ -713,7 +713,7 @@ export function Pantry({
                     onClick={() => onConsume(item)}
                     aria-label={`${copy.aria.consume}: ${item.label}`}
                     title={copy.consumedTitle}
-                    className="grid size-9 place-items-center rounded-full text-sm font-bold text-[#356248] transition hover:bg-[#dfeae1]"
+                    className="grid size-9 place-items-center rounded-full text-sm font-bold text-[#025026] transition hover:bg-[#dfeae1]"
                   >
                     ✓
                   </button>

@@ -113,13 +113,13 @@ export default async function EmailVerifiedPage({
         <div
           className={`mx-auto grid size-16 place-items-center rounded-full text-3xl ${
             verified
-              ? "bg-[#e3eee5] text-[#2f684f]"
+              ? "bg-[#e3eee5] text-[#025026]"
               : "bg-[#fff0e8] text-[#a45c45]"
           }`}
         >
           {verified ? "✓" : "!"}
         </div>
-        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
           SmartRecipe
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">
@@ -132,7 +132,7 @@ export default async function EmailVerifiedPage({
         </p>
         <Link
           href="/"
-          className="mt-7 inline-flex h-12 items-center justify-center rounded-xl bg-[#2f684f] px-6 font-semibold text-white"
+          className="mt-7 inline-flex h-12 items-center justify-center rounded-xl bg-[#025026] px-6 font-semibold text-white"
         >
           {copy.back}
         </Link>

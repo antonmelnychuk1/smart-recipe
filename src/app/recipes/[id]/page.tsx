@@ -376,7 +376,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
               </div>
             )}
             <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#356248] backdrop-blur">
+              <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#025026] backdrop-blur">
                 {savedRecipe.isPublic ? copy.public : copy.private}
               </span>
               {missingCount > 0 && (
@@ -389,7 +389,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
           <div className="p-5 sm:p-7 lg:p-9">
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-[#e8efe9] px-3 py-1.5 text-xs font-bold text-[#356248]">
+              <span className="rounded-full bg-[#e8efe9] px-3 py-1.5 text-xs font-bold text-[#025026]">
                 SmartRecipe
               </span>
               <span className="rounded-full bg-[#fff0e8] px-3 py-1.5 text-xs font-bold text-[#a45c45]">
@@ -397,7 +397,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
               </span>
             </div>
 
-            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               {copy.details}
             </p>
             <h1 className="break-anywhere mt-2 font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
@@ -438,17 +438,17 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 text={recipeText(recipe, "ingredients", language)}
                 idleLabel={copy.copyIngredients}
                 copiedLabel={copy.copied}
-                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
+                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#025026] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               />
               <CopyButton
                 text={recipeText(recipe, "steps", language)}
                 idleLabel={copy.copyInstructions}
                 copiedLabel={copy.copied}
-                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
+                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#025026] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               />
               <Link
                 href="/"
-                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#356248] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
+                className="rounded-xl border border-[#ccd7cf] bg-white px-4 py-2.5 text-sm font-semibold text-[#025026] transition hover:-translate-y-0.5 hover:bg-[#f4f7f3]"
               >
                 {copy.openApp}
               </Link>
@@ -468,7 +468,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                     {copy.perServing}
                   </p>
                 </div>
-                <span className="rounded-full bg-[#eef6ef] px-3 py-1 text-xs font-bold text-[#356248]">
+                <span className="rounded-full bg-[#eef6ef] px-3 py-1 text-xs font-bold text-[#025026]">
                   {copy.macro}
                 </span>
               </div>
@@ -501,7 +501,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                     key={ingredient}
                     className="flex gap-3 rounded-xl bg-[#fbfaf6] p-3"
                   >
-                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[#e8efe9] text-[0.65rem] font-bold text-[#356248]">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[#e8efe9] text-[0.65rem] font-bold text-[#025026]">
                       {index + 1}
                     </span>
                     <span className="break-anywhere">{ingredient}</span>
@@ -553,7 +553,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                   text={recipeText(recipe, "steps", language)}
                   idleLabel={copy.copySteps}
                   copiedLabel={copy.copied}
-                  className="rounded-xl bg-[#eef6ef] px-3 py-2 text-xs font-semibold text-[#356248] transition hover:bg-[#e3efe5]"
+                  className="rounded-xl bg-[#eef6ef] px-3 py-2 text-xs font-semibold text-[#025026] transition hover:bg-[#e3efe5]"
                 />
               </div>
               <ol className="mt-5 space-y-3 text-sm leading-6 text-[#59675f]">
@@ -562,7 +562,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                     key={step}
                     className="flex gap-3 rounded-2xl border border-[#eeeae2] bg-[#fffdf8] p-4"
                   >
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#dce9df] text-xs font-bold text-[#356248]">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#dce9df] text-xs font-bold text-[#025026]">
                       {index + 1}
                     </span>
                     <span className="break-anywhere pt-1">{step}</span>

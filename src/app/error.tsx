@@ -60,7 +60,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#fff0e8] text-3xl text-[#a45c45]">
           !
         </div>
-        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
           {copy.eyebrow}
         </p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">
@@ -77,13 +77,13 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">
           <button
             onClick={reset}
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-[#2f684f] px-4 text-sm font-semibold text-white"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white"
           >
             {copy.retry}
           </button>
           <Link
             href="/"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-4 text-sm font-semibold text-[#356248]"
+            className="inline-flex h-11 items-center justify-center rounded-xl border border-[#d8d7d0] bg-white px-4 text-sm font-semibold text-[#025026]"
           >
             {copy.home}
           </Link>

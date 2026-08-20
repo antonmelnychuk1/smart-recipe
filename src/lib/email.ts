@@ -108,12 +108,12 @@ export async function sendVerificationEmail({
     html: `
       <div style="background:#f7f4ed;padding:40px 16px;font-family:Arial,sans-serif;color:#25322b">
         <div style="max-width:560px;margin:0 auto;background:#fffdf8;border:1px solid #e2dfd6;border-radius:24px;padding:36px">
-          <div style="font-size:20px;font-weight:700;color:#2f684f">Smart<span style="color:#dc704d">Recipe</span></div>
+          <div style="font-size:20px;font-weight:700;color:#025026">Smart<span style="color:#fc5726">Recipe</span></div>
           <h1 style="font-family:Georgia,serif;font-size:32px;line-height:1.15;margin:28px 0 14px">${copy.verificationTitle}</h1>
           <p style="font-size:16px;line-height:1.7;color:#68736b;margin:0 0 26px">
             ${copy.verificationIntro(safeName)}
           </p>
-          <a href="${safeVerificationUrl}" style="display:inline-block;background:#2f684f;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px">
+          <a href="${safeVerificationUrl}" style="display:inline-block;background:#025026;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px">
             ${copy.verificationButton}
           </a>
           <p style="font-size:12px;line-height:1.6;color:#8a948e;margin:28px 0 0">
@@ -162,12 +162,12 @@ export async function sendPasswordResetEmail({
     html: `
       <div style="background:#f7f4ed;padding:40px 16px;font-family:Arial,sans-serif;color:#25322b">
         <div style="max-width:560px;margin:0 auto;background:#fffdf8;border:1px solid #e2dfd6;border-radius:24px;padding:36px">
-          <div style="font-size:20px;font-weight:700;color:#2f684f">Smart<span style="color:#dc704d">Recipe</span></div>
+          <div style="font-size:20px;font-weight:700;color:#025026">Smart<span style="color:#fc5726">Recipe</span></div>
           <h1 style="font-family:Georgia,serif;font-size:32px;line-height:1.15;margin:28px 0 14px">${copy.resetTitle}</h1>
           <p style="font-size:16px;line-height:1.7;color:#68736b;margin:0 0 26px">
             ${copy.resetIntro(safeName)}
           </p>
-          <a href="${safeResetUrl}" style="display:inline-block;background:#2f684f;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px">
+          <a href="${safeResetUrl}" style="display:inline-block;background:#025026;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px">
             ${copy.resetButton}
           </a>
           <p style="font-size:12px;line-height:1.6;color:#8a948e;margin:28px 0 0">

@@ -242,7 +242,7 @@ export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
       >
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d26849]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
               SmartRecipe
             </p>
             <h2 className="mt-2 font-serif text-3xl font-semibold">
@@ -313,7 +313,7 @@ export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
           {message && (
             <p
               role="status"
-              className="rounded-xl bg-[#e9f2eb] p-3 text-sm text-[#356248]"
+              className="rounded-xl bg-[#e9f2eb] p-3 text-sm text-[#025026]"
             >
               {message}
             </p>
@@ -321,7 +321,7 @@ export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
 
           <button
             disabled={isPending}
-            className="h-12 w-full rounded-xl bg-[#2f684f] font-semibold text-white disabled:opacity-50"
+            className="h-12 w-full rounded-xl bg-[#025026] font-semibold text-white disabled:opacity-50"
           >
             {isPending
               ? copy.buttons.pending
@@ -340,7 +340,7 @@ export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
               setError("");
               setMessage("");
             }}
-            className="mt-4 w-full text-sm font-semibold text-[#2f684f] hover:text-[#244f3c]"
+            className="mt-4 w-full text-sm font-semibold text-[#025026] hover:text-[#013d1d]"
           >
             {copy.buttons.forgotPassword}
           </button>
@@ -352,7 +352,7 @@ export function AuthDialog({ onClose, language = "pl" }: AuthDialogProps) {
             setError("");
             setMessage("");
           }}
-          className="mt-5 w-full text-sm text-[#667168] hover:text-[#2f684f]"
+          className="mt-5 w-full text-sm text-[#667168] hover:text-[#025026]"
         >
           {mode === "login"
             ? copy.buttons.toRegister
