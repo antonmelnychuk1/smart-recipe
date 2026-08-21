@@ -96,6 +96,8 @@ export function RecipeHistoryLibrary({
   language = "pl",
 }: RecipeHistoryLibraryProps) {
   const copy = historyLibraryCopy[getUiLanguage(language)];
+  const minuteUnit = language === "uk" ? "хв" : "min";
+  const calorieUnit = language === "uk" ? "ккал" : "kcal";
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState("all");
   const [diet, setDiet] = useState("all");
@@ -199,10 +201,18 @@ export function RecipeHistoryLibrary({
           className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
         >
           <option value="all">{copy.anyTime}</option>
-          <option value="15">{copy.upTo} 15 min</option>
-          <option value="30">{copy.upTo} 30 min</option>
-          <option value="45">{copy.upTo} 45 min</option>
-          <option value="60">{copy.upTo} 60 min</option>
+          <option value="15">
+            {copy.upTo} 15 {minuteUnit}
+          </option>
+          <option value="30">
+            {copy.upTo} 30 {minuteUnit}
+          </option>
+          <option value="45">
+            {copy.upTo} 45 {minuteUnit}
+          </option>
+          <option value="60">
+            {copy.upTo} 60 {minuteUnit}
+          </option>
         </select>
         <select
           value={sort}
@@ -243,7 +253,7 @@ export function RecipeHistoryLibrary({
                   <p className="mt-1 text-xs text-[#7a857e]">
                     {formatDate(entry.createdAt, language)} · {entry.diet}
                     {entry.maxTime > 0
-                      ? ` · ${copy.upTo} ${entry.maxTime} min`
+                      ? ` · ${copy.upTo} ${entry.maxTime} ${minuteUnit}`
                       : ""}
                   </p>
                 </div>
@@ -279,7 +289,8 @@ export function RecipeHistoryLibrary({
                         {recipe.title}
                       </p>
                       <p className="mt-1 text-xs text-[#7a857e]">
-                        {recipe.time} min · {recipe.calories} kcal
+                        {recipe.time} {minuteUnit} · {recipe.calories}{" "}
+                        {calorieUnit}
                       </p>
                     </div>
                   </div>

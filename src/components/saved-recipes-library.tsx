@@ -77,12 +77,16 @@ const difficultyOrder: Record<string, number> = {
   prosty: 1,
   easy: 1,
   "very easy": 1,
+  "дуже легко": 1,
+  легко: 1,
   średni: 2,
   średnia: 2,
   medium: 2,
+  середньо: 2,
   trudny: 3,
   trudna: 3,
   hard: 3,
+  складно: 3,
 };
 
 const savedCopy = {
@@ -260,6 +264,58 @@ function difficultyRank(difficulty: string) {
   return difficultyOrder[difficulty.toLocaleLowerCase("pl")] ?? 99;
 }
 
+function localizedDifficulty(difficulty: string, language: AppLanguage) {
+  const normalized = difficulty.toLocaleLowerCase("pl");
+  const level =
+    normalized === "bardzo łatwy" ||
+    normalized === "very easy" ||
+    normalized === "дуже легко"
+      ? "veryEasy"
+      : normalized === "łatwy" ||
+          normalized === "easy" ||
+          normalized === "легко"
+        ? "easy"
+        : normalized === "średni" ||
+            normalized === "medium" ||
+            normalized === "середньо"
+          ? "medium"
+          : "hard";
+
+  const labels = {
+    pl: {
+      veryEasy: "Bardzo łatwy",
+      easy: "Łatwy",
+      medium: "Średni",
+      hard: "Trudny",
+    },
+    en: {
+      veryEasy: "Very easy",
+      easy: "Easy",
+      medium: "Medium",
+      hard: "Hard",
+    },
+    uk: {
+      veryEasy: "Дуже легко",
+      easy: "Легко",
+      medium: "Середньо",
+      hard: "Складно",
+    },
+  } as const;
+
+  return labels[language][level];
+}
+
+function rangeLabel(
+  value: number,
+  unit: string,
+  language: AppLanguage,
+) {
+  const prefix = language === "en" ? "up to" : "do";
+  const localizedPrefix = language === "uk" ? "до" : prefix;
+
+  return `${localizedPrefix} ${value} ${unit}`;
+}
+
 export function SavedRecipesLibrary({
   initialItems,
   language = "pl",
@@ -268,6 +324,8 @@ export function SavedRecipesLibrary({
   language?: AppLanguage;
 }) {
   const copy = savedCopy[getUiLanguage(language)];
+  const minuteUnit = language === "uk" ? "хв" : "min";
+  const calorieUnit = language === "uk" ? "ккал" : "kcal";
   const [currency, setCurrency] = useState<CurrencyCode>("PLN");
   const [items, setItems] = useState(initialItems);
   const [search, setSearch] = useState("");
@@ -479,7 +537,9 @@ export function SavedRecipesLibrary({
           >
             <option value="all">{copy.allDifficulties}</option>
             {difficulties.map((option) => (
-              <option key={option}>{option}</option>
+              <option key={option} value={option}>
+                {localizedDifficulty(option, language)}
+              </option>
             ))}
           </select>
           <select
@@ -500,10 +560,10 @@ export function SavedRecipesLibrary({
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
             <option value="all">{copy.anyTime}</option>
-            <option value="15">do 15 min</option>
-            <option value="30">do 30 min</option>
-            <option value="45">do 45 min</option>
-            <option value="60">do 60 min</option>
+            <option value="15">{rangeLabel(15, minuteUnit, language)}</option>
+            <option value="30">{rangeLabel(30, minuteUnit, language)}</option>
+            <option value="45">{rangeLabel(45, minuteUnit, language)}</option>
+            <option value="60">{rangeLabel(60, minuteUnit, language)}</option>
           </select>
           <select
             value={maxCalories}
@@ -511,9 +571,9 @@ export function SavedRecipesLibrary({
             className="h-11 rounded-xl border border-[#dedfd9] bg-white px-3 text-sm outline-none"
           >
             <option value="all">{copy.anyCalories}</option>
-            <option value="400">do 400 kcal</option>
-            <option value="600">do 600 kcal</option>
-            <option value="800">do 800 kcal</option>
+            <option value="400">{rangeLabel(400, calorieUnit, language)}</option>
+            <option value="600">{rangeLabel(600, calorieUnit, language)}</option>
+            <option value="800">{rangeLabel(800, calorieUnit, language)}</option>
           </select>
           <select
             value={maxCost}
@@ -592,13 +652,13 @@ export function SavedRecipesLibrary({
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#7a857e]">
                   <span className="rounded-full bg-[#f6f3ec] px-2.5 py-1">
-                    {item.recipe.time} min
+                    {item.recipe.time} {minuteUnit}
                   </span>
                   <span className="rounded-full bg-[#f6f3ec] px-2.5 py-1">
-                    {item.recipe.difficulty}
+                    {localizedDifficulty(item.recipe.difficulty, language)}
                   </span>
                   <span className="rounded-full bg-[#f6f3ec] px-2.5 py-1">
-                    {item.recipe.calories} kcal
+                    {item.recipe.calories} {calorieUnit}
                   </span>
                   {item.recipe.estimatedCost && (
                     <span className="rounded-full bg-[#f6f3ec] px-2.5 py-1">

@@ -119,6 +119,47 @@ const dishResponseSchema = z.object({
   recipes: z.array(recipeSchema).length(3),
 });
 
+function localizeDifficulty(difficulty: string, language: "pl" | "en" | "uk") {
+  const normalized = difficulty.toLocaleLowerCase("pl");
+  const level =
+    normalized === "bardzo łatwy" ||
+    normalized === "very easy" ||
+    normalized === "дуже легко"
+      ? "veryEasy"
+      : normalized === "łatwy" ||
+          normalized === "easy" ||
+          normalized === "легко"
+        ? "easy"
+        : normalized === "średni" ||
+            normalized === "medium" ||
+            normalized === "середньо"
+          ? "medium"
+          : "hard";
+
+  const labels = {
+    pl: {
+      veryEasy: "Bardzo łatwy",
+      easy: "Łatwy",
+      medium: "Średni",
+      hard: "Trudny",
+    },
+    en: {
+      veryEasy: "Very easy",
+      easy: "Easy",
+      medium: "Medium",
+      hard: "Hard",
+    },
+    uk: {
+      veryEasy: "Дуже легко",
+      easy: "Легко",
+      medium: "Середньо",
+      hard: "Складно",
+    },
+  } as const;
+
+  return labels[language][level];
+}
+
 export async function POST(request: Request) {
   if (!process.env.OPENAI_API_KEY) {
     return apiError(
@@ -155,7 +196,11 @@ export async function POST(request: Request) {
   const priceRegion = getPriceRegionLabel(requestData.priceRegion);
   const isEnglish = language === "en";
   const isUkrainian = language === "uk";
-  const usesEnglishPrompt = isEnglish || isUkrainian;
+  const targetLanguageName = isUkrainian
+    ? "Ukrainian"
+    : isEnglish
+      ? "English"
+      : "Polish";
   const apiCopy =
     language === "uk"
       ? {
@@ -188,58 +233,104 @@ export async function POST(request: Request) {
           fallback: "Nie udało się wygenerować przepisów.",
         };
   const dietLabels: Record<string, string> = {
-    "Bez ograniczeń": isEnglish || isUkrainian ? "No restrictions" : "Bez ograniczeń",
-    Wegetariańska: isEnglish || isUkrainian ? "Vegetarian" : "Wegetariańska",
-    Wegańska: isEnglish || isUkrainian ? "Vegan" : "Wegańska",
+    "Bez ograniczeń": isUkrainian
+      ? "Без обмежень"
+      : isEnglish
+        ? "No restrictions"
+        : "Bez ograniczeń",
+    Wegetariańska: isUkrainian
+      ? "Вегетаріанська"
+      : isEnglish
+        ? "Vegetarian"
+        : "Wegetariańska",
+    Wegańska: isUkrainian ? "Веганська" : isEnglish ? "Vegan" : "Wegańska",
     Pescetariańska:
-      isEnglish || isUkrainian ? "Pescetarian" : "Pescetariańska",
-    Bezglutenowa: isEnglish || isUkrainian ? "Gluten-free" : "Bezglutenowa",
-    "Bez laktozy": isEnglish || isUkrainian ? "Lactose-free" : "Bez laktozy",
-    Ketogeniczna: isEnglish || isUkrainian ? "Keto" : "Ketogeniczna",
+      isUkrainian ? "Пескетаріанська" : isEnglish ? "Pescetarian" : "Pescetariańska",
+    Bezglutenowa:
+      isUkrainian ? "Без глютену" : isEnglish ? "Gluten-free" : "Bezglutenowa",
+    "Bez laktozy":
+      isUkrainian ? "Без лактози" : isEnglish ? "Lactose-free" : "Bez laktozy",
+    Ketogeniczna: isUkrainian ? "Кетогенна" : isEnglish ? "Keto" : "Ketogeniczna",
     Niskowęglowodanowa:
-      isEnglish || isUkrainian ? "Low-carb" : "Niskowęglowodanowa",
+      isUkrainian ? "Низьковуглеводна" : isEnglish ? "Low-carb" : "Niskowęglowodanowa",
     Śródziemnomorska:
-      isEnglish || isUkrainian ? "Mediterranean" : "Śródziemnomorska",
+      isUkrainian ? "Середземноморська" : isEnglish ? "Mediterranean" : "Śródziemnomorska",
     Wysokobiałkowa:
-      isEnglish || isUkrainian ? "High-protein" : "Wysokobiałkowa",
+      isUkrainian ? "Високобілкова" : isEnglish ? "High-protein" : "Wysokobiałkowa",
   };
   const localizedDiet = dietLabels[diet] ?? diet;
   const budgetRequirement =
     requestData.maxBudget === 0
-      ? usesEnglishPrompt
+      ? isUkrainian
+        ? "Без обмеження бюджету"
+        : isEnglish
         ? "No budget limit"
         : "Bez ograniczeń budżetowych"
-      : usesEnglishPrompt
+      : isUkrainian
+        ? `Максимум ${requestData.maxBudget} ${currency} на 2 порції`
+        : isEnglish
         ? `Maximum ${requestData.maxBudget} ${currency} for 2 servings`
         : `Maksymalnie ${requestData.maxBudget} ${currency} za 2 porcje`;
   const goalLabels: Record<typeof requestData.cookingGoal, string> = {
-    balanced: usesEnglishPrompt ? "a balanced meal" : "zbalansowany posiłek",
-    quick: usesEnglishPrompt
+    balanced: isUkrainian
+      ? "збалансована страва"
+      : isEnglish
+        ? "a balanced meal"
+        : "zbalansowany posiłek",
+    quick: isUkrainian
+      ? "найшвидше можливе приготування"
+      : isEnglish
       ? "the fastest possible preparation"
       : "jak najszybsze przygotowanie",
-    cheap: usesEnglishPrompt ? "the lowest possible cost" : "jak najniższy koszt",
-    healthy: usesEnglishPrompt
+    cheap: isUkrainian
+      ? "найнижча можлива вартість"
+      : isEnglish
+        ? "the lowest possible cost"
+        : "jak najniższy koszt",
+    healthy: isUkrainian
+      ? "здоровіший і легший склад"
+      : isEnglish
       ? "a healthier, lighter composition"
       : "zdrowszy, lekki skład",
-    high_protein: usesEnglishPrompt
+    high_protein: isUkrainian
+      ? "високий вміст білка"
+      : isEnglish
       ? "high protein content"
       : "wysoka zawartość białka",
-    use_pantry: usesEnglishPrompt
+    use_pantry: isUkrainian
+      ? "максимальне використання продуктів користувача"
+      : isEnglish
       ? "maximum use of the user's products"
       : "maksymalne wykorzystanie produktów użytkownika",
   };
-  const cookingGoalRequirement = usesEnglishPrompt
+  const cookingGoalRequirement = isUkrainian
+    ? `Пріоритет користувача: ${goalLabels[requestData.cookingGoal]}.`
+    : isEnglish
     ? `User priority: ${goalLabels[requestData.cookingGoal]}.`
     : `Priorytet użytkownika: ${goalLabels[requestData.cookingGoal]}.`;
   const excludedRequirement =
     requestData.excludedIngredients.length > 0
-      ? usesEnglishPrompt
+      ? isUkrainian
+        ? `Виключені продукти, алергії або нелюбимі інгредієнти: ${requestData.excludedIngredients.join(", ")}. Не використовуй їх в ingredients, missing, steps або substitutions.`
+        : isEnglish
         ? `Excluded products, allergies or disliked ingredients: ${requestData.excludedIngredients.join(", ")}. Do not use them in ingredients, missing, steps or substitutions.`
         : `Produkty wykluczone, alergie lub nielubiane składniki: ${requestData.excludedIngredients.join(", ")}. Nie używaj ich w składnikach, missing, krokach ani zamiennikach.`
-      : usesEnglishPrompt
+      : isUkrainian
+        ? "Немає додаткових виключень або нелюбимих інгредієнтів."
+        : isEnglish
         ? "No additional exclusions or disliked ingredients."
         : "Brak dodatkowych wykluczeń i nielubianych składników.";
-  const nutritionGoals = usesEnglishPrompt
+  const nutritionGoals = isUkrainian
+    ? `Денні цілі користувача: ${
+        requestData.calorieTarget
+          ? `${requestData.calorieTarget} ккал`
+          : "немає цілі калорій"
+      }, ${
+        requestData.proteinTarget
+          ? `${requestData.proteinTarget} г білка`
+          : "немає цілі білка"
+      }.`
+    : isEnglish
     ? `User daily goals: ${
         requestData.calorieTarget
           ? `${requestData.calorieTarget} kcal`
@@ -260,13 +351,19 @@ export async function POST(request: Request) {
       }.`;
   const timeRequirement =
     maxTime === 0
-      ? usesEnglishPrompt
+      ? isUkrainian
+        ? "Без обмеження часу"
+        : isEnglish
         ? "No time limit"
         : "Bez ograniczeń czasowych"
-      : usesEnglishPrompt
+      : isUkrainian
+        ? `Максимум ${maxTime} хвилин`
+        : isEnglish
         ? `Maximum ${maxTime} minutes`
         : `Maksymalnie ${maxTime} minut`;
-  const priceRegionRequirement = usesEnglishPrompt
+  const priceRegionRequirement = isUkrainian
+    ? `Оцінюй ціни інгредієнтів для регіону: ${priceRegion}. Використовуй типові роздрібні ціни на продукти для цього регіону.`
+    : isEnglish
     ? `Estimate ingredient prices for ${priceRegion}. Use typical consumer grocery prices for this region.`
     : `Szacuj ceny składników dla regionu: ${priceRegion}. Używaj typowych konsumenckich cen spożywczych dla tego regionu.`;
   let responseSchema;
@@ -274,8 +371,21 @@ export async function POST(request: Request) {
 
   if (requestData.mode === "dish") {
     responseSchema = dishResponseSchema;
-    requestPrompt = usesEnglishPrompt
-      ? `Prepare exactly 3 different recipes or variants of the dish described by the user: ${requestData.dish}.
+    requestPrompt = isUkrainian
+      ? `Підготуй рівно 3 різні рецепти або варіанти страви, яку описав користувач: ${requestData.dish}.
+
+Дієта: ${localizedDiet}
+Час приготування: ${timeRequirement}
+Бюджет: ${budgetRequirement}
+Регіон цін: ${priceRegion}
+${priceRegionRequirement}
+${cookingGoalRequirement}
+${excludedRequirement}
+${nutritionGoals}
+
+Кожен варіант має чітко відрізнятися інгредієнтами, смаком або способом приготування, але все одно відповідати запитаній страві. Усі пропозиції мають відповідати дієті та вимогам часу. Для кожного рецепта подай повний список інгредієнтів з кількостями на 2 порції та 4–8 конкретних кроків. Поле missing має містити тільки чисті назви продуктів для купівлі без кількостей і одиниць, а поле match встанови на 0.`
+      : isEnglish
+        ? `Prepare exactly 3 different recipes or variants of the dish described by the user: ${requestData.dish}.
 
 Diet: ${localizedDiet}
 Preparation time: ${timeRequirement}
@@ -287,7 +397,7 @@ ${excludedRequirement}
 ${nutritionGoals}
 
 Each variant must clearly differ in ingredients, flavor or preparation method while still matching the requested dish. Fit all suggestions to the diet and time requirements. For each recipe provide a complete ingredient list with amounts for 2 servings and 4–8 specific steps. The missing field must contain only clean product names to buy, without amounts or units, and match must be 0.`
-      : `Przygotuj dokładnie 3 różne przepisy lub warianty dania opisanego przez użytkownika: ${requestData.dish}.
+        : `Przygotuj dokładnie 3 różne przepisy lub warianty dania opisanego przez użytkownika: ${requestData.dish}.
 
 Dieta: ${localizedDiet}
 Czas przygotowania: ${timeRequirement}
@@ -301,8 +411,25 @@ ${nutritionGoals}
 Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tylko czyste nazwy produktów do kupienia bez ilości i jednostek, a pole match ustaw na 0.`;
   } else {
     responseSchema = ingredientsResponseSchema;
-    requestPrompt = usesEnglishPrompt
-      ? `Generate exactly 3 different recipes.
+    requestPrompt = isUkrainian
+      ? `Згенеруй рівно 3 різні рецепти.
+
+Доступні інгредієнти: ${requestData.ingredients.join(", ")}
+Продукти з коротким терміном придатності, які треба використати першими: ${
+          requestData.priorityIngredients?.join(", ") || "немає"
+        }
+Дієта: ${localizedDiet}
+Час приготування: ${timeRequirement}
+Бюджет: ${budgetRequirement}
+Регіон цін: ${priceRegion}
+${priceRegionRequirement}
+${cookingGoalRequirement}
+${excludedRequirement}
+${nutritionGoals}
+
+Кожен рецепт має відповідати вимогам часу, дотримуватися дієти, використовувати якомога більше доступних інгредієнтів і потребувати максимум 4 відсутні продукти. Якщо подано продукти з коротким терміном придатності, використай їх у якомога більшій кількості пропозицій. Подай повний список інгредієнтів з кількостями на 2 порції, 3–7 конкретних кроків і один відповідний emoji. Поле match — це відсоток інгредієнтів рецепта, які користувач уже має.`
+      : isEnglish
+        ? `Generate exactly 3 different recipes.
 
 Available ingredients: ${requestData.ingredients.join(", ")}
 Products close to expiry that should be used first: ${
@@ -318,7 +445,7 @@ ${excludedRequirement}
 ${nutritionGoals}
 
 Each recipe must meet the time requirement, follow the diet, use as many available ingredients as possible and require at most 4 missing products. If close-to-expiry products were provided, use them in as many suggestions as possible. Provide a complete ingredient list with amounts for 2 servings, 3–7 specific steps and one matching emoji. The match field is the percentage of recipe ingredients the user already has.`
-      : `Wygeneruj dokładnie 3 różne przepisy.
+        : `Wygeneruj dokładnie 3 różne przepisy.
 
 Dostępne składniki: ${requestData.ingredients.join(", ")}
 Produkty z krótką datą ważności, które należy wykorzystać w pierwszej kolejności: ${
@@ -335,11 +462,36 @@ ${nutritionGoals}
 
 Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Jeśli podano produkty z krótką datą ważności, wykorzystaj je w możliwie wielu propozycjach. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
   }
-  const systemPrompt = usesEnglishPrompt
-    ? `You are an experienced chef and dietitian. Create safe, realistic recipes in ${isUkrainian ? "Ukrainian" : "English"}. Nutrition estimates are for one serving. Do not claim that a dish is safe for people with allergies. Basic pantry products such as water, salt, pepper and a small amount of oil can be included in recipe ingredients, but do not add them to the missing shopping list.`
+  const systemPrompt = isUkrainian
+    ? "Ти досвідчений кухар і дієтолог. Створюй безпечні, реалістичні рецепти українською мовою. Оцінки харчової цінності стосуються однієї порції. Не стверджуй, що страва безпечна для людей з алергіями. Базові продукти комори, як вода, сіль, перець і невелика кількість олії, можуть бути в інгредієнтах рецепта, але не додавай їх до списку відсутніх покупок."
+    : isEnglish
+    ? `You are an experienced chef and dietitian. Create safe, realistic recipes in ${targetLanguageName}. Nutrition estimates are for one serving. Do not claim that a dish is safe for people with allergies. Basic pantry products such as water, salt, pepper and a small amount of oil can be included in recipe ingredients, but do not add them to the missing shopping list.`
     : "Jesteś doświadczonym kucharzem i dietetykiem. Tworzysz bezpieczne, realne przepisy po polsku. Szacunki wartości odżywczych dotyczą jednej porcji. Nie deklaruj, że danie jest bezpieczne dla alergika. Podstawowe produkty spiżarniane, takie jak woda, sól, pieprz i niewielka ilość oleju, mogą być w składnikach przepisu, ale nie dodawaj ich do listy brakujących zakupów.";
-  const generationRules = usesEnglishPrompt
-    ? `Respond in ${isUkrainian ? "Ukrainian" : "English"}. The only exception is imageQuery, which must always be an English Pexels search phrase.
+  const generationRules = isUkrainian
+    ? `Відповідай українською мовою в усіх полях: title, description, difficulty, ingredients, missing, substitutions та steps. Єдиний виняток — imageQuery, він завжди має бути англійською фразою для пошуку в Pexels.
+
+Поле difficulty має бути рівно одним із цих українських значень: "Дуже легко", "Легко", "Середньо", "Складно". Не використовуй польські або англійські назви складності.
+
+Поле imageQuery має містити англійську фразу для пошуку відповідного фото їжі в Pexels. Використай 6–10 конкретних слів, які описують назву страви, видимі ключові інгредієнти, подачу та за бажанням ракурс або стиль. Не використовуй слова photo, image або photography. Не додавай пунктуацію.
+
+Кожен елемент масиву ingredients ОБОВʼЯЗКОВО має містити точну кількість і одиницю на 2 порції. Використовуй практичні українські одиниці: г, кг, мл, л, шт., чайна ложка або столова ложка. “Чайна ложка” означає маленьку ложку для чаю, а “столова ложка” — велику ложку. Завжди пиши конкретно “чайна ложка” або “столова ложка”, ніколи не пиши нечітке “ложки”. Це стосується також олії, спецій, солі та води — не використовуй “за смаком”, “трохи”, “за потреби” або назви продуктів без кількостей. Правильні приклади: “250 г пшеничного борошна”, “2 шт. яєць”, “1 столова ложка оливкової олії”, “0,5 чайної ложки солі”.
+
+Поле missing — це ТІЛЬКИ список покупок. Кожен елемент missing має бути короткою назвою продукту українською мовою без кількостей, грамів, мл, штук, столових або чайних ложок. Правильно: “пармезан”, “суміш овочів”, “соєвий соус”. Неправильно: “50 г пармезану”, “150 г суміші овочів”, “2 столові ложки соєвого соусу”. Не додавай до missing воду, сіль, перець або дрібну кількість базової олії. Якщо потрібен бульйон, не вважай його одним відсутнім інгредієнтом: в ingredients подай продукти для простого бульйону або використай воду і спеції, а в missing додай тільки магазинні продукти, потрібні для його приготування.
+
+У кроках приготування вказуй кількість і одиницю під час першого використання кожного інгредієнта, наприклад: “Додай 250 г борошна і 300 мл молока”. Не пропускай пропорції в інструкціях.
+
+estimatedCost — це реалістична загальна орієнтовна вартість інгредієнтів для 2 порцій у цілих одиницях валюти ${currency}, на основі типових цін у регіоні ${priceRegion}. Поле currency встанови рівно як "${currency}". Дотримуйся бюджету, якщо його задано. Харчові цілі — це орієнтир для однієї страви, не для всього дня.
+
+substitutions має містити 2–5 практичних замін для інгредієнтів, які користувач може захотіти замінити або які часто є проблемними. Кожен елемент має вказувати оригінальний інгредієнт рецепта та 1–3 заміни з короткою кількістю, наприклад “150 г грецького йогурту” замість “150 г сметани”. Заміни мають відповідати вибраній дієті й не порушувати обмеження користувача.
+
+Приклади imageQuery:
+- chicken rice egg bowl top view asian style plated food
+- creamy chicken spinach risotto
+- chicken rice omelette golden brown on pan close up`
+    : isEnglish
+    ? `Respond in English. The only exception is imageQuery, which must always be an English Pexels search phrase.
+
+The difficulty field must be exactly one of these English values: "Very easy", "Easy", "Medium", "Hard". Do not use Polish or Ukrainian difficulty labels.
 
 The imageQuery field must contain an English phrase for finding a matching food photo in Pexels. Use 6–10 specific words describing the dish name, visible key ingredients, serving style and optionally angle or style. Do not use the words photo, image or photography. Do not add punctuation.
 
@@ -357,7 +509,11 @@ Example imageQuery values:
 - chicken rice egg bowl top view asian style plated food
 - creamy chicken spinach risotto
 - chicken rice omelette golden brown on pan close up`
-    : `Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęcia w Pexels. Użyj 6–10 konkretnych słów opisujących nazwę dania, najważniejsze widoczne składniki, sposób podania oraz opcjonalnie ujęcie lub styl. Nie używaj słów photo, image ani photography. Nie tłumacz frazy i nie dodawaj znaków interpunkcyjnych.
+    : `Odpowiadaj po polsku we wszystkich polach poza imageQuery.
+
+Pole difficulty ma mieć dokładnie jedną z polskich wartości: "Bardzo łatwy", "Łatwy", "Średni", "Trudny". Nie używaj angielskich ani ukraińskich nazw trudności.
+
+Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęcia w Pexels. Użyj 6–10 konkretnych słów opisujących nazwę dania, najważniejsze widoczne składniki, sposób podania oraz opcjonalnie ujęcie lub styl. Nie używaj słów photo, image ani photography. Nie tłumacz frazy i nie dodawaj znaków interpunkcyjnych.
 
 Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka albo łyżka stołowa. „Łyżeczka” oznacza małą łyżeczkę do herbaty, a „łyżka stołowa” oznacza dużą łyżkę. Zawsze pisz konkretnie „łyżeczka” albo „łyżka stołowa”, nigdy samo niejasne „łyżki”. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka stołowa oliwy”, „0,5 łyżeczki soli”.
 
@@ -447,6 +603,7 @@ ${generationRules}`,
     return Response.json({
       recipes: recipesWithPhotos.map((recipe) => ({
         ...recipe,
+        difficulty: localizeDifficulty(recipe.difficulty, language),
         priceRegion: requestData.priceRegion,
       })),
       usage: {

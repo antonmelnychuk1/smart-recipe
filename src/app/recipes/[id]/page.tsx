@@ -42,6 +42,47 @@ function truncate(value: string, maxLength = 155) {
     : value;
 }
 
+function localizedDifficulty(difficulty: string, language: AppLanguage) {
+  const normalized = difficulty.toLocaleLowerCase("pl");
+  const level =
+    normalized === "bardzo łatwy" ||
+    normalized === "very easy" ||
+    normalized === "дуже легко"
+      ? "veryEasy"
+      : normalized === "łatwy" ||
+          normalized === "easy" ||
+          normalized === "легко"
+        ? "easy"
+        : normalized === "średni" ||
+            normalized === "medium" ||
+            normalized === "середньо"
+          ? "medium"
+          : "hard";
+
+  const labels = {
+    pl: {
+      veryEasy: "Bardzo łatwy",
+      easy: "Łatwy",
+      medium: "Średni",
+      hard: "Trudny",
+    },
+    en: {
+      veryEasy: "Very easy",
+      easy: "Easy",
+      medium: "Medium",
+      hard: "Hard",
+    },
+    uk: {
+      veryEasy: "Дуже легко",
+      easy: "Легко",
+      medium: "Середньо",
+      hard: "Складно",
+    },
+  } as const;
+
+  return labels[language][level];
+}
+
 const recipePageCopy = {
   pl: {
     sharedTitle: "Udostępniony przepis · SmartRecipe",
@@ -261,6 +302,8 @@ export default async function RecipePage({ params }: RecipePageProps) {
   ]);
   const language = normalizeLanguage(cookieStore.get(languageCookieName)?.value);
   const copy = recipePageCopy[getUiLanguage(language)];
+  const minuteUnit = language === "uk" ? "хв" : "min";
+  const calorieUnit = language === "uk" ? "ккал" : "kcal";
 
   if (
     !savedRecipe ||
@@ -271,13 +314,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
   const recipe = savedRecipe.recipe as Recipe;
   const nutrition = [
-    [copy.calories, `${recipe.calories} kcal`],
+    [copy.calories, `${recipe.calories} ${calorieUnit}`],
     [copy.protein, `${recipe.protein} g`],
     [copy.carbs, `${recipe.carbs} g`],
     [copy.fat, `${recipe.fat} g`],
   ];
   const summary = [
-    [copy.time, `${recipe.time} min`, copy.prep],
+    [copy.time, `${recipe.time} ${minuteUnit}`, copy.prep],
     [
       copy.cost,
       recipe.estimatedCost
@@ -393,7 +436,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 SmartRecipe
               </span>
               <span className="rounded-full bg-[#fff0e8] px-3 py-1.5 text-xs font-bold text-[#a45c45]">
-                {recipe.difficulty}
+                {localizedDifficulty(recipe.difficulty, language)}
               </span>
             </div>
 
@@ -546,7 +589,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                   </h2>
                   <p className="mt-1 text-xs text-[#7a857e]">
                     {recipe.steps.length} {copy.steps} · {copy.around}{" "}
-                    {recipe.time} min
+                    {recipe.time} {minuteUnit}
                   </p>
                 </div>
                 <CopyButton

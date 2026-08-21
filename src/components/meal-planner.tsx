@@ -208,6 +208,8 @@ export function MealPlanner({
   currency = "PLN",
 }: MealPlannerProps) {
   const copy = plannerCopy[getUiLanguage(language)];
+  const minuteUnit = language === "uk" ? "хв" : "min";
+  const calorieUnit = language === "uk" ? "ккал" : "kcal";
   const mealTypes = mealTypeKeys.map((key) => ({
     key,
     label: copy.meals[key],
@@ -516,7 +518,7 @@ export function MealPlanner({
                 formatPrice(language, weekSummary.cost, currency),
                 copy.estimated,
               ],
-              [copy.time, `${weekSummary.time} min`, copy.cooking],
+              [copy.time, `${weekSummary.time} ${minuteUnit}`, copy.cooking],
             ].map(([label, value, hint]) => (
               <article
                 key={label}
@@ -599,7 +601,8 @@ export function MealPlanner({
                               {entry.recipe.title}
                             </span>
                             <span className="mt-1 block text-xs text-[#7a857e]">
-                              {entry.recipe.time} min · {entry.recipe.calories} kcal
+                              {entry.recipe.time} {minuteUnit} ·{" "}
+                              {entry.recipe.calories} {calorieUnit}
                             </span>
                           </button>
                           <div className="mt-3 flex gap-2 text-xs font-semibold">
@@ -725,7 +728,8 @@ export function MealPlanner({
                         {recipe.title}
                       </span>
                       <span className="mt-1 block text-xs text-[#7a857e]">
-                        {recipe.time} min · {recipe.calories} kcal
+                        {recipe.time} {minuteUnit} · {recipe.calories}{" "}
+                        {calorieUnit}
                       </span>
                     </span>
                   </button>

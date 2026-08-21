@@ -381,6 +381,47 @@ function formatTimer(seconds: number) {
   )}`;
 }
 
+function localizedDifficulty(difficulty: string, language: AppLanguage) {
+  const normalized = difficulty.toLocaleLowerCase("pl");
+  const level =
+    normalized === "bardzo łatwy" ||
+    normalized === "very easy" ||
+    normalized === "дуже легко"
+      ? "veryEasy"
+      : normalized === "łatwy" ||
+          normalized === "easy" ||
+          normalized === "легко"
+        ? "easy"
+        : normalized === "średni" ||
+            normalized === "medium" ||
+            normalized === "середньо"
+          ? "medium"
+          : "hard";
+
+  const labels = {
+    pl: {
+      veryEasy: "Bardzo łatwy",
+      easy: "Łatwy",
+      medium: "Średni",
+      hard: "Trudny",
+    },
+    en: {
+      veryEasy: "Very easy",
+      easy: "Easy",
+      medium: "Medium",
+      hard: "Hard",
+    },
+    uk: {
+      veryEasy: "Дуже легко",
+      easy: "Легко",
+      medium: "Середньо",
+      hard: "Складно",
+    },
+  } as const;
+
+  return labels[language][level];
+}
+
 function Icon({ name }: { name: "spark" | "clock" | "heart" | "leaf" }) {
   const paths = {
     spark: "M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zm6 11l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9L18 14z",
@@ -621,6 +662,8 @@ export default function Home() {
   );
   const modalOpen = Boolean(selectedRecipe) || cookingMode || authOpen;
   const copy = homeCopy[language];
+  const minuteUnit = language === "uk" ? "хв" : "min";
+  const calorieUnit = language === "uk" ? "ккал" : "kcal";
   const pageCopy =
     language === "pl"
       ? {
@@ -3038,10 +3081,14 @@ export default function Home() {
               <div className="p-4 sm:p-6">
                 <div className="flex min-w-0 gap-3 overflow-x-auto pb-1 text-xs font-medium text-[#78837c] sm:gap-4 sm:overflow-visible sm:pb-0">
                   <span className="flex items-center gap-1.5">
-                    <Icon name="clock" /> {recipe.time} min
+                    <Icon name="clock" /> {recipe.time} {minuteUnit}
                   </span>
-                  <span className="shrink-0">{recipe.difficulty}</span>
-                  <span className="shrink-0">{recipe.calories} kcal</span>
+                  <span className="shrink-0">
+                    {localizedDifficulty(recipe.difficulty, language)}
+                  </span>
+                  <span className="shrink-0">
+                    {recipe.calories} {calorieUnit}
+                  </span>
                   {recipe.estimatedCost && (
                     <span className="shrink-0">
                       {copy.results.approx}{" "}
@@ -3266,7 +3313,8 @@ export default function Home() {
                           {recipe.title}
                         </span>
                         <span className="text-xs text-[#7a857e]">
-                          {recipe.time} min · {recipe.calories} kcal
+                          {recipe.time} {minuteUnit} · {recipe.calories}{" "}
+                          {calorieUnit}
                         </span>
                       </button>
                       <button
@@ -3680,8 +3728,12 @@ export default function Home() {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-2 rounded-2xl bg-[#edf2ed] p-3 text-sm sm:grid-cols-5 sm:gap-3 sm:p-4">
-              <span className="min-w-0 truncate">{selectedRecipe.time} min</span>
-              <span className="min-w-0 truncate">{selectedRecipe.calories} kcal</span>
+              <span className="min-w-0 truncate">
+                {selectedRecipe.time} {minuteUnit}
+              </span>
+              <span className="min-w-0 truncate">
+                {selectedRecipe.calories} {calorieUnit}
+              </span>
               <span className="min-w-0 truncate">
                 {copy.recipeModal.proteinShort}: {selectedRecipe.protein} g
               </span>
@@ -4020,7 +4072,7 @@ export default function Home() {
                     }
                     className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#025026]"
                   >
-                    +1 min
+                    +1 {minuteUnit}
                   </button>
                   <button
                     onClick={() =>
@@ -4031,7 +4083,7 @@ export default function Home() {
                     disabled={cookingTimerSeconds === 0}
                     className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#025026] disabled:opacity-40"
                   >
-                    -1 min
+                    -1 {minuteUnit}
                   </button>
                   <button
                     onClick={() =>
@@ -4039,7 +4091,7 @@ export default function Home() {
                     }
                     className="h-10 rounded-xl border border-[#ccd7cf] px-3 text-xs font-semibold text-[#025026]"
                   >
-                    +5 min
+                    +5 {minuteUnit}
                   </button>
                   <button
                     onClick={() =>
