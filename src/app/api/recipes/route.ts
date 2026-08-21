@@ -160,6 +160,82 @@ function localizeDifficulty(difficulty: string, language: "pl" | "en" | "uk") {
   return labels[language][level];
 }
 
+function cleanShoppingProductName(item: string) {
+  const withoutAmount = item
+    .trim()
+    .replace(
+      /^(?:ok\.|około|about|approx\.|близько|прибл\.)?\s*\d+(?:\s*\/\s*\d+|[.,]\d+)?\s*(?:g|kg|ml|l|г|кг|мл|л|szt\.?|шт\.?|pcs?\.?|pieces?|łyżeczki|łyżeczek|łyżeczka|łyżka|łyżki|łyżek|stołowa|stołowe|stołowych|teaspoons?|tablespoons?|tsp|tbsp|чайна\s+ложка|чайної\s+ложки|чайні\s+ложки|чайних\s+ложок|столова\s+ложка|столової\s+ложки|столові\s+ложки|столових\s+ложок|szklanki|szklanka|склянки|склянка|ząbki|ząbek|зубчики|зубчик|garści|garść|жмені|жменя|plastry|plaster|скибки|скибка|łodyga|łodygi|стебло|стебла|liść|liścia|лист|листа)\s+/i,
+      "",
+    )
+    .replace(/^(?:stołowa|stołowe|stołowych|ложка|ложки)\s+/i, "")
+    .replace(/[.;:,]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const normalized = withoutAmount.toLocaleLowerCase("pl");
+  const commonNames: Record<string, string> = {
+    "filetu z kurczaka": "filet z kurczaka",
+    "tartego sera": "tarty ser",
+    parmezanu: "parmezan",
+    pieprzu: "pieprz",
+    oleju: "olej",
+    oliwy: "oliwa",
+    "mieszanki warzyw": "mieszanka warzyw",
+    "sosu sojowego": "sos sojowy",
+    marchewki: "marchewka",
+    cebuli: "cebula",
+    "all-purpose flour": "all-purpose flour",
+    flour: "flour",
+    eggs: "eggs",
+    egg: "eggs",
+    blueberries: "blueberries",
+    "sour cream": "sour cream",
+    butter: "butter",
+    sugar: "sugar",
+    salt: "salt",
+    oil: "oil",
+    "пшеничного борошна": "пшеничне борошно",
+    борошна: "борошно",
+    яйця: "яйця",
+    яєць: "яйця",
+    "теплої води": "вода",
+    води: "вода",
+    вода: "вода",
+    олії: "олія",
+    олія: "олія",
+    лохини: "лохина",
+    лохина: "лохина",
+    цукру: "цукор",
+    цукор: "цукор",
+    сметани: "сметана",
+    сметана: "сметана",
+    "вершкового масла": "вершкове масло",
+    "вершкове масло": "вершкове масло",
+    солі: "сіль",
+    сіль: "сіль",
+    перцю: "перець",
+    перець: "перець",
+  };
+
+  return commonNames[normalized] ?? withoutAmount;
+}
+
+function completeDishShoppingList(
+  recipe: { ingredients: string[]; missing: string[] },
+) {
+  const ignored = new Set(["woda", "water", "вода"]);
+  const allProducts = [...recipe.missing, ...recipe.ingredients]
+    .map(cleanShoppingProductName)
+    .filter((item) => item && !ignored.has(item.toLocaleLowerCase("pl")));
+  const uniqueProducts = new Map<string, string>();
+
+  allProducts.forEach((item) => {
+    uniqueProducts.set(item.toLocaleLowerCase("pl"), item);
+  });
+
+  return [...uniqueProducts.values()];
+}
+
 export async function POST(request: Request) {
   if (!process.env.OPENAI_API_KEY) {
     return apiError(
@@ -383,7 +459,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Кожен варіант має чітко відрізнятися інгредієнтами, смаком або способом приготування, але все одно відповідати запитаній страві. Усі пропозиції мають відповідати дієті та вимогам часу. Для кожного рецепта подай повний список інгредієнтів з кількостями на 2 порції та 4–8 конкретних кроків. Поле missing має містити тільки чисті назви продуктів для купівлі без кількостей і одиниць, а поле match встанови на 0.`
+Кожен варіант має чітко відрізнятися інгредієнтами, смаком або способом приготування, але все одно відповідати запитаній страві. Усі пропозиції мають відповідати дієті та вимогам часу. Для кожного рецепта подай повний список інгредієнтів з кількостями на 2 порції та 4–8 конкретних кроків. Оскільки користувач просить конкретну страву, а не подає список продуктів, поле missing має містити всі продукти, потрібні для приготування рецепта, але як чисті назви без кількостей і одиниць, наприклад: “пшеничне борошно”, “яйця”, “лохина”, “цукор”, “сметана”, “вершкове масло”, “сіль”, “олія”. Не додавай тільки воду. Поле match встанови на 0.`
       : isEnglish
         ? `Prepare exactly 3 different recipes or variants of the dish described by the user: ${requestData.dish}.
 
@@ -396,7 +472,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Each variant must clearly differ in ingredients, flavor or preparation method while still matching the requested dish. Fit all suggestions to the diet and time requirements. For each recipe provide a complete ingredient list with amounts for 2 servings and 4–8 specific steps. The missing field must contain only clean product names to buy, without amounts or units, and match must be 0.`
+Each variant must clearly differ in ingredients, flavor or preparation method while still matching the requested dish. Fit all suggestions to the diet and time requirements. For each recipe provide a complete ingredient list with amounts for 2 servings and 4–8 specific steps. Because the user requests a specific dish and does not provide owned ingredients, the missing field must contain all products needed to cook the recipe, as clean product names without amounts or units, for example: “flour”, “eggs”, “blueberries”, “sugar”, “sour cream”, “butter”, “salt”, “oil”. Omit only water. Set match to 0.`
         : `Przygotuj dokładnie 3 różne przepisy lub warianty dania opisanego przez użytkownika: ${requestData.dish}.
 
 Dieta: ${localizedDiet}
@@ -408,7 +484,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Pole missing ma zawierać tylko czyste nazwy produktów do kupienia bez ilości i jednostek, a pole match ustaw na 0.`;
+Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Ponieważ użytkownik prosi o konkretne danie i nie podaje produktów, które posiada, pole missing ma zawierać wszystkie produkty potrzebne do przygotowania przepisu jako czyste nazwy bez ilości i jednostek, np. „mąka pszenna”, „jajka”, „borówki”, „cukier”, „śmietana”, „masło”, „sól”, „olej”. Pomiń tylko wodę. Pole match ustaw na 0.`;
   } else {
     responseSchema = ingredientsResponseSchema;
     requestPrompt = isUkrainian
@@ -476,7 +552,7 @@ Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, w
 
 Кожен елемент масиву ingredients ОБОВʼЯЗКОВО має містити точну кількість і одиницю на 2 порції. Використовуй практичні українські одиниці: г, кг, мл, л, шт., чайна ложка або столова ложка. “Чайна ложка” означає маленьку ложку для чаю, а “столова ложка” — велику ложку. Завжди пиши конкретно “чайна ложка” або “столова ложка”, ніколи не пиши нечітке “ложки”. Це стосується також олії, спецій, солі та води — не використовуй “за смаком”, “трохи”, “за потреби” або назви продуктів без кількостей. Правильні приклади: “250 г пшеничного борошна”, “2 шт. яєць”, “1 столова ложка оливкової олії”, “0,5 чайної ложки солі”.
 
-Поле missing — це ТІЛЬКИ список покупок. Кожен елемент missing має бути короткою назвою продукту українською мовою без кількостей, грамів, мл, штук, столових або чайних ложок. Правильно: “пармезан”, “суміш овочів”, “соєвий соус”. Неправильно: “50 г пармезану”, “150 г суміші овочів”, “2 столові ложки соєвого соусу”. Не додавай до missing воду, сіль, перець або дрібну кількість базової олії. Якщо потрібен бульйон, не вважай його одним відсутнім інгредієнтом: в ingredients подай продукти для простого бульйону або використай воду і спеції, а в missing додай тільки магазинні продукти, потрібні для його приготування.
+Поле missing — це ТІЛЬКИ список покупок. Кожен елемент missing має бути короткою назвою продукту українською мовою без кількостей, грамів, мл, штук, столових або чайних ложок. Правильно: “пшеничне борошно”, “яйця”, “лохина”, “сметана”. Неправильно: “250 г пшеничного борошна”, “1 шт. яйця”, “100 г сметани”. У режимі конкретної страви додай до missing всі продукти з рецепта як чисті назви, включно з сіллю, перцем, олією, цукром, борошном, яйцями, маслом і молочними продуктами; пропусти тільки воду. У режимі генерації зі списку інгредієнтів missing має містити тільки продукти, яких користувач не має. Якщо потрібен бульйон, не вважай його одним відсутнім інгредієнтом: в ingredients подай продукти для простого бульйону або використай воду і спеції, а в missing додай тільки конкретні продукти, потрібні для його приготування.
 
 У кроках приготування вказуй кількість і одиницю під час першого використання кожного інгредієнта, наприклад: “Додай 250 г борошна і 300 мл молока”. Не пропускай пропорції в інструкціях.
 
@@ -497,7 +573,7 @@ The imageQuery field must contain an English phrase for finding a matching food 
 
 Every item in ingredients MUST include an exact amount and unit for 2 servings. Use practical units: g, kg, ml, l, pcs, teaspoon or tablespoon. “Teaspoon” means a small tea spoon and “tablespoon” means a large spoon. Always write specifically “teaspoon” or “tablespoon”, never vague “spoons”. This also applies to oil, spices, salt and water — do not use “to taste”, “a little”, “as needed” or product names without amounts. Correct examples: “250 g all-purpose flour”, “2 pcs eggs”, “1 tablespoon olive oil”, “0.5 teaspoon salt”.
 
-The missing field is ONLY a shopping list. Each missing item must be a short product name without amounts, grams, ml, pieces, tablespoons or teaspoons. Correct: “parmesan”, “mixed vegetables”, “soy sauce”. Incorrect: “50 g parmesan”, “150 g mixed vegetables”, “2 tablespoons soy sauce”. Do not add water, salt, pepper or tiny amounts of basic oil to missing. If stock/broth is needed, do not treat it as one missing ingredient: in ingredients list the products for a simple stock or use water and spices, and in missing add only shop products needed to prepare it.
+The missing field is ONLY a shopping list. Each missing item must be a short product name without amounts, grams, ml, pieces, tablespoons or teaspoons. Correct: “flour”, “eggs”, “blueberries”, “sour cream”. Incorrect: “250 g flour”, “1 pc egg”, “100 g sour cream”. In specific dish mode, add all recipe products to missing as clean names, including salt, pepper, oil, sugar, flour, eggs, butter and dairy; omit only water. In ingredients mode, missing must contain only products the user does not have. If stock/broth is needed, do not treat it as one missing ingredient: in ingredients list the products for a simple stock or use water and spices, and in missing add only specific products needed to prepare it.
 
 In preparation steps, include the amount and unit the first time each ingredient is used, e.g. “Add 250 g flour and 300 ml milk”. Do not omit proportions in instructions.
 
@@ -517,7 +593,7 @@ Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęci
 
 Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka albo łyżka stołowa. „Łyżeczka” oznacza małą łyżeczkę do herbaty, a „łyżka stołowa” oznacza dużą łyżkę. Zawsze pisz konkretnie „łyżeczka” albo „łyżka stołowa”, nigdy samo niejasne „łyżki”. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka stołowa oliwy”, „0,5 łyżeczki soli”.
 
-Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing musi być krótką nazwą produktu bez ilości, gramów, ml, sztuk, łyżek i łyżeczek. Poprawnie: „parmezan”, „mieszanka warzyw”, „sos sojowy”. Niepoprawnie: „50 g parmezanu”, „150 g mieszanki warzyw”, „2 łyżki sosu sojowego”. Nie dodawaj do missing wody, soli, pieprzu ani drobnych ilości podstawowego oleju. Jeśli potrzebny jest bulion, nie traktuj go jako pojedynczego brakującego składnika: w ingredients podaj składniki do przygotowania prostego bulionu lub użyj wody i przypraw, a w missing podaj tylko produkty sklepowe potrzebne do jego przygotowania.
+Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing musi być krótką nazwą produktu bez ilości, gramów, ml, sztuk, łyżek i łyżeczek. Poprawnie: „mąka pszenna”, „jajka”, „borówki”, „śmietana”. Niepoprawnie: „250 g mąki pszennej”, „1 szt. jajka”, „100 g śmietany”. W trybie konkretnego dania dodaj do missing wszystkie produkty z przepisu jako czyste nazwy, w tym sól, pieprz, olej, cukier, mąkę, jajka, masło i nabiał; pomiń tylko wodę. W trybie składników missing ma zawierać tylko produkty, których użytkownik nie ma. Jeśli potrzebny jest bulion, nie traktuj go jako pojedynczego brakującego składnika: w ingredients podaj składniki do przygotowania prostego bulionu lub użyj wody i przypraw, a w missing podaj tylko konkretne produkty potrzebne do jego przygotowania.
 
 W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
 
@@ -604,6 +680,7 @@ ${generationRules}`,
       recipes: recipesWithPhotos.map((recipe) => ({
         ...recipe,
         difficulty: localizeDifficulty(recipe.difficulty, language),
+        missing: isDishMode ? completeDishShoppingList(recipe) : recipe.missing,
         priceRegion: requestData.priceRegion,
       })),
       usage: {
