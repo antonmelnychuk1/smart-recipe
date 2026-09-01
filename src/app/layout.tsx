@@ -42,7 +42,9 @@ export const metadata: Metadata = {
     alternateLocale: ["pl_PL", "uk_UA"],
     images: [
       {
-        url: "/smart-recipe-icon.svg",
+        url: "/icon-512.png",
+        width: 512,
+        height: 512,
         alt: `${siteName} logo`,
       },
     ],
@@ -51,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: siteTitle,
     description: siteDescription,
-    images: ["/smart-recipe-icon.svg"],
+    images: ["/icon-512.png"],
   },
   robots: {
     index: true,
@@ -64,14 +66,21 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/smart-recipe-icon.svg",
-        type: "image/svg+xml",
+        url: "/favicon.png",
+        type: "image/png",
+        sizes: "48x48",
+      },
+      {
+        url: "/icon-192.png",
+        type: "image/png",
+        sizes: "192x192",
       },
     ],
     apple: [
       {
-        url: "/smart-recipe-icon.svg",
-        type: "image/svg+xml",
+        url: "/apple-touch-icon.png",
+        type: "image/png",
+        sizes: "180x180",
       },
     ],
   },

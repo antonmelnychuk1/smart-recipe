@@ -2275,16 +2275,15 @@ export default function Home() {
       <nav
         className={`${pageContainerClass} relative z-40 flex items-center justify-between py-4 sm:py-6`}
       >
-        <a href="#" className="flex items-center gap-2 text-lg font-bold">
+        <a href="#" aria-label="SmartRecipe" className="flex items-center">
           <Image
-            src="/smart-recipe-icon.svg"
+            src="/logo-full.png"
             alt="SmartRecipe logo"
-            width={38}
-            height={38}
+            width={150}
+            height={59}
             priority
-            className="size-9 rounded-xl object-contain sm:size-10"
+            className="h-auto w-36 object-contain sm:w-40"
           />
-          Smart<span className="-ml-2 text-[#fc5726]">Recipe</span>
         </a>
         <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] xl:flex xl:gap-5 xl:text-sm">
           <a className="transition hover:text-[#25322b]" href="#how">
