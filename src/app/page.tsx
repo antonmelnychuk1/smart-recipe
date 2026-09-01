@@ -248,14 +248,38 @@ function scaleIngredient(ingredient: string, multiplier: number) {
   );
 }
 
+function scaleAmount(value: string, multiplier: number) {
+  let amount: number;
+  if (value.includes("/")) {
+    const [numerator, denominator] = value
+      .split("/")
+      .map((part) => Number(part.trim()));
+    amount = denominator ? numerator / denominator : numerator;
+  } else {
+    amount = Number(value.replace(",", "."));
+  }
+
+  return new Intl.NumberFormat("pl-PL", {
+    maximumFractionDigits: 2,
+  }).format(amount * multiplier);
+}
+
+function scaleRecipeText(text: string, multiplier: number) {
+  return text.replace(
+    /(\d+\s*\/\s*\d+|\d+(?:[.,]\d+)?)(\s*(?:g|kg|ml|l|г|кг|мл|л|szt\.?|шт\.?|pcs?\.?|pieces?|łyżeczki|łyżeczek|łyżeczka|łyżka|łyżki|łyżek|stołowa|stołowe|stołowych|teaspoons?|tablespoons?|tsp|tbsp|чайна\s+ложка|чайної\s+ложки|чайні\s+ложки|чайних\s+ложок|столова\s+ложка|столової\s+ложки|столові\s+ложки|столових\s+ложок|szklanki|szklanka|склянки|склянка|ząbki|ząbek|зубчики|зубчик|garści|garść|жмені|жменя|plastry|plaster|скибки|скибка|łodyga|łodygi|стебло|стебла|liść|liścia|лист|листа)\b)/gi,
+    (_match, value: string, unit: string) => `${scaleAmount(value, multiplier)}${unit}`,
+  );
+}
+
 function normalizeShoppingItem(item: string) {
   const withoutAmount = item
     .trim()
     .replace(
-      /^(?:ok\.\s*)?\d+(?:[.,]\d+)?\s*(?:g|kg|ml|l|szt\.?|łyżeczki|łyżeczek|łyżka|łyżki|łyżek|szklanki|szklanka|ząbki|ząbek|garści|garść|plastry|plaster|łodyga|łodygi|liść|liścia)\s+/i,
+      /^(?:ok\.|około|about|approx\.|близько|прибл\.)?\s*\d+(?:\s*\/\s*\d+|[.,]\d+)?\s*(?:g|kg|ml|l|г|кг|мл|л|szt\.?|шт\.?|pcs?\.?|pieces?|łyżeczki|łyżeczek|łyżeczka|łyżka|łyżki|łyżek|stołowa|stołowe|stołowych|teaspoons?|tablespoons?|tsp|tbsp|чайна\s+ложка|чайної\s+ложки|чайні\s+ложки|чайних\s+ложок|столова\s+ложка|столової\s+ложки|столові\s+ложки|столових\s+ложок|szklanki|szklanka|склянки|склянка|ząbki|ząbek|зубчики|зубчик|garści|garść|жмені|жменя|plastry|plaster|скибки|скибка|łodyga|łodygi|стебло|стебла|liść|liścia|лист|листа)\s+/i,
       "",
     )
-    .replace(/^(?:stołowa|stołowe|stołowych)\s+/i, "")
+    .replace(/^(?:stołowa|stołowe|stołowych|ложка|ложки)\s+/i, "")
+    .replace(/[.;:,]+$/g, "")
     .replace(/\s+/g, " ")
     .trim();
 
@@ -274,9 +298,76 @@ function normalizeShoppingItem(item: string) {
     "marchewki": "marchewka",
     "cebuli": "cebula",
     "liścia laurowego": "liść laurowy",
+    "all-purpose flour": "all-purpose flour",
+    flour: "flour",
+    egg: "eggs",
+    eggs: "eggs",
+    blueberries: "blueberries",
+    "sour cream": "sour cream",
+    butter: "butter",
+    sugar: "sugar",
+    salt: "salt",
+    oil: "oil",
+    potato: "potato",
+    potatoes: "potato",
+    mushroom: "mushrooms",
+    mushrooms: "mushrooms",
+    onion: "onion",
+    garlic: "garlic",
+    "black pepper": "black pepper",
+    paprika: "paprika",
+    "пшеничного борошна": "пшеничне борошно",
+    борошна: "борошно",
+    яйця: "яйця",
+    яєць: "яйця",
+    "теплої води": "вода",
+    води: "вода",
+    вода: "вода",
+    олії: "олія",
+    олія: "олія",
+    лохини: "лохина",
+    лохина: "лохина",
+    цукру: "цукор",
+    цукор: "цукор",
+    сметани: "сметана",
+    сметана: "сметана",
+    "вершкового масла": "вершкове масло",
+    "вершкове масло": "вершкове масло",
+    солі: "сіль",
+    сіль: "сіль",
+    перцю: "перець",
+    перець: "перець",
+    картоплі: "картопля",
+    картопля: "картопля",
+    "курячого стегна без кістки": "куряче стегно без кістки",
+    "куряче стегно без кістки": "куряче стегно без кістки",
+    печериць: "печериці",
+    печериці: "печериці",
+    майонезу: "майонез",
+    майонез: "майонез",
+    цибулі: "цибуля",
+    цибуля: "цибуля",
+    часнику: "часник",
+    часник: "часник",
+    "чорного перцю": "чорний перець",
+    "чорний перець": "чорний перець",
+    паприки: "паприка",
+    паприка: "паприка",
   };
 
   return commonNames[normalized] ?? withoutAmount;
+}
+
+function uniqueShoppingItems(items: string[]) {
+  const unique = new Map<string, string>();
+
+  items.forEach((item) => {
+    const normalizedItem = normalizeShoppingItem(item);
+    if (!normalizedItem) return;
+    unique.set(normalizedItem.toLocaleLowerCase("pl"), normalizedItem);
+  });
+
+  return [...unique.values()];
 }
 
 function getShoppingCategory(item: string) {
@@ -3127,42 +3218,50 @@ export default function Home() {
                     {copy.results.missing}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {recipe.missing.length > 0 ? (
-                      recipe.missing.map((item) => {
-                        const shoppingItem = normalizeShoppingItem(item);
-                        const added = isOnShoppingList(shoppingItem);
-                        return (
-                        <button
-                          key={item}
-                          onClick={() => addToShoppingList([shoppingItem])}
-                          disabled={added}
-                          className={`break-anywhere max-w-full whitespace-normal rounded-full px-2.5 py-1 text-left text-xs font-medium transition-all duration-200 ${
-                            added
-                              ? "bg-[#e3eee5] text-[#025026]"
-                              : "bg-[#f7eee8] text-[#a45c45] hover:-translate-y-0.5 hover:bg-[#f2ded3] hover:shadow-sm"
-                          }`}
-                        >
-                          {added ? "✓" : "+"} {shoppingItem}
-                        </button>
-                        );
-                      })
-                    ) : (
-                      <span className="text-sm text-[#4f765e]">
-                        {copy.results.haveEverything}
-                      </span>
-                    )}
+                    {(() => {
+                      const missingItems = uniqueShoppingItems(recipe.missing);
+
+                      return missingItems.length > 0 ? (
+                        missingItems.map((shoppingItem) => {
+                          const added = isOnShoppingList(shoppingItem);
+                          return (
+                            <button
+                              key={shoppingItem}
+                              onClick={() => addToShoppingList([shoppingItem])}
+                              disabled={added}
+                              className={`break-anywhere max-w-full whitespace-normal rounded-full px-2.5 py-1 text-left text-xs font-medium transition-all duration-200 ${
+                                added
+                                  ? "bg-[#e3eee5] text-[#025026]"
+                                  : "bg-[#f7eee8] text-[#a45c45] hover:-translate-y-0.5 hover:bg-[#f2ded3] hover:shadow-sm"
+                              }`}
+                            >
+                              {added ? "✓" : "+"} {shoppingItem}
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <span className="text-sm text-[#4f765e]">
+                          {copy.results.haveEverything}
+                        </span>
+                      );
+                    })()}
                   </div>
-                  {recipe.missing.length > 0 && (
-                    <button
-                      onClick={() => addToShoppingList(recipe.missing)}
-                      disabled={recipe.missing.every(isOnShoppingList)}
-                      className="mt-3 rounded-lg px-2 py-1 text-xs font-semibold text-[#a45c45] transition hover:bg-[#fff0e8] disabled:text-[#6e8376]"
-                    >
-                      {recipe.missing.every(isOnShoppingList)
-                        ? copy.results.allOnList
-                        : copy.results.addAllMissing}
-                    </button>
-                  )}
+                  {(() => {
+                    const missingItems = uniqueShoppingItems(recipe.missing);
+                    if (missingItems.length === 0) return null;
+
+                    return (
+                      <button
+                        onClick={() => addToShoppingList(missingItems)}
+                        disabled={missingItems.every(isOnShoppingList)}
+                        className="mt-3 rounded-lg px-2 py-1 text-xs font-semibold text-[#a45c45] transition hover:bg-[#fff0e8] disabled:text-[#6e8376]"
+                      >
+                        {missingItems.every(isOnShoppingList)
+                          ? copy.results.allOnList
+                          : copy.results.addAllMissing}
+                      </button>
+                    );
+                  })()}
                 </div>
                 {recipe.substitutions && recipe.substitutions.length > 0 && (
                   <div className="mt-4 rounded-2xl bg-[#f8f4ec] p-3">
@@ -3865,33 +3964,37 @@ export default function Home() {
               </span>
             </div>
 
-            {selectedRecipe.missing.length > 0 && (
-              <div className="mt-5 rounded-2xl border border-[#eee1d8] bg-[#fff8f3] p-4">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#9a6251]">
-                  {copy.recipeModal.missingClick}
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {selectedRecipe.missing.map((item) => {
-                    const shoppingItem = normalizeShoppingItem(item);
-                    const added = isOnShoppingList(shoppingItem);
-                    return (
-                      <button
-                        key={item}
-                        onClick={() => addToShoppingList([shoppingItem])}
-                        disabled={added}
-                        className={`break-anywhere max-w-full whitespace-normal rounded-full px-3 py-1.5 text-left text-xs font-semibold transition-all ${
-                          added
-                            ? "bg-[#e3eee5] text-[#025026]"
-                            : "bg-white text-[#a45c45] shadow-sm hover:-translate-y-0.5 hover:shadow-md"
-                        }`}
-                      >
-                        {added ? "✓" : "+"} {shoppingItem}
-                      </button>
-                    );
-                  })}
+            {(() => {
+              const missingItems = uniqueShoppingItems(selectedRecipe.missing);
+              if (missingItems.length === 0) return null;
+
+              return (
+                <div className="mt-5 rounded-2xl border border-[#eee1d8] bg-[#fff8f3] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#9a6251]">
+                    {copy.recipeModal.missingClick}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {missingItems.map((shoppingItem) => {
+                      const added = isOnShoppingList(shoppingItem);
+                      return (
+                        <button
+                          key={shoppingItem}
+                          onClick={() => addToShoppingList([shoppingItem])}
+                          disabled={added}
+                          className={`break-anywhere max-w-full whitespace-normal rounded-full px-3 py-1.5 text-left text-xs font-semibold transition-all ${
+                            added
+                              ? "bg-[#e3eee5] text-[#025026]"
+                              : "bg-white text-[#a45c45] shadow-sm hover:-translate-y-0.5 hover:shadow-md"
+                          }`}
+                        >
+                          {added ? "✓" : "+"} {shoppingItem}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {selectedRecipe.substitutions &&
               selectedRecipe.substitutions.length > 0 && (
@@ -3941,7 +4044,7 @@ export default function Home() {
                       <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#dce9df] text-xs font-bold text-[#025026]">
                         {index + 1}
                       </span>
-                      {step}
+                      {scaleRecipeText(step, servings / 2)}
                     </li>
                   ))}
                 </ol>
@@ -4193,7 +4296,10 @@ export default function Home() {
                     </button>
                   </div>
                   <p className="mt-5 font-serif text-2xl leading-9 text-[#25322b] sm:text-3xl sm:leading-10">
-                    {selectedRecipe.steps[cookingStep]}
+                    {scaleRecipeText(
+                      selectedRecipe.steps[cookingStep],
+                      servings / 2,
+                    )}
                   </p>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">

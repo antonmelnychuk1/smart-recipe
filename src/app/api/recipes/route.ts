@@ -194,6 +194,14 @@ function cleanShoppingProductName(item: string) {
     sugar: "sugar",
     salt: "salt",
     oil: "oil",
+    potato: "potato",
+    potatoes: "potato",
+    mushroom: "mushrooms",
+    mushrooms: "mushrooms",
+    onion: "onion",
+    garlic: "garlic",
+    "black pepper": "black pepper",
+    paprika: "paprika",
     "пшеничного борошна": "пшеничне борошно",
     борошна: "борошно",
     яйця: "яйця",
@@ -215,9 +223,38 @@ function cleanShoppingProductName(item: string) {
     сіль: "сіль",
     перцю: "перець",
     перець: "перець",
+    картоплі: "картопля",
+    картопля: "картопля",
+    "курячого стегна без кістки": "куряче стегно без кістки",
+    "куряче стегно без кістки": "куряче стегно без кістки",
+    печериць: "печериці",
+    печериці: "печериці",
+    майонезу: "майонез",
+    майонез: "майонез",
+    цибулі: "цибуля",
+    цибуля: "цибуля",
+    часнику: "часник",
+    часник: "часник",
+    "чорного перцю": "чорний перець",
+    "чорний перець": "чорний перець",
+    паприки: "паприка",
+    паприка: "паприка",
   };
 
   return commonNames[normalized] ?? withoutAmount;
+}
+
+function uniqueShoppingProductNames(items: string[]) {
+  const uniqueProducts = new Map<string, string>();
+
+  items
+    .map(cleanShoppingProductName)
+    .filter(Boolean)
+    .forEach((item) => {
+      uniqueProducts.set(item.toLocaleLowerCase("pl"), item);
+    });
+
+  return [...uniqueProducts.values()];
 }
 
 function completeDishShoppingList(
@@ -680,7 +717,9 @@ ${generationRules}`,
       recipes: recipesWithPhotos.map((recipe) => ({
         ...recipe,
         difficulty: localizeDifficulty(recipe.difficulty, language),
-        missing: isDishMode ? completeDishShoppingList(recipe) : recipe.missing,
+        missing: isDishMode
+          ? completeDishShoppingList(recipe)
+          : uniqueShoppingProductNames(recipe.missing),
         priceRegion: requestData.priceRegion,
       })),
       usage: {
