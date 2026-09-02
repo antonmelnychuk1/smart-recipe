@@ -176,6 +176,26 @@ verified sending domain, enable it locally and in the hosting environment:
 NEXT_PUBLIC_EMAIL_VERIFICATION_ENABLED=true
 ```
 
+## Mobile Wrapper
+
+The repository includes Capacitor projects for iOS and Android. The native apps
+load the production web application from:
+
+```text
+https://smartrecipeapp.com
+```
+
+Useful commands:
+
+```bash
+npm run mobile:sync
+npm run mobile:open:ios
+npm run mobile:open:android
+```
+
+Run `npm run mobile:sync` after changing `capacitor.config.ts` or mobile
+assets.
+
 ## Administrator Access
 
 The protected dashboard is available at `/admin`. Access is checked on the
@@ -200,13 +220,10 @@ Run this command only from a trusted environment with access to
 
 ## Roadmap
 
-- email verification and password recovery,
 - configurable usage plans and higher limits for selected users,
-- ingredient scaling based on serving size,
-- substitutions for missing ingredients,
 - prioritization of ingredients nearing their expiration date,
 - automated tests,
-- iOS and Android applications built with React Native and Expo,
+- native iOS and Android app icons and splash screens,
 - App Store and Google Play releases.
 
 ## Project Status
