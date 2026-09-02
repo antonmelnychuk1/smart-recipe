@@ -239,6 +239,21 @@ function cleanShoppingProductName(item: string) {
     "чорний перець": "чорний перець",
     паприки: "паприка",
     паприка: "паприка",
+    ананаса: "ананас",
+    ананас: "ананас",
+    апельсина: "апельсин",
+    апельсин: "апельсин",
+    "соку лайма": "сік лайма",
+    "сік лайма": "сік лайма",
+    меду: "мед",
+    мед: "мед",
+    "кокосової стружки": "кокосова стружка",
+    "кокосова стружка": "кокосова стружка",
+    "винограду без кісточок": "виноград без кісточок",
+    "виноград без кісточок": "виноград без кісточок",
+    "листя мʼяти": "листя мʼяти",
+    "листя м’яти": "листя мʼяти",
+    ківі: "ківі",
   };
 
   return commonNames[normalized] ?? withoutAmount;
@@ -589,7 +604,7 @@ Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, w
 
 Кожен елемент масиву ingredients ОБОВʼЯЗКОВО має містити точну кількість і одиницю на 2 порції. Використовуй практичні українські одиниці: г, кг, мл, л, шт., чайна ложка або столова ложка. “Чайна ложка” означає маленьку ложку для чаю, а “столова ложка” — велику ложку. Завжди пиши конкретно “чайна ложка” або “столова ложка”, ніколи не пиши нечітке “ложки”. Це стосується також олії, спецій, солі та води — не використовуй “за смаком”, “трохи”, “за потреби” або назви продуктів без кількостей. Правильні приклади: “250 г пшеничного борошна”, “2 шт. яєць”, “1 столова ложка оливкової олії”, “0,5 чайної ложки солі”.
 
-Поле missing — це ТІЛЬКИ список покупок. Кожен елемент missing має бути короткою назвою продукту українською мовою без кількостей, грамів, мл, штук, столових або чайних ложок. Правильно: “пшеничне борошно”, “яйця”, “лохина”, “сметана”. Неправильно: “250 г пшеничного борошна”, “1 шт. яйця”, “100 г сметани”. У режимі конкретної страви додай до missing всі продукти з рецепта як чисті назви, включно з сіллю, перцем, олією, цукром, борошном, яйцями, маслом і молочними продуктами; пропусти тільки воду. У режимі генерації зі списку інгредієнтів missing має містити тільки продукти, яких користувач не має. Якщо потрібен бульйон, не вважай його одним відсутнім інгредієнтом: в ingredients подай продукти для простого бульйону або використай воду і спеції, а в missing додай тільки конкретні продукти, потрібні для його приготування.
+Поле missing — це ТІЛЬКИ список покупок. Кожен елемент missing має бути короткою назвою продукту українською мовою без кількостей, грамів, мл, штук, столових або чайних ложок. Використовуй одну базову форму назви продукту і не дублюй той самий продукт у різних відмінках: пиши “ананас”, а не одночасно “ананас” і “ананаса”; “апельсин”, а не “апельсин” і “апельсина”. Правильно: “пшеничне борошно”, “яйця”, “лохина”, “сметана”. Неправильно: “250 г пшеничного борошна”, “1 шт. яйця”, “100 г сметани”. У режимі конкретної страви додай до missing всі продукти з рецепта як чисті назви, включно з сіллю, перцем, олією, цукром, борошном, яйцями, маслом і молочними продуктами; пропусти тільки воду. У режимі генерації зі списку інгредієнтів missing має містити тільки продукти, яких користувач не має. Якщо потрібен бульйон, не вважай його одним відсутнім інгредієнтом: в ingredients подай продукти для простого бульйону або використай воду і спеції, а в missing додай тільки конкретні продукти, потрібні для його приготування.
 
 У кроках приготування вказуй кількість і одиницю під час першого використання кожного інгредієнта, наприклад: “Додай 250 г борошна і 300 мл молока”. Не пропускай пропорції в інструкціях.
 
@@ -610,7 +625,7 @@ The imageQuery field must contain an English phrase for finding a matching food 
 
 Every item in ingredients MUST include an exact amount and unit for 2 servings. Use practical units: g, kg, ml, l, pcs, teaspoon or tablespoon. “Teaspoon” means a small tea spoon and “tablespoon” means a large spoon. Always write specifically “teaspoon” or “tablespoon”, never vague “spoons”. This also applies to oil, spices, salt and water — do not use “to taste”, “a little”, “as needed” or product names without amounts. Correct examples: “250 g all-purpose flour”, “2 pcs eggs”, “1 tablespoon olive oil”, “0.5 teaspoon salt”.
 
-The missing field is ONLY a shopping list. Each missing item must be a short product name without amounts, grams, ml, pieces, tablespoons or teaspoons. Correct: “flour”, “eggs”, “blueberries”, “sour cream”. Incorrect: “250 g flour”, “1 pc egg”, “100 g sour cream”. In specific dish mode, add all recipe products to missing as clean names, including salt, pepper, oil, sugar, flour, eggs, butter and dairy; omit only water. In ingredients mode, missing must contain only products the user does not have. If stock/broth is needed, do not treat it as one missing ingredient: in ingredients list the products for a simple stock or use water and spices, and in missing add only specific products needed to prepare it.
+The missing field is ONLY a shopping list. Each missing item must be a short product name without amounts, grams, ml, pieces, tablespoons or teaspoons. Use one canonical product name and do not duplicate the same product in singular/plural or inflected forms. Correct: “flour”, “eggs”, “blueberries”, “sour cream”. Incorrect: “250 g flour”, “1 pc egg”, “100 g sour cream”. In specific dish mode, add all recipe products to missing as clean names, including salt, pepper, oil, sugar, flour, eggs, butter and dairy; omit only water. In ingredients mode, missing must contain only products the user does not have. If stock/broth is needed, do not treat it as one missing ingredient: in ingredients list the products for a simple stock or use water and spices, and in missing add only specific products needed to prepare it.
 
 In preparation steps, include the amount and unit the first time each ingredient is used, e.g. “Add 250 g flour and 300 ml milk”. Do not omit proportions in instructions.
 
@@ -630,7 +645,7 @@ Pole imageQuery ma zawierać angielską frazę do wyszukania pasującego zdjęci
 
 Każdy element tablicy ingredients MUSI zawierać dokładną ilość oraz jednostkę dla 2 porcji. Używaj jednostek praktycznych w polskiej kuchni: g, kg, ml, l, szt., łyżeczka albo łyżka stołowa. „Łyżeczka” oznacza małą łyżeczkę do herbaty, a „łyżka stołowa” oznacza dużą łyżkę. Zawsze pisz konkretnie „łyżeczka” albo „łyżka stołowa”, nigdy samo niejasne „łyżki”. Dotyczy to również oleju, przypraw, soli i wody — nie używaj określeń „do smaku”, „trochę”, „według uznania” ani samych nazw produktów. Przykłady poprawnego formatu: „250 g mąki pszennej”, „2 szt. jajek”, „1 łyżka stołowa oliwy”, „0,5 łyżeczki soli”.
 
-Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing musi być krótką nazwą produktu bez ilości, gramów, ml, sztuk, łyżek i łyżeczek. Poprawnie: „mąka pszenna”, „jajka”, „borówki”, „śmietana”. Niepoprawnie: „250 g mąki pszennej”, „1 szt. jajka”, „100 g śmietany”. W trybie konkretnego dania dodaj do missing wszystkie produkty z przepisu jako czyste nazwy, w tym sól, pieprz, olej, cukier, mąkę, jajka, masło i nabiał; pomiń tylko wodę. W trybie składników missing ma zawierać tylko produkty, których użytkownik nie ma. Jeśli potrzebny jest bulion, nie traktuj go jako pojedynczego brakującego składnika: w ingredients podaj składniki do przygotowania prostego bulionu lub użyj wody i przypraw, a w missing podaj tylko konkretne produkty potrzebne do jego przygotowania.
+Pole missing służy WYŁĄCZNIE jako lista zakupów. Każdy element missing musi być krótką nazwą produktu bez ilości, gramów, ml, sztuk, łyżek i łyżeczek. Używaj jednej bazowej nazwy produktu i nie duplikuj tego samego produktu w liczbie pojedynczej/mnogiej albo różnych odmianach. Poprawnie: „mąka pszenna”, „jajka”, „borówki”, „śmietana”. Niepoprawnie: „250 g mąki pszennej”, „1 szt. jajka”, „100 g śmietany”. W trybie konkretnego dania dodaj do missing wszystkie produkty z przepisu jako czyste nazwy, w tym sól, pieprz, olej, cukier, mąkę, jajka, masło i nabiał; pomiń tylko wodę. W trybie składników missing ma zawierać tylko produkty, których użytkownik nie ma. Jeśli potrzebny jest bulion, nie traktuj go jako pojedynczego brakującego składnika: w ingredients podaj składniki do przygotowania prostego bulionu lub użyj wody i przypraw, a w missing podaj tylko konkretne produkty potrzebne do jego przygotowania.
 
 W krokach przygotowania podawaj ilość i jednostkę przy pierwszym użyciu każdego składnika, np. „Dodaj 250 g mąki i 300 ml mleka”. Nie pomijaj proporcji w instrukcjach.
 

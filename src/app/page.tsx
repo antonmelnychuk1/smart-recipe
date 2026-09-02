@@ -264,10 +264,41 @@ function scaleAmount(value: string, multiplier: number) {
   }).format(amount * multiplier);
 }
 
+function formatScaledUnit(unit: string, scaledAmount: string) {
+  const numericAmount = Number(scaledAmount.replace(",", "."));
+  if (numericAmount === 1) return unit;
+
+  const leadingSpace = unit.match(/^\s*/)?.[0] ?? "";
+  const normalizedUnit = unit.trim().toLocaleLowerCase("pl");
+  const pluralUnits: Record<string, string> = {
+    "łyżeczka": "łyżeczki",
+    "łyżka": "łyżki",
+    "teaspoon": "teaspoons",
+    "tablespoon": "tablespoons",
+    "piece": "pieces",
+    "pc": "pcs",
+    "чайна ложка": "чайні ложки",
+    "чайної ложки": "чайні ложки",
+    "столова ложка": "столові ложки",
+    "столової ложки": "столові ложки",
+    "склянка": "склянки",
+    "зубчик": "зубчики",
+    "жменя": "жмені",
+    "скибка": "скибки",
+    "стебло": "стебла",
+    "лист": "листи",
+  };
+
+  return `${leadingSpace}${pluralUnits[normalizedUnit] ?? unit.trim()}`;
+}
+
 function scaleRecipeText(text: string, multiplier: number) {
   return text.replace(
-    /(\d+\s*\/\s*\d+|\d+(?:[.,]\d+)?)(\s*(?:g|kg|ml|l|г|кг|мл|л|szt\.?|шт\.?|pcs?\.?|pieces?|łyżeczki|łyżeczek|łyżeczka|łyżka|łyżki|łyżek|stołowa|stołowe|stołowych|teaspoons?|tablespoons?|tsp|tbsp|чайна\s+ложка|чайної\s+ложки|чайні\s+ложки|чайних\s+ложок|столова\s+ложка|столової\s+ложки|столові\s+ложки|столових\s+ложок|szklanki|szklanka|склянки|склянка|ząbki|ząbek|зубчики|зубчик|garści|garść|жмені|жменя|plastry|plaster|скибки|скибка|łodyga|łodygi|стебло|стебла|liść|liścia|лист|листа)\b)/gi,
-    (_match, value: string, unit: string) => `${scaleAmount(value, multiplier)}${unit}`,
+    /(\d+\s*\/\s*\d+|\d+(?:[.,]\d+)?)(\s*(?:g|kg|ml|l|г|кг|мл|л|szt\.?|шт\.?|pcs?\.?|pieces?|łyżeczki|łyżeczek|łyżeczka|łyżka|łyżki|łyżek|stołowa|stołowe|stołowych|teaspoons?|tablespoons?|tsp|tbsp|чайна\s+ложка|чайної\s+ложки|чайні\s+ложки|чайних\s+ложок|столова\s+ложка|столової\s+ложки|столові\s+ложки|столових\s+ложок|szklanki|szklanka|склянки|склянка|ząbki|ząbek|зубчики|зубчик|garści|garść|жмені|жменя|plastry|plaster|скибки|скибка|łodyga|łodygi|стебло|стебла|liść|liścia|лист|листа))(?=\s|[.,;:!?)]|$)/gi,
+    (_match, value: string, unit: string) => {
+      const scaledAmount = scaleAmount(value, multiplier);
+      return `${scaledAmount}${formatScaledUnit(unit, scaledAmount)}`;
+    },
   );
 }
 
@@ -353,6 +384,21 @@ function normalizeShoppingItem(item: string) {
     "чорний перець": "чорний перець",
     паприки: "паприка",
     паприка: "паприка",
+    ананаса: "ананас",
+    ананас: "ананас",
+    апельсина: "апельсин",
+    апельсин: "апельсин",
+    "соку лайма": "сік лайма",
+    "сік лайма": "сік лайма",
+    меду: "мед",
+    мед: "мед",
+    "кокосової стружки": "кокосова стружка",
+    "кокосова стружка": "кокосова стружка",
+    "винограду без кісточок": "виноград без кісточок",
+    "виноград без кісточок": "виноград без кісточок",
+    "листя мʼяти": "листя мʼяти",
+    "листя м’яти": "листя мʼяти",
+    ківі: "ківі",
   };
 
   return commonNames[normalized] ?? withoutAmount;
