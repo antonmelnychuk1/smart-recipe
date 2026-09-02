@@ -2277,7 +2277,7 @@ export default function Home() {
       >
         <a href="#" aria-label="SmartRecipe" className="flex items-center">
           <Image
-            src="/logo-full.png"
+            src="/logo-full.svg"
             alt="SmartRecipe logo"
             width={150}
             height={59}
