@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import type { FormEvent, ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthDialog } from "@/components/auth-dialog";
 import { MealPlanner } from "@/components/meal-planner";
 import { Pantry } from "@/components/pantry";
@@ -202,6 +203,8 @@ const feedbackOptions: {
   { value: "too_caloric", label: "Za dużo kalorii", tone: "warning" },
   { value: "bad_photo", label: "Zdjęcie nie pasuje", tone: "warning" },
 ];
+
+type NativeTab = "generator" | "recipes" | "planner" | "kitchen";
 
 function readStoredValue<T>(key: string, fallback: T): T {
   try {
@@ -586,6 +589,71 @@ function Icon({ name }: { name: "spark" | "clock" | "heart" | "leaf" }) {
   );
 }
 
+function NativeTabIcon({
+  name,
+  active,
+}: {
+  name: NativeTab | "more";
+  active: boolean;
+}) {
+  const paths: Record<NativeTab | "more", ReactNode> = {
+    generator: (
+      <>
+        <path d="M12 3.5l1.45 4 4.05 1.45-4.05 1.45L12 14.5l-1.45-4.1L6.5 8.95l4.05-1.45L12 3.5z" />
+        <path d="M18.5 14.5l.75 2 2 .75-2 .75-.75 2-.75-2-2-.75 2-.75.75-2z" />
+      </>
+    ),
+    recipes: (
+      <>
+        <path d="M7.5 4.5h8.2a2.8 2.8 0 0 1 2.8 2.8v12.2H8a2.5 2.5 0 0 1-2.5-2.5V6.5a2 2 0 0 1 2-2z" />
+        <path d="M8 16.5h10.5" />
+        <path d="M9 8.5h6" />
+        <path d="M9 11.5h4.5" />
+      </>
+    ),
+    planner: (
+      <>
+        <path d="M6.5 5.5h11a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-10a2 2 0 0 1 2-2z" />
+        <path d="M8 3.5v4" />
+        <path d="M16 3.5v4" />
+        <path d="M4.5 9.5h15" />
+        <path d="M8 13h.01" />
+        <path d="M12 13h.01" />
+        <path d="M16 13h.01" />
+      </>
+    ),
+    kitchen: (
+      <>
+        <path d="M6.5 10.5h11l-1.1 8.2a2 2 0 0 1-2 1.8H9.6a2 2 0 0 1-2-1.8l-1.1-8.2z" />
+        <path d="M9 10.5V8a3 3 0 0 1 6 0v2.5" />
+        <path d="M8.5 14.5h7" />
+      </>
+    ),
+    more: (
+      <>
+        <path d="M6.5 12h.01" />
+        <path d="M12 12h.01" />
+        <path d="M17.5 12h.01" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="size-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={active ? 2.2 : 1.9}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {paths[name]}
+    </svg>
+  );
+}
+
 function RecipeCardSkeleton() {
   return (
     <article className="overflow-hidden rounded-[1.7rem] border border-[#e2dfd6] bg-white shadow-sm">
@@ -769,6 +837,8 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [nativeMoreOpen, setNativeMoreOpen] = useState(false);
   const [isNativeIosApp, setIsNativeIosApp] = useState(false);
+  const [activeNativeTab, setActiveNativeTab] =
+    useState<NativeTab>("generator");
   const [isAdmin, setIsAdmin] = useState(false);
   const [accountDailyLimit, setAccountDailyLimit] = useState(20);
   const [verificationPending, setVerificationPending] = useState(false);
@@ -803,6 +873,8 @@ export default function Home() {
   const copy = homeCopy[language];
   const nativeMoreLabel =
     language === "pl" ? "Więcej" : language === "uk" ? "Більше" : "More";
+  const nativeTabClass = (tab: NativeTab) =>
+    isNativeIosApp && activeNativeTab !== tab ? "hidden" : "";
   const minuteUnit = language === "uk" ? "хв" : "min";
   const calorieUnit = language === "uk" ? "ккал" : "kcal";
   const pageCopy =
@@ -1219,11 +1291,39 @@ export default function Home() {
 
     try {
       const entry = JSON.parse(stored) as SearchHistoryEntry;
-      restoreHistory(entry);
+      window.setTimeout(() => {
+        if (entry.mode === "dish" && entry.query) {
+          setDesiredDish(entry.query);
+          setDesiredDishDiet(entry.diet);
+          setDesiredDishMaxTime(String(entry.maxTime));
+          setGenerationMode("dish");
+        } else {
+          setIngredients(entry.ingredients);
+          setDiet(entry.diet);
+          setMaxTime(String(entry.maxTime));
+          setGenerationMode("ingredients");
+        }
+        setGeneratedRecipes(entry.recipes);
+        setGenerated(true);
+
+        if (isNativeIosApp) {
+          setActiveNativeTab("recipes");
+          setNativeMoreOpen(false);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          window.setTimeout(
+            () =>
+              document
+                .getElementById("results")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+            50,
+          );
+        }
+      }, 0);
     } catch {
       // Niepoprawny zapis ignorujemy — historia nadal zostaje w bazie.
     }
-  }, [storageLoaded]);
+  }, [isNativeIosApp, storageLoaded]);
 
   useEffect(() => {
     if (!cookingMode || !cookingTimerRunning || cookingTimerSeconds <= 0) {
@@ -1518,6 +1618,12 @@ export default function Home() {
   const handleMealPlanEntriesChange = useCallback((count: number) => {
     setMealPlanCount(count);
   }, []);
+
+  function openNativeTab(tab: NativeTab) {
+    setActiveNativeTab(tab);
+    setNativeMoreOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   function addIngredient(value = input) {
     const ingredient = value.trim().toLocaleLowerCase("pl");
@@ -2097,13 +2203,17 @@ export default function Home() {
     }
     setGeneratedRecipes(entry.recipes);
     setGenerated(true);
-    window.setTimeout(
-      () =>
-        document
-          .getElementById("results")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" }),
-      50,
-    );
+    if (isNativeIosApp) {
+      openNativeTab("recipes");
+    } else {
+      window.setTimeout(
+        () =>
+          document
+            .getElementById("results")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        50,
+      );
+    }
   }
 
   async function generateFromIngredients(submittedIngredients: string[]) {
@@ -2190,13 +2300,17 @@ export default function Home() {
           recipes: data.recipes,
         });
       }
-      window.setTimeout(
-        () =>
-          document
-            .getElementById("results")
-            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
-        50,
-      );
+      if (isNativeIosApp) {
+        openNativeTab("recipes");
+      } else {
+        window.setTimeout(
+          () =>
+            document
+              .getElementById("results")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+          50,
+        );
+      }
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -2296,13 +2410,17 @@ export default function Home() {
           recipes: data.recipes,
         });
       }
-      window.setTimeout(
-        () =>
-          document
-            .getElementById("results")
-            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
-        50,
-      );
+      if (isNativeIosApp) {
+        openNativeTab("recipes");
+      } else {
+        window.setTimeout(
+          () =>
+            document
+              .getElementById("results")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+          50,
+        );
+      }
     } catch (caughtError) {
       setDesiredDishError(
         caughtError instanceof Error
@@ -2607,7 +2725,7 @@ export default function Home() {
       )}
 
       {session?.user && !preferencesCompleted && (
-        <section className="pt-4 sm:pt-6">
+        <section className={`${nativeTabClass("generator")} pt-4 sm:pt-6`}>
           <div className={pageContainerClass}>
             <div className="overflow-hidden rounded-[1.5rem] border border-[#d6e2d8] bg-[#eef6ef] p-4 shadow-sm sm:p-5">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -2642,7 +2760,7 @@ export default function Home() {
       )}
 
       {session?.user && (
-        <section className={`${pageContainerClass} pt-4 sm:pt-6`}>
+        <section className={`${pageContainerClass} ${nativeTabClass("kitchen")} pt-4 sm:pt-6`}>
           <div className="min-w-0 overflow-hidden rounded-2xl border border-[#dfe4dc] bg-white/85 p-3 shadow-[0_12px_36px_rgba(53,68,58,0.07)] backdrop-blur sm:p-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
@@ -2765,7 +2883,7 @@ export default function Home() {
 
       <section
         id="generator"
-        className="relative mx-auto max-w-7xl px-4 pb-8 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20"
+        className={`${nativeTabClass("generator")} relative mx-auto max-w-7xl px-4 pb-8 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20`}
       >
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />
         <div className="mx-auto max-w-3xl text-center">
@@ -2972,7 +3090,10 @@ export default function Home() {
         </form>
       </section>
 
-      <section id="how" className="border-y border-[#e4e0d7] bg-[#eeebe3]">
+      <section
+        id="how"
+        className={`${nativeTabClass("generator")} border-y border-[#e4e0d7] bg-[#eeebe3]`}
+      >
         <div
           className={`${pageContainerClass} grid gap-5 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:py-8`}
         >
@@ -2988,7 +3109,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#f7f4ed] py-8 sm:py-14">
+      <section className={`${nativeTabClass("generator")} bg-[#f7f4ed] py-8 sm:py-14`}>
         <div className={pageContainerClass}>
           <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
@@ -3025,7 +3146,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-t border-[#e4e0d7] bg-[#f0e8dc] py-8 sm:py-14">
+      <section className={`${nativeTabClass("generator")} border-t border-[#e4e0d7] bg-[#f0e8dc] py-8 sm:py-14`}>
         <div
           className={`${pageContainerClass} grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12`}
         >
@@ -3134,7 +3255,7 @@ export default function Home() {
 
       <section
         id="results"
-        className={`${pageContainerClass} scroll-mt-8 py-8 sm:py-20`}
+        className={`${pageContainerClass} ${nativeTabClass("recipes")} scroll-mt-8 py-8 sm:py-20`}
       >
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -3381,20 +3502,22 @@ export default function Home() {
         </div>
       </section>
 
-      <MealPlanner
-        recipes={generated ? generatedRecipes : sampleRecipes}
-        favorites={favorites}
-        isSignedIn={Boolean(session?.user)}
-        language={language}
-        currency={currency}
-        onOpenRecipe={openRecipe}
-        onAddToShoppingList={addToShoppingList}
-        onEntriesChange={handleMealPlanEntriesChange}
-      />
+      <div className={nativeTabClass("planner")}>
+        <MealPlanner
+          recipes={generated ? generatedRecipes : sampleRecipes}
+          favorites={favorites}
+          isSignedIn={Boolean(session?.user)}
+          language={language}
+          currency={currency}
+          onOpenRecipe={openRecipe}
+          onAddToShoppingList={addToShoppingList}
+          onEntriesChange={handleMealPlanEntriesChange}
+        />
+      </div>
 
       <section
         id="my-kitchen"
-        className="scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] py-8 sm:py-20"
+        className={`${nativeTabClass("kitchen")} scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] py-8 sm:py-20`}
       >
         <div className={pageContainerClass}>
           <div className="max-w-2xl">
@@ -4532,21 +4655,30 @@ export default function Home() {
         <nav className="native-tab-bar fixed inset-x-0 z-[70] border-t border-[#dedbd2] bg-[#fffdf8]/95 px-2 pt-2 shadow-[0_-12px_30px_rgba(37,50,43,0.12)] backdrop-blur">
           <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
             {[
-              ["✨", pageCopy.generateRecipe, "#generator"],
-              ["🍽️", copy.nav.recipes, "#results"],
-              ["📅", copy.nav.planner, "#meal-planner"],
-              ["🥬", copy.nav.kitchen, "#my-kitchen"],
-            ].map(([icon, label, href]) => (
-              <a
-                key={href}
-                href={href}
-                onClick={() => setNativeMoreOpen(false)}
-                className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[0.68rem] font-bold leading-tight text-[#5f6c64] active:bg-[#f1eee7]"
+              ["generator", pageCopy.generateRecipe],
+              ["recipes", copy.nav.recipes],
+              ["planner", copy.nav.planner],
+              ["kitchen", copy.nav.kitchen],
+            ].map(([tab, label]) => {
+              const nativeTab = tab as NativeTab;
+              const active = activeNativeTab === nativeTab && !nativeMoreOpen;
+
+              return (
+              <button
+                key={nativeTab}
+                type="button"
+                onClick={() => openNativeTab(nativeTab)}
+                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[0.68rem] font-bold leading-tight ${
+                  active
+                    ? "bg-[#e8efe9] text-[#025026]"
+                    : "text-[#5f6c64] active:bg-[#f1eee7]"
+                }`}
               >
-                <span className="text-base leading-none">{icon}</span>
+                <NativeTabIcon name={nativeTab} active={active} />
                 <span className="max-w-full truncate">{label}</span>
-              </a>
-            ))}
+              </button>
+              );
+            })}
             <button
               type="button"
               onClick={() => setNativeMoreOpen((current) => !current)}
@@ -4554,9 +4686,9 @@ export default function Home() {
                 nativeMoreOpen
                   ? "bg-[#e8efe9] text-[#025026]"
                   : "text-[#5f6c64]"
-              }`}
+                }`}
             >
-              <span className="text-base leading-none">•••</span>
+              <NativeTabIcon name="more" active={nativeMoreOpen} />
               <span className="max-w-full truncate">{nativeMoreLabel}</span>
             </button>
           </div>
