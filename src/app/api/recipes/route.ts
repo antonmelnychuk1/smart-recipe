@@ -94,7 +94,7 @@ const recipeSchema = z.object({
   missing: z
     .array(z.string())
     .describe(
-      "Lista zakupowa: tylko czyste nazwy brakujących produktów bez ilości i jednostek, np. parmezan albo mieszanka warzyw",
+      "Lista zakupowa: tylko kanoniczne nazwy produktów w formie sklepowej/słownikowej, bez ilości i jednostek, np. parmezan albo mieszanka warzyw. Nie używaj odmienionych form z listy ingredients.",
     ),
   substitutions: z
     .array(
@@ -268,22 +268,6 @@ function uniqueShoppingProductNames(items: string[]) {
     .forEach((item) => {
       uniqueProducts.set(item.toLocaleLowerCase("pl"), item);
     });
-
-  return [...uniqueProducts.values()];
-}
-
-function completeDishShoppingList(
-  recipe: { ingredients: string[]; missing: string[] },
-) {
-  const ignored = new Set(["woda", "water", "вода"]);
-  const allProducts = [...recipe.missing, ...recipe.ingredients]
-    .map(cleanShoppingProductName)
-    .filter((item) => item && !ignored.has(item.toLocaleLowerCase("pl")));
-  const uniqueProducts = new Map<string, string>();
-
-  allProducts.forEach((item) => {
-    uniqueProducts.set(item.toLocaleLowerCase("pl"), item);
-  });
 
   return [...uniqueProducts.values()];
 }
@@ -511,7 +495,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Кожен варіант має чітко відрізнятися інгредієнтами, смаком або способом приготування, але все одно відповідати запитаній страві. Усі пропозиції мають відповідати дієті та вимогам часу. Для кожного рецепта подай повний список інгредієнтів з кількостями на 2 порції та 4–8 конкретних кроків. Оскільки користувач просить конкретну страву, а не подає список продуктів, поле missing має містити всі продукти, потрібні для приготування рецепта, але як чисті назви без кількостей і одиниць, наприклад: “пшеничне борошно”, “яйця”, “лохина”, “цукор”, “сметана”, “вершкове масло”, “сіль”, “олія”. Не додавай тільки воду. Поле match встанови на 0.`
+Кожен варіант має чітко відрізнятися інгредієнтами, смаком або способом приготування, але все одно відповідати запитаній страві. Усі пропозиції мають відповідати дієті та вимогам часу. Для кожного рецепта подай повний список інгредієнтів з кількостями на 2 порції та 4–8 конкретних кроків. Оскільки користувач просить конкретну страву, а не подає список продуктів, поле missing має містити всі продукти, потрібні для приготування рецепта, але як чисті канонічні назви для списку покупок у називному/словниковому відмінку, без кількостей і одиниць, наприклад: “пшеничне борошно”, “яйця”, “лохина”, “цукор”, “сметана”, “вершкове масло”, “сіль”, “олія”. Не додавай тільки воду. Не копіюй відмінені форми з ingredients. Поле match встанови на 0.`
       : isEnglish
         ? `Prepare exactly 3 different recipes or variants of the dish described by the user: ${requestData.dish}.
 
@@ -524,7 +508,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Each variant must clearly differ in ingredients, flavor or preparation method while still matching the requested dish. Fit all suggestions to the diet and time requirements. For each recipe provide a complete ingredient list with amounts for 2 servings and 4–8 specific steps. Because the user requests a specific dish and does not provide owned ingredients, the missing field must contain all products needed to cook the recipe, as clean product names without amounts or units, for example: “flour”, “eggs”, “blueberries”, “sugar”, “sour cream”, “butter”, “salt”, “oil”. Omit only water. Set match to 0.`
+Each variant must clearly differ in ingredients, flavor or preparation method while still matching the requested dish. Fit all suggestions to the diet and time requirements. For each recipe provide a complete ingredient list with amounts for 2 servings and 4–8 specific steps. Because the user requests a specific dish and does not provide owned ingredients, the missing field must contain all products needed to cook the recipe, as clean canonical shopping-list product names in dictionary/base form, without amounts or units, for example: “flour”, “eggs”, “blueberries”, “sugar”, “sour cream”, “butter”, “salt”, “oil”. Omit only water. Do not copy inflected forms from ingredients. Set match to 0.`
         : `Przygotuj dokładnie 3 różne przepisy lub warianty dania opisanego przez użytkownika: ${requestData.dish}.
 
 Dieta: ${localizedDiet}
@@ -536,7 +520,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Ponieważ użytkownik prosi o konkretne danie i nie podaje produktów, które posiada, pole missing ma zawierać wszystkie produkty potrzebne do przygotowania przepisu jako czyste nazwy bez ilości i jednostek, np. „mąka pszenna”, „jajka”, „borówki”, „cukier”, „śmietana”, „masło”, „sól”, „olej”. Pomiń tylko wodę. Pole match ustaw na 0.`;
+Każdy wariant ma wyraźnie różnić się składnikami, smakiem albo sposobem przygotowania, ale nadal odpowiadać podanemu daniu. Dopasuj wszystkie propozycje do diety i wymagań czasowych. Dla każdego przepisu podaj kompletną listę składników z ilościami dla 2 porcji oraz 4–8 konkretnych kroków. Ponieważ użytkownik prosi o konkretne danie i nie podaje produktów, które posiada, pole missing ma zawierać wszystkie produkty potrzebne do przygotowania przepisu jako czyste kanoniczne nazwy do listy zakupów w formie podstawowej/słownikowej, bez ilości i jednostek, np. „mąka pszenna”, „jajka”, „borówki”, „cukier”, „śmietana”, „masło”, „sól”, „olej”. Pomiń tylko wodę. Nie kopiuj odmienionych form z ingredients. Pole match ustaw na 0.`;
   } else {
     responseSchema = ingredientsResponseSchema;
     requestPrompt = isUkrainian
@@ -555,7 +539,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Кожен рецепт має відповідати вимогам часу, дотримуватися дієти, використовувати якомога більше доступних інгредієнтів і потребувати максимум 4 відсутні продукти. Якщо подано продукти з коротким терміном придатності, використай їх у якомога більшій кількості пропозицій. Подай повний список інгредієнтів з кількостями на 2 порції, 3–7 конкретних кроків і один відповідний emoji. Поле match — це відсоток інгредієнтів рецепта, які користувач уже має.`
+Кожен рецепт має відповідати вимогам часу, дотримуватися дієти, використовувати якомога більше доступних інгредієнтів і потребувати максимум 4 відсутні продукти. Якщо подано продукти з коротким терміном придатності, використай їх у якомога більшій кількості пропозицій. Подай повний список інгредієнтів з кількостями на 2 порції, 3–7 конкретних кроків і один відповідний emoji. Поле missing має містити тільки справді відсутні продукти як канонічні назви для списку покупок у називному/словниковому відмінку; не копіюй відмінені форми з ingredients. Поле match — це відсоток інгредієнтів рецепта, які користувач уже має.`
       : isEnglish
         ? `Generate exactly 3 different recipes.
 
@@ -572,7 +556,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Each recipe must meet the time requirement, follow the diet, use as many available ingredients as possible and require at most 4 missing products. If close-to-expiry products were provided, use them in as many suggestions as possible. Provide a complete ingredient list with amounts for 2 servings, 3–7 specific steps and one matching emoji. The match field is the percentage of recipe ingredients the user already has.`
+Each recipe must meet the time requirement, follow the diet, use as many available ingredients as possible and require at most 4 missing products. If close-to-expiry products were provided, use them in as many suggestions as possible. Provide a complete ingredient list with amounts for 2 servings, 3–7 specific steps and one matching emoji. The missing field must contain only truly missing products as canonical shopping-list names in dictionary/base form; do not copy inflected forms from ingredients. The match field is the percentage of recipe ingredients the user already has.`
         : `Wygeneruj dokładnie 3 różne przepisy.
 
 Dostępne składniki: ${requestData.ingredients.join(", ")}
@@ -588,7 +572,7 @@ ${cookingGoalRequirement}
 ${excludedRequirement}
 ${nutritionGoals}
 
-Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Jeśli podano produkty z krótką datą ważności, wykorzystaj je w możliwie wielu propozycjach. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole match to procent składników przepisu, które użytkownik już posiada.`;
+Każdy przepis musi spełniać podane wymagania czasowe, być zgodny z dietą, wykorzystywać możliwie dużo dostępnych składników i wymagać najwyżej 4 brakujących produktów. Jeśli podano produkty z krótką datą ważności, wykorzystaj je w możliwie wielu propozycjach. Podaj kompletną listę składników z ilościami dla 2 porcji, 3–7 konkretnych kroków oraz jedno pasujące emoji. Pole missing ma zawierać tylko naprawdę brakujące produkty jako kanoniczne nazwy do listy zakupów w formie podstawowej/słownikowej; nie kopiuj odmienionych form z ingredients. Pole match to procent składników przepisu, które użytkownik już posiada.`;
   }
   const systemPrompt = isUkrainian
     ? "Ти досвідчений кухар і дієтолог. Створюй безпечні, реалістичні рецепти українською мовою. Оцінки харчової цінності стосуються однієї порції. Не стверджуй, що страва безпечна для людей з алергіями. Базові продукти комори, як вода, сіль, перець і невелика кількість олії, можуть бути в інгредієнтах рецепта, але не додавай їх до списку відсутніх покупок."
@@ -732,9 +716,7 @@ ${generationRules}`,
       recipes: recipesWithPhotos.map((recipe) => ({
         ...recipe,
         difficulty: localizeDifficulty(recipe.difficulty, language),
-        missing: isDishMode
-          ? completeDishShoppingList(recipe)
-          : uniqueShoppingProductNames(recipe.missing),
+        missing: uniqueShoppingProductNames(recipe.missing),
         priceRegion: requestData.priceRegion,
       })),
       usage: {
