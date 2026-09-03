@@ -8,6 +8,22 @@ const config: CapacitorConfig = {
     url: "https://smartrecipeapp.com",
     cleartext: false,
   },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 900,
+      launchAutoHide: false,
+      backgroundColor: "#f7f4ed",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: false,
+      splashFullScreen: false,
+      splashImmersive: false,
+    },
+    StatusBar: {
+      style: "LIGHT",
+      backgroundColor: "#f7f4ed",
+      overlaysWebView: false,
+    },
+  },
 };
 
 export default config;

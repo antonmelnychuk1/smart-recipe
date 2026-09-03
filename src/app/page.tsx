@@ -1203,6 +1203,28 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!isNativeIosApp) return;
+
+    void Promise.all([
+      import("@capacitor/status-bar"),
+      import("@capacitor/splash-screen"),
+    ])
+      .then(([statusBarModule, splashScreenModule]) =>
+        Promise.allSettled([
+          statusBarModule.StatusBar.setStyle({
+            style: statusBarModule.Style.Light,
+          }),
+          statusBarModule.StatusBar.setBackgroundColor({ color: "#f7f4ed" }),
+          statusBarModule.StatusBar.setOverlaysWebView({ overlay: false }),
+          splashScreenModule.SplashScreen.hide({ fadeOutDuration: 250 }),
+        ]),
+      )
+      .catch(() => {
+        // Native plugins are optional in the web build.
+      });
+  }, [isNativeIosApp]);
+
+  useEffect(() => {
     let cancelled = false;
 
     fetch(
