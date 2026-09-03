@@ -4477,6 +4477,18 @@ export default function Home() {
             {session?.user ? (
               <>
                 <Link
+                  href="/recipes"
+                  className="rounded-xl bg-[#f8f5ee] px-4 py-3 text-[#35483e]"
+                >
+                  {copy.nav.savedRecipes}
+                </Link>
+                <Link
+                  href="/recipes/history"
+                  className="rounded-xl bg-[#f8f5ee] px-4 py-3 text-[#35483e]"
+                >
+                  {copy.nav.recipeHistory}
+                </Link>
+                <Link
                   href="/settings"
                   className="rounded-xl bg-[#f3f6f2] px-4 py-3 text-[#025026]"
                 >
