@@ -3255,11 +3255,21 @@ export default function Home() {
 
       <section
         id="results"
-        className={`${pageContainerClass} ${nativeTabClass("recipes")} scroll-mt-8 py-8 sm:py-20`}
+        className={`${pageContainerClass} ${nativeTabClass("recipes")} scroll-mt-8 ${
+          isNativeIosApp ? "py-4" : "py-8 sm:py-20"
+        }`}
       >
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div
+          className={`flex flex-wrap items-end justify-between gap-4 ${
+            isNativeIosApp ? "mb-2" : ""
+          }`}
+        >
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
+            <p
+              className={`font-semibold uppercase tracking-[0.16em] text-[#fc5726] ${
+                isNativeIosApp ? "text-xs" : "text-sm"
+              }`}
+            >
               {generationInProgress
                 ? copy.results.cooking
                 : generationMode === "dish"
@@ -3268,7 +3278,11 @@ export default function Home() {
                   ? copy.results.matched
                   : copy.results.demo}
             </p>
-            <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h2
+              className={`mt-2 font-serif font-semibold tracking-tight ${
+                isNativeIosApp ? "text-3xl" : "text-4xl sm:text-5xl"
+              }`}
+            >
               {generationInProgress
                 ? copy.results.preparing
                 : generationMode === "dish"
@@ -3278,7 +3292,11 @@ export default function Home() {
                 : copy.results.demoTitle}
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-6 text-[#748078]">
+          <p
+            className={`max-w-md text-sm leading-6 text-[#748078] ${
+              isNativeIosApp ? "hidden" : ""
+            }`}
+          >
             {generationInProgress
               ? copy.results.cookingText
               : generationMode === "dish"
@@ -3310,13 +3328,115 @@ export default function Home() {
           )}
         </div>
 
-        <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-3">
+        <div
+          className={`grid ${
+            isNativeIosApp
+              ? "mt-4 gap-3"
+              : "mt-7 gap-4 sm:mt-10 sm:gap-6 lg:grid-cols-3"
+          }`}
+        >
           {generationInProgress
             ? Array.from({ length: 3 }).map((_, index) => (
                 <RecipeCardSkeleton key={index} />
               ))
             : visibleRecipes.length > 0
-              ? visibleRecipes.map((recipe, index) => (
+              ? visibleRecipes.map((recipe, index) => {
+                  if (isNativeIosApp) {
+                    const missingItems = uniqueShoppingItems(recipe.missing);
+
+                    return (
+                      <article
+                        key={recipe.title}
+                        className="grid min-w-0 grid-cols-[6.25rem_1fr] overflow-hidden rounded-[1.35rem] border border-[#e2dfd6] bg-white shadow-sm"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => openRecipe(recipe)}
+                          className={`relative grid min-h-32 place-items-center overflow-hidden bg-gradient-to-br ${accents[index % accents.length]}`}
+                        >
+                          {recipe.image ? (
+                            <Image
+                              src={recipe.image.url}
+                              alt={recipe.image.alt}
+                              fill
+                              sizes="100px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <span className="text-5xl drop-shadow-lg">
+                              {recipe.emoji}
+                            </span>
+                          )}
+                          <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-1 text-[0.65rem] font-bold text-[#025026] backdrop-blur">
+                            {generationMode === "dish"
+                              ? copy.results.fullRecipe
+                              : `${recipe.match}%`}
+                          </span>
+                        </button>
+                        <div className="min-w-0 p-3">
+                          <div className="flex min-w-0 items-center gap-2 text-[0.68rem] font-semibold text-[#78837c]">
+                            <span className="flex shrink-0 items-center gap-1">
+                              <Icon name="clock" /> {recipe.time} {minuteUnit}
+                            </span>
+                            <span className="truncate">
+                              {localizedDifficulty(recipe.difficulty, language)}
+                            </span>
+                            <span className="shrink-0">
+                              {recipe.calories} {calorieUnit}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => openRecipe(recipe)}
+                            className="mt-2 block w-full text-left"
+                          >
+                            <h3 className="break-anywhere font-serif text-xl font-semibold leading-6 text-[#25322b]">
+                              {recipe.title}
+                            </h3>
+                            <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#748078]">
+                              {recipe.description}
+                            </p>
+                          </button>
+                          <div className="mt-2 flex items-center justify-between gap-2">
+                            <button
+                              onClick={() => toggleFavorite(recipe)}
+                              aria-label={
+                                isFavorite(recipe)
+                                  ? `${copy.results.removeFavorite}: ${recipe.title}`
+                                  : `${copy.results.addFavorite}: ${recipe.title}`
+                              }
+                              className={`grid size-9 shrink-0 place-items-center rounded-full ${
+                                isFavorite(recipe)
+                                  ? "bg-[#fc5726] text-white"
+                                  : "bg-[#f6f3ec] text-[#536159]"
+                              }`}
+                            >
+                              <Icon name="heart" />
+                            </button>
+                            {missingItems.length > 0 ? (
+                              <button
+                                onClick={() => addToShoppingList(missingItems)}
+                                disabled={missingItems.every(isOnShoppingList)}
+                                className="min-w-0 truncate rounded-full bg-[#f7eee8] px-3 py-2 text-xs font-bold text-[#a45c45] disabled:bg-[#e3eee5] disabled:text-[#025026]"
+                              >
+                                {missingItems.every(isOnShoppingList)
+                                  ? copy.results.allOnList
+                                  : `+ ${missingItems.slice(0, 2).join(", ")}${
+                                      missingItems.length > 2 ? "…" : ""
+                                    }`}
+                              </button>
+                            ) : (
+                              <span className="truncate rounded-full bg-[#e3eee5] px-3 py-2 text-xs font-bold text-[#025026]">
+                                {copy.results.haveEverything}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  }
+
+                  return (
             <article
               key={recipe.title}
               className="group min-w-0 overflow-hidden rounded-[1.7rem] border border-[#e2dfd6] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
@@ -3488,7 +3608,8 @@ export default function Home() {
                 </button>
               </div>
             </article>
-              ))
+                  );
+                })
               : (
                 <div className="rounded-[1.7rem] border border-dashed border-[#cfcec7] bg-white/70 p-8 text-center lg:col-span-3">
                   <p className="font-serif text-2xl font-semibold">
