@@ -50,6 +50,15 @@ body {
   margin-inline: auto;
 }
 
+.native-tab-bar {
+  bottom: 0;
+  padding-bottom: max(0.7rem, calc(env(safe-area-inset-bottom) + 0.45rem));
+}
+
+.native-more-sheet {
+  bottom: max(5.7rem, calc(env(safe-area-inset-bottom) + 5.2rem));
+}
+
 .min-h-screen {
   min-height: 100dvh;
 }

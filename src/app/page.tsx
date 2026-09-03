@@ -767,6 +767,8 @@ export default function Home() {
   const [error, setError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [nativeMoreOpen, setNativeMoreOpen] = useState(false);
+  const [isNativeIosApp, setIsNativeIosApp] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [accountDailyLimit, setAccountDailyLimit] = useState(20);
   const [verificationPending, setVerificationPending] = useState(false);
@@ -799,6 +801,8 @@ export default function Home() {
   );
   const modalOpen = Boolean(selectedRecipe) || cookingMode || authOpen;
   const copy = homeCopy[language];
+  const nativeMoreLabel =
+    language === "pl" ? "Więcej" : language === "uk" ? "Більше" : "More";
   const minuteUnit = language === "uk" ? "хв" : "min";
   const calorieUnit = language === "uk" ? "ккал" : "kcal";
   const pageCopy =
@@ -1077,6 +1081,30 @@ export default function Home() {
     document.documentElement.lang = language;
     document.cookie = `${languageCookieName}=${language}; path=/; max-age=31536000; samesite=lax`;
   }, [currency, language, languageLoaded, priceRegion]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const capacitor = (
+        window as Window & {
+          Capacitor?: {
+            getPlatform?: () => string;
+            isNativePlatform?: () => boolean;
+          };
+        }
+      ).Capacitor;
+      const isNative =
+        capacitor?.isNativePlatform?.() ||
+        window.navigator.userAgent.includes("Capacitor");
+      const isIos =
+        capacitor?.getPlatform?.() === "ios" ||
+        /iPad|iPhone|iPod/.test(window.navigator.userAgent);
+
+      setIsNativeIosApp(Boolean(isNative && isIos));
+      if (isNative && isIos) setMobileMenuOpen(false);
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -2317,7 +2345,12 @@ export default function Home() {
   }
 
   return (
-    <main className="app-shell overflow-hidden bg-[#f7f4ed] text-[#25322b]">
+    <main
+      className={`app-shell overflow-hidden bg-[#f7f4ed] text-[#25322b] ${
+        isNativeIosApp ? "pb-24" : ""
+      }`}
+    >
+      {!isNativeIosApp && (
       <nav
         className={`${pageContainerClass} app-top-nav relative z-40 flex items-center justify-between`}
       >
@@ -2426,8 +2459,9 @@ export default function Home() {
           </span>
         </button>
       </nav>
+      )}
 
-      {mobileMenuOpen && (
+      {!isNativeIosApp && mobileMenuOpen && (
         <div
           id="mobile-navigation"
           className="app-mobile-menu relative z-30 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl xl:hidden"
@@ -4428,6 +4462,96 @@ export default function Home() {
         </div>
       )}
 
+      {isNativeIosApp && nativeMoreOpen && (
+        <div className="native-more-sheet fixed left-3 right-3 z-[75] rounded-[1.4rem] border border-[#dedbd2] bg-white p-3 shadow-2xl">
+          <LocaleSettings
+            language={language}
+            currency={currency}
+            region={priceRegion}
+            onLanguageChange={changeLanguage}
+            onCurrencyChange={changeCurrency}
+            onRegionChange={changePriceRegion}
+            compact
+          />
+          <div className="mt-3 grid gap-2 text-sm font-semibold text-[#536159]">
+            {session?.user ? (
+              <>
+                <Link
+                  href="/settings"
+                  className="rounded-xl bg-[#f3f6f2] px-4 py-3 text-[#025026]"
+                >
+                  {copy.nav.accountSettings}
+                </Link>
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="rounded-xl bg-[#253d31] px-4 py-3 text-white"
+                  >
+                    {copy.nav.adminPanel}
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    setNativeMoreOpen(false);
+                    setIsAdmin(false);
+                    void authClient.signOut();
+                  }}
+                  className="rounded-xl px-4 py-3 text-left text-[#a45c45]"
+                >
+                  {copy.nav.logoutFull}
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setNativeMoreOpen(false);
+                  setAuthOpen(true);
+                }}
+                className="h-11 rounded-xl bg-[#025026] px-4 text-white"
+              >
+                {copy.nav.loginOrCreate}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isNativeIosApp && (
+        <nav className="native-tab-bar fixed inset-x-0 z-[70] border-t border-[#dedbd2] bg-[#fffdf8]/95 px-2 pt-2 shadow-[0_-12px_30px_rgba(37,50,43,0.12)] backdrop-blur">
+          <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+            {[
+              ["✨", pageCopy.generateRecipe, "#generator"],
+              ["🍽️", copy.nav.recipes, "#results"],
+              ["📅", copy.nav.planner, "#meal-planner"],
+              ["🥬", copy.nav.kitchen, "#my-kitchen"],
+            ].map(([icon, label, href]) => (
+              <a
+                key={href}
+                href={href}
+                onClick={() => setNativeMoreOpen(false)}
+                className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[0.68rem] font-bold leading-tight text-[#5f6c64] active:bg-[#f1eee7]"
+              >
+                <span className="text-base leading-none">{icon}</span>
+                <span className="max-w-full truncate">{label}</span>
+              </a>
+            ))}
+            <button
+              type="button"
+              onClick={() => setNativeMoreOpen((current) => !current)}
+              className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[0.68rem] font-bold leading-tight ${
+                nativeMoreOpen
+                  ? "bg-[#e8efe9] text-[#025026]"
+                  : "text-[#5f6c64]"
+              }`}
+            >
+              <span className="text-base leading-none">•••</span>
+              <span className="max-w-full truncate">{nativeMoreLabel}</span>
+            </button>
+          </div>
+        </nav>
+      )}
+
+      {!isNativeIosApp && (
       <footer className="bg-[#23362c] py-6 text-center text-sm text-[#b8c3bc] sm:py-8">
         <div
           className={`${pageContainerClass} flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap`}
@@ -4457,6 +4581,7 @@ export default function Home() {
           </Link>
         </div>
       </footer>
+      )}
     </main>
   );
 }
