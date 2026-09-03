@@ -896,6 +896,7 @@ export default function Home() {
           };
   const nativeTabClass = (tab: NativeTab) =>
     isNativeIosApp && activeNativeTab !== tab ? "hidden" : "";
+  const nativeTabContentClass = isNativeIosApp ? "native-tab-content" : "";
   const minuteUnit = language === "uk" ? "хв" : "min";
   const calorieUnit = language === "uk" ? "ккал" : "kcal";
   const pageCopy =
@@ -2904,7 +2905,7 @@ export default function Home() {
 
       <section
         id="generator"
-        className={`${nativeTabClass("generator")} relative mx-auto max-w-7xl px-4 ${
+        className={`${nativeTabClass("generator")} ${nativeTabContentClass} relative mx-auto max-w-7xl px-4 ${
           isNativeIosApp
             ? "pb-4 pt-4"
             : "pb-8 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20"
@@ -3348,7 +3349,7 @@ export default function Home() {
 
       <section
         id="results"
-        className={`${pageContainerClass} ${nativeTabClass("recipes")} scroll-mt-8 ${
+        className={`${pageContainerClass} ${nativeTabClass("recipes")} ${nativeTabContentClass} scroll-mt-8 ${
           isNativeIosApp ? "py-4" : "py-8 sm:py-20"
         }`}
       >
@@ -3716,7 +3717,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className={nativeTabClass("planner")}>
+      <div className={`${nativeTabClass("planner")} ${nativeTabContentClass}`}>
         <MealPlanner
           recipes={generated ? generatedRecipes : sampleRecipes}
           favorites={favorites}
@@ -3732,7 +3733,7 @@ export default function Home() {
 
       <section
         id="my-kitchen"
-        className={`${nativeTabClass("kitchen")} scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] ${
+        className={`${nativeTabClass("kitchen")} ${nativeTabContentClass} scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] ${
           isNativeIosApp ? "py-4" : "py-8 sm:py-20"
         }`}
       >

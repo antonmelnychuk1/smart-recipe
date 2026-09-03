@@ -59,6 +59,10 @@ body {
   bottom: max(5.7rem, calc(env(safe-area-inset-bottom) + 5.2rem));
 }
 
+.native-tab-content {
+  padding-bottom: max(7rem, calc(env(safe-area-inset-bottom) + 6.5rem)) !important;
+}
+
 .min-h-screen {
   min-height: 100dvh;
 }
