@@ -2485,11 +2485,7 @@ export default function Home() {
   }
 
   return (
-    <main
-      className={`app-shell overflow-hidden bg-[#f7f4ed] text-[#25322b] ${
-        isNativeIosApp ? "pb-24" : ""
-      }`}
-    >
+    <main className="app-shell overflow-hidden bg-[#f7f4ed] text-[#25322b]">
       {!isNativeIosApp && (
       <nav
         className={`${pageContainerClass} app-top-nav relative z-40 flex items-center justify-between`}
@@ -2905,7 +2901,7 @@ export default function Home() {
 
       <section
         id="generator"
-        className={`${nativeTabClass("generator")} ${nativeTabContentClass} relative mx-auto max-w-7xl px-4 ${
+        className={`${nativeTabClass("generator")} relative mx-auto max-w-7xl px-4 ${
           isNativeIosApp
             ? "pb-4 pt-4"
             : "pb-8 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20"
@@ -3215,7 +3211,7 @@ export default function Home() {
       </section>
 
       <section
-        className={`${nativeTabClass("generator")} border-t border-[#e4e0d7] bg-[#f0e8dc] ${
+        className={`${nativeTabClass("generator")} ${nativeTabContentClass} border-t border-[#e4e0d7] bg-[#f0e8dc] ${
           isNativeIosApp ? "py-4" : "py-8 sm:py-14"
         }`}
       >
