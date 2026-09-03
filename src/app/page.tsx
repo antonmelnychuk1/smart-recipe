@@ -896,7 +896,9 @@ export default function Home() {
           };
   const nativeTabClass = (tab: NativeTab) =>
     isNativeIosApp && activeNativeTab !== tab ? "hidden" : "";
-  const nativeTabContentClass = isNativeIosApp ? "native-tab-content" : "";
+  const nativeTabEndSpacer = isNativeIosApp ? (
+    <div aria-hidden="true" className="native-tab-end-spacer" />
+  ) : null;
   const minuteUnit = language === "uk" ? "хв" : "min";
   const calorieUnit = language === "uk" ? "ккал" : "kcal";
   const pageCopy =
@@ -3211,7 +3213,7 @@ export default function Home() {
       </section>
 
       <section
-        className={`${nativeTabClass("generator")} ${nativeTabContentClass} border-t border-[#e4e0d7] bg-[#f0e8dc] ${
+        className={`${nativeTabClass("generator")} border-t border-[#e4e0d7] bg-[#f0e8dc] ${
           isNativeIosApp ? "py-4" : "py-8 sm:py-14"
         }`}
       >
@@ -3341,11 +3343,12 @@ export default function Home() {
             )}
           </form>
         </div>
+        {nativeTabEndSpacer}
       </section>
 
       <section
         id="results"
-        className={`${pageContainerClass} ${nativeTabClass("recipes")} ${nativeTabContentClass} scroll-mt-8 ${
+        className={`${pageContainerClass} ${nativeTabClass("recipes")} scroll-mt-8 ${
           isNativeIosApp ? "py-4" : "py-8 sm:py-20"
         }`}
       >
@@ -3711,9 +3714,10 @@ export default function Home() {
                 </div>
               )}
         </div>
+        {nativeTabEndSpacer}
       </section>
 
-      <div className={`${nativeTabClass("planner")} ${nativeTabContentClass}`}>
+      <div className={nativeTabClass("planner")}>
         <MealPlanner
           recipes={generated ? generatedRecipes : sampleRecipes}
           favorites={favorites}
@@ -3725,11 +3729,12 @@ export default function Home() {
           onAddToShoppingList={addToShoppingList}
           onEntriesChange={handleMealPlanEntriesChange}
         />
+        {nativeTabEndSpacer}
       </div>
 
       <section
         id="my-kitchen"
-        className={`${nativeTabClass("kitchen")} ${nativeTabContentClass} scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] ${
+        className={`${nativeTabClass("kitchen")} scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] ${
           isNativeIosApp ? "py-4" : "py-8 sm:py-20"
         }`}
       >
@@ -4200,6 +4205,7 @@ export default function Home() {
             </article>
           </div>
         </div>
+        {nativeTabEndSpacer}
       </section>
 
       {selectedRecipe && (

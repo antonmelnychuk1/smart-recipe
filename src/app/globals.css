@@ -52,15 +52,27 @@ body {
 
 .native-tab-bar {
   bottom: 0;
+  padding-top: 0.85rem;
   padding-bottom: max(0.7rem, calc(env(safe-area-inset-bottom) + 0.45rem));
+}
+
+.native-tab-bar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1rem;
+  height: 1rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(247, 244, 237, 0), #fffdf8);
 }
 
 .native-more-sheet {
   bottom: max(5.7rem, calc(env(safe-area-inset-bottom) + 5.2rem));
 }
 
-.native-tab-content {
-  padding-bottom: max(5rem, calc(env(safe-area-inset-bottom) + 5rem)) !important;
+.native-tab-end-spacer {
+  height: max(5.75rem, calc(env(safe-area-inset-bottom) + 5.25rem));
 }
 
 .min-h-screen {
