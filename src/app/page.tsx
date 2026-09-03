@@ -2317,9 +2317,9 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f7f4ed] text-[#25322b]">
+    <main className="app-shell overflow-hidden bg-[#f7f4ed] text-[#25322b]">
       <nav
-        className={`${pageContainerClass} relative z-40 flex items-center justify-between py-4 sm:py-6`}
+        className={`${pageContainerClass} app-top-nav relative z-40 flex items-center justify-between`}
       >
         <a href="#" aria-label="SmartRecipe" className="flex items-center">
           <Image
@@ -2328,7 +2328,7 @@ export default function Home() {
             width={150}
             height={59}
             priority
-            className="h-auto w-36 object-contain sm:w-40"
+            className="h-auto w-32 object-contain sm:w-40"
           />
         </a>
         <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] xl:flex xl:gap-5 xl:text-sm">
@@ -2405,7 +2405,7 @@ export default function Home() {
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-navigation"
           onClick={() => setMobileMenuOpen((current) => !current)}
-          className="grid size-11 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm xl:hidden"
+          className="grid size-10 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm sm:size-11 xl:hidden"
         >
           <span className="relative block h-4 w-5">
             <span
@@ -2430,7 +2430,7 @@ export default function Home() {
       {mobileMenuOpen && (
         <div
           id="mobile-navigation"
-          className="relative z-30 mx-4 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl xl:hidden"
+          className="app-mobile-menu relative z-30 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl xl:hidden"
         >
           <div className="grid gap-1 text-sm font-semibold text-[#536159]">
             {[

@@ -78,7 +78,7 @@ export default async function SavedRecipesPage() {
   }));
 
   return (
-    <main className="min-h-screen bg-[#f7f4ed] px-4 py-5 text-[#25322b] sm:px-8 sm:py-8">
+    <main className="app-shell bg-[#f7f4ed] px-4 py-5 text-[#25322b] sm:px-8 sm:py-8">
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>

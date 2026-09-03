@@ -55,7 +55,7 @@ export default async function NotFound() {
   const copy = notFoundCopy[language];
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#f7f4ed] px-4 py-8 text-[#25322b]">
+    <main className="app-shell grid place-items-center bg-[#f7f4ed] px-4 py-8 text-[#25322b]">
       <section className="w-full max-w-lg rounded-[2rem] border border-[#e2dfd6] bg-[#fffdf8] p-6 text-center shadow-xl sm:p-10">
         <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#fff0e8] text-2xl font-bold text-[#a45c45]">
           {copy.eyebrow}

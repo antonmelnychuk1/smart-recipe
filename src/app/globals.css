@@ -31,6 +31,25 @@ body {
   overscroll-behavior-y: none;
 }
 
+.app-shell {
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  background:
+    linear-gradient(#f7f4ed, #f7f4ed) top / 100% env(safe-area-inset-top)
+      no-repeat,
+    var(--background);
+}
+
+.app-top-nav {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.app-mobile-menu {
+  width: min(calc(100% - 2rem), 80rem);
+  margin-inline: auto;
+}
+
 .min-h-screen {
   min-height: 100dvh;
 }
@@ -139,6 +158,15 @@ select:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .app-top-nav {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .app-mobile-menu {
+    width: min(calc(100% - 1.5rem), 80rem);
+  }
+
   input,
   select,
   textarea {

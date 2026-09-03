@@ -371,7 +371,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f4ed] px-4 py-4 text-[#25322b] sm:px-8 sm:py-8">
+    <main className="app-shell bg-[#f7f4ed] px-4 py-4 text-[#25322b] sm:px-8 sm:py-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
