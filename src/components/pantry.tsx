@@ -15,6 +15,7 @@ type PantryProps = {
   onCookFromPantry: () => void;
   isGenerating: boolean;
   language?: AppLanguage;
+  nativeApp?: boolean;
 };
 
 const pantryCopy = {
@@ -349,6 +350,7 @@ export function Pantry({
   onCookFromPantry,
   isGenerating,
   language = "pl",
+  nativeApp = false,
 }: PantryProps) {
   const copy = pantryCopy[getUiLanguage(language)];
   const [label, setLabel] = useState("");
@@ -460,18 +462,30 @@ export function Pantry({
   }
 
   return (
-    <article className="rounded-[1.7rem] border border-[#ced9cf] bg-[#f8fbf7] p-4 shadow-sm sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <article
+      className={`rounded-[1.7rem] border border-[#ced9cf] bg-[#f8fbf7] shadow-sm ${
+        nativeApp ? "p-3" : "p-4 sm:p-6"
+      }`}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h3 className="font-serif text-2xl font-semibold">
+            <h3
+              className={`font-serif font-semibold ${
+                nativeApp ? "text-xl" : "text-2xl"
+              }`}
+            >
               {copy.headerTitle}
             </h3>
             <span className="rounded-full bg-[#dfeae1] px-3 py-1 text-xs font-bold text-[#025026]">
               {items.length}
             </span>
           </div>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[#748078]">
+          <p
+            className={`mt-2 max-w-2xl text-sm leading-6 text-[#748078] ${
+              nativeApp ? "hidden" : ""
+            }`}
+          >
             {copy.headerText}
           </p>
         </div>
@@ -483,7 +497,9 @@ export function Pantry({
                   onClick={() =>
                     onUseIngredients(urgentItems.map((item) => item.label))
                   }
-                  className="rounded-xl bg-[#fff0e3] px-4 py-2.5 text-xs font-semibold text-[#a45c45] transition hover:bg-[#f8e3d3]"
+                  className={`rounded-xl bg-[#fff0e3] text-xs font-semibold text-[#a45c45] transition hover:bg-[#f8e3d3] ${
+                    nativeApp ? "px-3 py-2" : "px-4 py-2.5"
+                  }`}
                 >
                   {copy.useUrgent} ({urgentItems.length})
                 </button>
@@ -491,7 +507,9 @@ export function Pantry({
                   onClick={() =>
                     onAddToShoppingList(urgentItems.map((item) => item.label))
                   }
-                  className="rounded-xl border border-[#efd5ab] bg-white px-4 py-2.5 text-xs font-semibold text-[#8d6840] transition hover:bg-[#fff8e9]"
+                  className={`rounded-xl border border-[#efd5ab] bg-white text-xs font-semibold text-[#8d6840] transition hover:bg-[#fff8e9] ${
+                    nativeApp ? "px-3 py-2" : "px-4 py-2.5"
+                  }`}
                 >
                   {copy.urgentToShopping}
                 </button>
@@ -499,14 +517,18 @@ export function Pantry({
             )}
             <button
               onClick={() => onUseIngredients(items.map((item) => item.label))}
-              className="rounded-xl bg-[#025026] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#013d1d]"
+              className={`rounded-xl bg-[#025026] text-xs font-semibold text-white transition hover:bg-[#013d1d] ${
+                nativeApp ? "px-3 py-2" : "px-4 py-2.5"
+              }`}
             >
               {copy.addAllToGenerator}
             </button>
             <button
               onClick={onCookFromPantry}
               disabled={isGenerating}
-              className="rounded-xl bg-[#fc5726] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#d94318] disabled:cursor-not-allowed disabled:opacity-50"
+              className={`rounded-xl bg-[#fc5726] text-xs font-semibold text-white transition hover:bg-[#d94318] disabled:cursor-not-allowed disabled:opacity-50 ${
+                nativeApp ? "px-3 py-2" : "px-4 py-2.5"
+              }`}
             >
               {isGenerating ? copy.aiCooking : copy.cookFromPantry}
             </button>
@@ -516,7 +538,9 @@ export function Pantry({
 
       <form
         onSubmit={submit}
-        className="mt-5 grid gap-3 rounded-2xl border border-[#dfe6df] bg-white p-3 sm:grid-cols-[1fr_0.65fr_0.8fr_auto] sm:p-4"
+        className={`grid gap-3 rounded-2xl border border-[#dfe6df] bg-white p-3 sm:grid-cols-[1fr_0.65fr_0.8fr_auto] sm:p-4 ${
+          nativeApp ? "mt-3 grid-cols-2 gap-2" : "mt-5"
+        }`}
       >
         <label className="text-xs font-semibold text-[#59675f]">
           {copy.product}
@@ -527,7 +551,7 @@ export function Pantry({
             disabled={editingId !== null}
             maxLength={80}
             placeholder={copy.productPlaceholder}
-            className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] disabled:bg-[#f3f1eb]"
+            className="mt-1.5 block h-10 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] disabled:bg-[#f3f1eb] sm:h-11"
           />
         </label>
         <label className="text-xs font-semibold text-[#59675f]">
@@ -538,7 +562,7 @@ export function Pantry({
             onChange={(event) => setQuantity(event.target.value)}
             maxLength={60}
             placeholder={copy.quantityPlaceholder}
-            className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e]"
+            className="mt-1.5 block h-10 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] sm:h-11"
           />
         </label>
         <label className="text-xs font-semibold text-[#59675f]">
@@ -547,10 +571,10 @@ export function Pantry({
             type="date"
             value={expiresAt}
             onChange={(event) => setExpiresAt(event.target.value)}
-            className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e]"
+            className="mt-1.5 block h-10 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] sm:h-11"
           />
         </label>
-        <div className="mt-auto flex gap-2">
+        <div className={`mt-auto flex gap-2 ${nativeApp ? "col-span-2" : ""}`}>
           {editingId && (
             <button
               type="button"
@@ -560,13 +584,13 @@ export function Pantry({
               {copy.cancel}
             </button>
           )}
-          <button className="h-11 flex-1 rounded-xl bg-[#025026] px-5 text-sm font-semibold text-white transition hover:bg-[#013d1d]">
+          <button className="h-10 flex-1 rounded-xl bg-[#025026] px-5 text-sm font-semibold text-white transition hover:bg-[#013d1d] sm:h-11">
             {editingId ? copy.save : copy.addProduct}
           </button>
         </div>
       </form>
 
-      <p className="mt-2 text-[11px] text-[#8a948e]">
+      <p className={`mt-2 text-[11px] text-[#8a948e] ${nativeApp ? "hidden" : ""}`}>
         {isSignedIn
           ? copy.syncSignedIn
           : copy.syncGuest}
@@ -574,7 +598,7 @@ export function Pantry({
 
       {items.length > 0 && (
         <>
-          <div className="mt-4 grid gap-2 sm:grid-cols-4">
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:grid-cols-4">
             {[
               [copy.all, items.length, "bg-white text-[#365a46]"],
               [copy.urgent, urgentItems.length, "bg-[#fff8e9] text-[#8d6840]"],
@@ -583,17 +607,29 @@ export function Pantry({
             ].map(([label, value, className]) => (
               <div
                 key={label}
-                className={`rounded-2xl p-3 ring-1 ring-[#e6e2d8] ${className}`}
+                className={`rounded-2xl ring-1 ring-[#e6e2d8] ${className} ${
+                  nativeApp ? "p-2.5" : "p-3"
+                }`}
               >
                 <p className="text-[0.65rem] font-bold uppercase tracking-wider opacity-75">
                   {label}
                 </p>
-                <p className="mt-1 font-serif text-2xl font-semibold">{value}</p>
+                <p
+                  className={`mt-1 font-serif font-semibold ${
+                    nativeApp ? "text-xl" : "text-2xl"
+                  }`}
+                >
+                  {value}
+                </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 grid gap-3 rounded-2xl border border-[#dfe6df] bg-white p-3 lg:grid-cols-[1fr_auto]">
+          <div
+            className={`mt-3 grid gap-3 rounded-2xl border border-[#dfe6df] bg-white p-3 lg:grid-cols-[1fr_auto] ${
+              nativeApp ? "hidden" : ""
+            }`}
+          >
             <div>
               <p className="mb-2 px-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#8a948e]">
                 {copy.categoriesLabel}
@@ -650,7 +686,11 @@ export function Pantry({
         </>
       )}
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 ${
+          nativeApp ? "mt-3" : "mt-5"
+        }`}
+      >
         {visibleItems.length > 0 ? (
           visibleItems.map((item) => {
             const days = item.expiresAt ? daysUntil(item.expiresAt) : null;
@@ -660,7 +700,9 @@ export function Pantry({
             return (
               <div
                 key={item.id}
-                className={`flex min-w-0 flex-col gap-3 rounded-2xl border p-3 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between ${
+                className={`flex min-w-0 flex-col rounded-2xl border p-3 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between ${
+                  nativeApp ? "gap-2" : "gap-3"
+                } ${
                   isExpired
                     ? "border-[#e6b9ae] bg-[#fff3ef]"
                     : isUrgent

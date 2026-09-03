@@ -873,6 +873,27 @@ export default function Home() {
   const copy = homeCopy[language];
   const nativeMoreLabel =
     language === "pl" ? "Więcej" : language === "uk" ? "Більше" : "More";
+  const nativeTabLabels: Record<NativeTab, string> =
+    language === "pl"
+      ? {
+          generator: "Gotuj",
+          recipes: "Przepisy",
+          planner: "Plan",
+          kitchen: "Kuchnia",
+        }
+      : language === "uk"
+        ? {
+            generator: "Готуй",
+            recipes: "Рецепти",
+            planner: "План",
+            kitchen: "Кухня",
+          }
+        : {
+            generator: "Cook",
+            recipes: "Recipes",
+            planner: "Plan",
+            kitchen: "Kitchen",
+          };
   const nativeTabClass = (tab: NativeTab) =>
     isNativeIosApp && activeNativeTab !== tab ? "hidden" : "";
   const minuteUnit = language === "uk" ? "хв" : "min";
@@ -2883,36 +2904,60 @@ export default function Home() {
 
       <section
         id="generator"
-        className={`${nativeTabClass("generator")} relative mx-auto max-w-7xl px-4 pb-8 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20`}
+        className={`${nativeTabClass("generator")} relative mx-auto max-w-7xl px-4 ${
+          isNativeIosApp
+            ? "pb-4 pt-4"
+            : "pb-8 pt-6 sm:px-8 sm:pb-20 sm:pt-10 lg:pt-20"
+        }`}
       >
         <div className="pointer-events-none absolute -right-32 top-0 size-80 rounded-full bg-[#e3a96b]/20 blur-3xl" />
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#d8dfd7] bg-white/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#48705c] sm:mb-5 sm:px-4">
+          <div
+            className={`mb-4 inline-flex items-center gap-2 rounded-full border border-[#d8dfd7] bg-white/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#48705c] sm:mb-5 sm:px-4 ${
+              isNativeIosApp ? "hidden" : ""
+            }`}
+          >
             <Icon name="spark" /> {copy.hero.badge}
           </div>
-          <h1 className="font-serif text-5xl font-semibold leading-[1.02] tracking-[-0.04em] text-[#203128] sm:text-7xl">
+          <h1
+            className={`font-serif font-semibold leading-[1.02] tracking-[-0.04em] text-[#203128] ${
+              isNativeIosApp ? "text-4xl" : "text-5xl sm:text-7xl"
+            }`}
+          >
             {copy.hero.title}
             <span className="block italic text-[#fc5726]">
               {copy.hero.titleAccent}
             </span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-[#68736b] sm:mt-6 sm:text-lg">
+          <p
+            className={`mx-auto mt-4 max-w-xl text-base leading-7 text-[#68736b] sm:mt-6 sm:text-lg ${
+              isNativeIosApp ? "hidden" : ""
+            }`}
+          >
             {copy.hero.description}
           </p>
         </div>
 
         <form
           onSubmit={submit}
-          className="mx-auto mt-7 max-w-4xl rounded-3xl border border-white bg-white/90 p-3 shadow-[0_24px_80px_rgba(53,68,58,0.13)] sm:mt-10 sm:rounded-[2rem] sm:p-7"
+          className={`mx-auto max-w-4xl rounded-3xl border border-white bg-white/90 p-3 shadow-[0_24px_80px_rgba(53,68,58,0.13)] sm:rounded-[2rem] sm:p-7 ${
+            isNativeIosApp ? "mt-5" : "mt-7 sm:mt-10"
+          }`}
         >
           <label className="mb-2 block text-sm font-semibold text-[#35483e]">
             {copy.generator.ingredientsLabel}
           </label>
-          <div className="flex min-h-16 flex-wrap items-center gap-2 rounded-2xl border border-[#dedfd9] bg-[#fbfaf6] p-2.5 focus-within:border-[#71927e] focus-within:ring-4 focus-within:ring-[#71927e]/10">
+          <div
+            className={`flex flex-wrap items-center gap-2 rounded-2xl border border-[#dedfd9] bg-[#fbfaf6] p-2.5 focus-within:border-[#71927e] focus-within:ring-4 focus-within:ring-[#71927e]/10 ${
+              isNativeIosApp ? "min-h-12" : "min-h-16"
+            }`}
+          >
             {ingredients.map((ingredient) => (
               <span
                 key={ingredient}
-                className="flex items-center gap-2 rounded-full bg-[#e5eee6] px-3 py-2 text-sm font-medium text-[#365a46]"
+                className={`flex items-center gap-2 rounded-full bg-[#e5eee6] text-sm font-medium text-[#365a46] ${
+                  isNativeIosApp ? "px-2.5 py-1.5" : "px-3 py-2"
+                }`}
               >
                 {ingredient}
                 <button
@@ -2943,7 +2988,11 @@ export default function Home() {
             />
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#828a84]">
+          <div
+            className={`mt-3 flex flex-wrap items-center gap-2 text-xs text-[#828a84] ${
+              isNativeIosApp ? "hidden" : ""
+            }`}
+          >
             <span>{copy.generator.suggestions}</span>
             {pageCopy.suggestions
               .filter((item) => !ingredients.includes(item))
@@ -2959,13 +3008,19 @@ export default function Home() {
               ))}
           </div>
 
-          <div className="mt-4 grid gap-3 border-t border-[#eeece5] pt-4 sm:mt-6 sm:grid-cols-2 sm:gap-4 sm:pt-6 lg:grid-cols-[1fr_1fr_1fr_auto]">
+          <div
+            className={`mt-4 grid gap-3 border-t border-[#eeece5] pt-4 sm:mt-6 sm:grid-cols-2 sm:gap-4 sm:pt-6 lg:grid-cols-[1fr_1fr_1fr_auto] ${
+              isNativeIosApp ? "grid-cols-2 gap-2 pt-3" : ""
+            }`}
+          >
             <label className="text-sm font-semibold text-[#35483e]">
               {copy.generator.diet}
               <select
                 value={diet}
                 onChange={(event) => setDiet(event.target.value)}
-                className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
+                className={`mt-2 block w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 font-normal text-[#25322b] outline-none ${
+                  isNativeIosApp ? "h-10 text-sm" : "h-12 text-base"
+                }`}
               >
                 {dietOptions.map((option) => (
                   <option key={option} value={option}>
@@ -2979,7 +3034,9 @@ export default function Home() {
               <select
                 value={maxBudget}
                 onChange={(event) => setMaxBudget(event.target.value)}
-                className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
+                className={`mt-2 block w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 font-normal text-[#25322b] outline-none ${
+                  isNativeIosApp ? "h-10 text-sm" : "h-12 text-base"
+                }`}
               >
                 {budgetOptions.map(([value, label]) => (
                   <option key={value} value={value}>
@@ -2993,7 +3050,9 @@ export default function Home() {
               <select
                 value={maxTime}
                 onChange={(event) => setMaxTime(event.target.value)}
-                className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
+                className={`mt-2 block w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 font-normal text-[#25322b] outline-none ${
+                  isNativeIosApp ? "h-10 text-sm" : "h-12 text-base"
+                }`}
               >
                 {timeOptions.map(([value, label]) => (
                   <option key={value} value={value}>
@@ -3004,7 +3063,9 @@ export default function Home() {
             </label>
             <button
               disabled={ingredients.length === 0 || isLoading}
-              className="mt-auto flex h-12 items-center justify-center gap-2 rounded-xl bg-[#025026] px-6 font-semibold text-white shadow-lg shadow-[#025026]/20 transition hover:-translate-y-0.5 hover:bg-[#013d1d] disabled:cursor-not-allowed disabled:opacity-40"
+              className={`mt-auto flex items-center justify-center gap-2 rounded-xl bg-[#025026] font-semibold text-white shadow-lg shadow-[#025026]/20 transition hover:-translate-y-0.5 hover:bg-[#013d1d] disabled:cursor-not-allowed disabled:opacity-40 ${
+                isNativeIosApp ? "col-span-2 h-11 px-4" : "h-12 px-6"
+              }`}
             >
               <Icon name="spark" />{" "}
               {isLoading ? copy.generator.generating : copy.generator.generate}
@@ -3092,7 +3153,9 @@ export default function Home() {
 
       <section
         id="how"
-        className={`${nativeTabClass("generator")} border-y border-[#e4e0d7] bg-[#eeebe3]`}
+        className={`${nativeTabClass("generator")} ${
+          isNativeIosApp ? "hidden" : ""
+        } border-y border-[#e4e0d7] bg-[#eeebe3]`}
       >
         <div
           className={`${pageContainerClass} grid gap-5 py-6 text-center sm:grid-cols-3 sm:gap-8 sm:py-8`}
@@ -3109,7 +3172,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`${nativeTabClass("generator")} bg-[#f7f4ed] py-8 sm:py-14`}>
+      <section
+        className={`${nativeTabClass("generator")} ${
+          isNativeIosApp ? "hidden" : ""
+        } bg-[#f7f4ed] py-8 sm:py-14`}
+      >
         <div className={pageContainerClass}>
           <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
@@ -3146,25 +3213,39 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`${nativeTabClass("generator")} border-t border-[#e4e0d7] bg-[#f0e8dc] py-8 sm:py-14`}>
+      <section
+        className={`${nativeTabClass("generator")} border-t border-[#e4e0d7] bg-[#f0e8dc] ${
+          isNativeIosApp ? "py-4" : "py-8 sm:py-14"
+        }`}
+      >
         <div
           className={`${pageContainerClass} grid items-center gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12`}
         >
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726] sm:text-sm">
               {copy.dish.eyebrow}
             </p>
-            <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h2
+              className={`mt-2 font-serif font-semibold tracking-tight ${
+                isNativeIosApp ? "text-2xl" : "text-3xl sm:text-4xl"
+              }`}
+            >
               {copy.dish.title}
             </h2>
-            <p className="mt-3 max-w-lg text-sm leading-6 text-[#68736b] sm:text-base">
+            <p
+              className={`mt-3 max-w-lg text-sm leading-6 text-[#68736b] sm:text-base ${
+                isNativeIosApp ? "hidden" : ""
+              }`}
+            >
               {copy.dish.description}
             </p>
           </div>
 
           <form
             onSubmit={submitDesiredDish}
-            className="rounded-3xl border border-white bg-white/90 p-3 shadow-[0_18px_60px_rgba(53,68,58,0.10)] sm:p-5"
+            className={`rounded-3xl border border-white bg-white/90 p-3 shadow-[0_18px_60px_rgba(53,68,58,0.10)] sm:p-5 ${
+              isNativeIosApp ? "rounded-[1.35rem]" : ""
+            }`}
           >
             <label className="text-sm font-semibold text-[#35483e]">
               {copy.dish.label}
@@ -3173,17 +3254,23 @@ export default function Home() {
                 value={desiredDish}
                 onChange={(event) => setDesiredDish(event.target.value)}
                 maxLength={120}
-                className="mt-1.5 block h-11 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e]"
+                className="mt-1.5 block h-10 w-full rounded-xl border border-[#dedfd9] px-3 text-sm font-normal outline-none focus:border-[#71927e] sm:h-11"
                 placeholder={copy.dish.placeholder}
               />
             </label>
-            <div className="mt-3 grid gap-3 border-t border-[#eeece5] pt-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
+            <div
+              className={`mt-3 grid gap-3 border-t border-[#eeece5] pt-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto] ${
+                isNativeIosApp ? "grid-cols-2 gap-2" : ""
+              }`}
+            >
               <label className="text-sm font-semibold text-[#35483e]">
                 {copy.generator.diet}
                 <select
                   value={desiredDishDiet}
                   onChange={(event) => setDesiredDishDiet(event.target.value)}
-                  className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
+                  className={`mt-2 block w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 font-normal text-[#25322b] outline-none ${
+                    isNativeIosApp ? "h-10 text-sm" : "h-12 text-base"
+                  }`}
                 >
                   {dietOptions.map((option) => (
                     <option key={option} value={option}>
@@ -3197,7 +3284,9 @@ export default function Home() {
                 <select
                   value={desiredDishBudget}
                   onChange={(event) => setDesiredDishBudget(event.target.value)}
-                  className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
+                  className={`mt-2 block w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 font-normal text-[#25322b] outline-none ${
+                    isNativeIosApp ? "h-10 text-sm" : "h-12 text-base"
+                  }`}
                 >
                   {budgetOptions.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -3213,7 +3302,9 @@ export default function Home() {
                   onChange={(event) =>
                     setDesiredDishMaxTime(event.target.value)
                   }
-                  className="mt-2 block h-12 w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 text-base font-normal text-[#25322b] outline-none"
+                  className={`mt-2 block w-full appearance-none rounded-xl border border-[#dedfd9] bg-white px-3 font-normal text-[#25322b] outline-none ${
+                    isNativeIosApp ? "h-10 text-sm" : "h-12 text-base"
+                  }`}
                 >
                   {timeOptions.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -3224,13 +3315,15 @@ export default function Home() {
               </label>
               <button
                 disabled={desiredDish.trim().length < 2 || desiredDishLoading}
-                className="mt-auto flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#fc5726] px-5 font-semibold text-white shadow-lg shadow-[#fc5726]/20 transition hover:-translate-y-0.5 hover:bg-[#d94318] disabled:cursor-not-allowed disabled:opacity-40"
+                className={`mt-auto flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#fc5726] font-semibold text-white shadow-lg shadow-[#fc5726]/20 transition hover:-translate-y-0.5 hover:bg-[#d94318] disabled:cursor-not-allowed disabled:opacity-40 ${
+                  isNativeIosApp ? "col-span-2 h-11 px-4" : "h-12 px-5"
+                }`}
               >
                 <Icon name="spark" />
                 {desiredDishLoading ? copy.dish.creating : copy.dish.create}
               </button>
             </div>
-            <p className="mt-3 text-xs text-[#7a857e]">
+            <p className={`mt-3 text-xs text-[#7a857e] ${isNativeIosApp ? "hidden" : ""}`}>
               {copy.dish.note}
             </p>
             {desiredDishError && (
@@ -3630,6 +3723,7 @@ export default function Home() {
           isSignedIn={Boolean(session?.user)}
           language={language}
           currency={currency}
+          nativeApp={isNativeIosApp}
           onOpenRecipe={openRecipe}
           onAddToShoppingList={addToShoppingList}
           onEntriesChange={handleMealPlanEntriesChange}
@@ -3638,17 +3732,27 @@ export default function Home() {
 
       <section
         id="my-kitchen"
-        className={`${nativeTabClass("kitchen")} scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] py-8 sm:py-20`}
+        className={`${nativeTabClass("kitchen")} scroll-mt-8 border-t border-[#e1ddd3] bg-[#eeebe3] ${
+          isNativeIosApp ? "py-4" : "py-8 sm:py-20"
+        }`}
       >
         <div className={pageContainerClass}>
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726] sm:text-sm">
               {copy.kitchen.eyebrow}
             </p>
-            <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight sm:text-5xl">
+            <h2
+              className={`mt-2 font-serif font-semibold tracking-tight ${
+                isNativeIosApp ? "text-3xl" : "text-3xl sm:text-5xl"
+              }`}
+            >
               {copy.kitchen.title}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-[#748078] sm:mt-3 sm:text-base sm:leading-7">
+            <p
+              className={`mt-2 text-sm leading-6 text-[#748078] sm:mt-3 sm:text-base sm:leading-7 ${
+                isNativeIosApp ? "hidden" : ""
+              }`}
+            >
               {session?.user
                 ? copy.kitchen.signedIn
                 : copy.kitchen.local}
@@ -3694,10 +3798,15 @@ export default function Home() {
               onCookFromPantry={cookFromPantry}
               isGenerating={isLoading}
               language={language}
+              nativeApp={isNativeIosApp}
             />
           </div>
 
-          <div className="mt-4 grid gap-3 sm:mt-6 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div
+            className={`mt-4 grid gap-3 sm:mt-6 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 ${
+              isNativeIosApp ? "hidden" : ""
+            }`}
+          >
             <article className="min-w-0 rounded-[1.7rem] border border-[#dedbd2] bg-white p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-2xl font-semibold">
@@ -4773,13 +4882,13 @@ export default function Home() {
       )}
 
       {isNativeIosApp && (
-        <nav className="native-tab-bar fixed inset-x-0 z-[70] border-t border-[#dedbd2] bg-[#fffdf8]/95 px-2 pt-2 shadow-[0_-12px_30px_rgba(37,50,43,0.12)] backdrop-blur">
-          <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+        <nav className="native-tab-bar fixed inset-x-0 z-[70] border-t border-[#dedbd2] bg-[#fffdf8]/95 px-2 pt-1.5 shadow-[0_-12px_30px_rgba(37,50,43,0.12)] backdrop-blur">
+          <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
             {[
-              ["generator", pageCopy.generateRecipe],
-              ["recipes", copy.nav.recipes],
-              ["planner", copy.nav.planner],
-              ["kitchen", copy.nav.kitchen],
+              ["generator", nativeTabLabels.generator],
+              ["recipes", nativeTabLabels.recipes],
+              ["planner", nativeTabLabels.planner],
+              ["kitchen", nativeTabLabels.kitchen],
             ].map(([tab, label]) => {
               const nativeTab = tab as NativeTab;
               const active = activeNativeTab === nativeTab && !nativeMoreOpen;
@@ -4789,28 +4898,32 @@ export default function Home() {
                 key={nativeTab}
                 type="button"
                 onClick={() => openNativeTab(nativeTab)}
-                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[0.68rem] font-bold leading-tight ${
+                className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1.5 text-center text-[0.64rem] font-bold leading-[1.05] ${
                   active
                     ? "bg-[#e8efe9] text-[#025026]"
                     : "text-[#5f6c64] active:bg-[#f1eee7]"
                 }`}
               >
-                <NativeTabIcon name={nativeTab} active={active} />
-                <span className="max-w-full truncate">{label}</span>
+                <span className="grid size-7 place-items-center">
+                  <NativeTabIcon name={nativeTab} active={active} />
+                </span>
+                <span className="line-clamp-1 w-full px-0.5">{label}</span>
               </button>
               );
             })}
             <button
               type="button"
               onClick={() => setNativeMoreOpen((current) => !current)}
-              className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[0.68rem] font-bold leading-tight ${
+              className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1.5 text-center text-[0.64rem] font-bold leading-[1.05] ${
                 nativeMoreOpen
                   ? "bg-[#e8efe9] text-[#025026]"
                   : "text-[#5f6c64]"
                 }`}
             >
-              <NativeTabIcon name="more" active={nativeMoreOpen} />
-              <span className="max-w-full truncate">{nativeMoreLabel}</span>
+              <span className="grid size-7 place-items-center">
+                <NativeTabIcon name="more" active={nativeMoreOpen} />
+              </span>
+              <span className="line-clamp-1 w-full px-0.5">{nativeMoreLabel}</span>
             </button>
           </div>
         </nav>

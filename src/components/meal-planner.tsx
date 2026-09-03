@@ -162,6 +162,7 @@ type MealPlannerProps = {
   onEntriesChange?: (count: number) => void;
   language?: AppLanguage;
   currency?: CurrencyCode;
+  nativeApp?: boolean;
 };
 
 function mondayOf(date: Date) {
@@ -206,6 +207,7 @@ export function MealPlanner({
   onEntriesChange,
   language = "pl",
   currency = "PLN",
+  nativeApp = false,
 }: MealPlannerProps) {
   const copy = plannerCopy[getUiLanguage(language)];
   const minuteUnit = language === "uk" ? "хв" : "min";
@@ -455,22 +457,32 @@ export function MealPlanner({
   return (
     <section
       id="meal-planner"
-      className="scroll-mt-8 border-t border-[#e5e0d7] bg-[#faf8f3] py-8 sm:py-20"
+      className={`scroll-mt-8 border-t border-[#e5e0d7] bg-[#faf8f3] ${
+        nativeApp ? "py-4" : "py-8 sm:py-20"
+      }`}
     >
       <div className={plannerContainerClass}>
-        <div className="flex flex-wrap items-end justify-between gap-5">
+        <div className="flex flex-wrap items-end justify-between gap-3 sm:gap-5">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726] sm:text-sm">
               {copy.eyebrow}
             </p>
-            <h2 className="mt-2 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h2
+              className={`mt-2 font-serif font-semibold tracking-tight ${
+                nativeApp ? "text-3xl" : "text-4xl sm:text-5xl"
+              }`}
+            >
               {copy.title}
             </h2>
-            <p className="mt-3 max-w-xl leading-7 text-[#748078]">
+            <p
+              className={`mt-3 max-w-xl leading-7 text-[#748078] ${
+                nativeApp ? "hidden" : ""
+              }`}
+            >
               {copy.description}
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
             <div className="flex items-center gap-2 rounded-full border border-[#dedbd2] bg-white p-1.5 shadow-sm">
               <button
                 onClick={() => shiftWeek(-7)}
@@ -479,7 +491,11 @@ export function MealPlanner({
               >
                 ←
               </button>
-              <span className="min-w-44 text-center text-sm font-semibold">
+              <span
+                className={`text-center text-sm font-semibold ${
+                  nativeApp ? "min-w-36" : "min-w-44"
+                }`}
+              >
                 {formatWeekRange(week, copy.locale)}
               </span>
               <button
@@ -493,22 +509,30 @@ export function MealPlanner({
             <button
               onClick={copyWeekPlan}
               disabled={entries.length === 0}
-              className="rounded-xl border border-[#d8d7d0] bg-white px-4 py-2.5 text-sm font-semibold text-[#365a46] shadow-sm disabled:opacity-40"
+              className={`rounded-xl border border-[#d8d7d0] bg-white text-sm font-semibold text-[#365a46] shadow-sm disabled:opacity-40 ${
+                nativeApp ? "px-3 py-2" : "px-4 py-2.5"
+              }`}
             >
               {copy.copyPlan}
             </button>
             <button
               onClick={clearWeek}
               disabled={entries.length === 0}
-              className="rounded-xl bg-[#fff0e8] px-4 py-2.5 text-sm font-semibold text-[#9a6251] disabled:opacity-40"
+              className={`rounded-xl bg-[#fff0e8] text-sm font-semibold text-[#9a6251] disabled:opacity-40 ${
+                nativeApp ? "px-3 py-2" : "px-4 py-2.5"
+              }`}
             >
               {copy.clearWeek}
             </button>
           </div>
         </div>
 
-        <div className="mt-5 overflow-x-auto pb-1 sm:mt-6">
-          <div className="grid min-w-[620px] grid-cols-5 gap-2 sm:min-w-0 sm:gap-3">
+        <div className="mt-4 overflow-x-auto pb-1 sm:mt-6">
+          <div
+            className={`grid grid-cols-5 gap-2 sm:min-w-0 sm:gap-3 ${
+              nativeApp ? "min-w-[520px]" : "min-w-[620px]"
+            }`}
+          >
             {[
               [copy.planned, `${entries.length}/21`, copy.mealsCount],
               [copy.avgCalories, averageCalories, copy.kcalMeal],
@@ -522,12 +546,18 @@ export function MealPlanner({
             ].map(([label, value, hint]) => (
               <article
                 key={label}
-                className="rounded-2xl border border-[#e1ddd4] bg-white p-3 shadow-sm sm:p-4"
+                className={`rounded-2xl border border-[#e1ddd4] bg-white shadow-sm ${
+                  nativeApp ? "p-2.5" : "p-3 sm:p-4"
+                }`}
               >
                 <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-[#8a948e] sm:text-xs">
                   {label}
                 </p>
-                <p className="mt-1 font-serif text-2xl font-semibold sm:mt-2 sm:text-3xl">
+                <p
+                  className={`mt-1 font-serif font-semibold sm:mt-2 sm:text-3xl ${
+                    nativeApp ? "text-xl" : "text-2xl"
+                  }`}
+                >
                   {value}
                 </p>
                 <p className="mt-1 line-clamp-1 text-[0.68rem] text-[#7a857e] sm:text-xs">
@@ -538,11 +568,19 @@ export function MealPlanner({
           </div>
         </div>
 
-        <div className="mt-5 overflow-x-auto pb-3 sm:mt-10">
-          <div className="grid min-w-[1050px] grid-cols-7 gap-3">
+        <div className="mt-4 overflow-x-auto pb-3 sm:mt-10">
+          <div
+            className={`grid grid-cols-7 ${
+              nativeApp ? "min-w-[840px] gap-2" : "min-w-[1050px] gap-3"
+            }`}
+          >
             {copy.days.map((day, dayIndex) => (
               <div key={day} className="space-y-3">
-                <div className="rounded-xl bg-[#025026] px-3 py-3 text-center text-white">
+                <div
+                  className={`rounded-xl bg-[#025026] px-3 text-center text-white ${
+                    nativeApp ? "py-2" : "py-3"
+                  }`}
+                >
                   <div>
                     <p className="text-sm font-bold">{day}</p>
                     <p className="mt-0.5 text-xs text-white/70">
@@ -571,7 +609,9 @@ export function MealPlanner({
                   return (
                     <div
                       key={meal.key}
-                      className="min-h-36 rounded-2xl border border-[#e1ddd4] bg-white p-3 shadow-sm"
+                      className={`rounded-2xl border border-[#e1ddd4] bg-white p-3 shadow-sm ${
+                        nativeApp ? "min-h-28" : "min-h-36"
+                      }`}
                     >
                       <p className="text-[10px] font-bold uppercase tracking-wider text-[#929a94]">
                         {meal.label}
@@ -583,7 +623,11 @@ export function MealPlanner({
                             className="block w-full text-left"
                           >
                             {entry.recipe.image ? (
-                              <span className="relative block h-16 overflow-hidden rounded-lg">
+                              <span
+                                className={`relative block overflow-hidden rounded-lg ${
+                                  nativeApp ? "h-12" : "h-16"
+                                }`}
+                              >
                                 <Image
                                   src={entry.recipe.image.url}
                                   alt={entry.recipe.image.alt}
@@ -597,7 +641,11 @@ export function MealPlanner({
                                 {entry.recipe.emoji}
                               </span>
                             )}
-                            <span className="break-anywhere mt-2 block text-sm font-semibold leading-5">
+                            <span
+                              className={`break-anywhere mt-2 block font-semibold leading-5 ${
+                                nativeApp ? "line-clamp-2 text-xs" : "text-sm"
+                              }`}
+                            >
                               {entry.recipe.title}
                             </span>
                             <span className="mt-1 block text-xs text-[#7a857e]">
@@ -633,7 +681,9 @@ export function MealPlanner({
                               mealType: meal.key,
                             })
                           }
-                          className="mt-3 grid h-24 w-full place-items-center rounded-xl border border-dashed border-[#d5d4ce] text-2xl text-[#9aa49d] transition hover:border-[#75917f] hover:bg-[#f4f7f3] hover:text-[#3f6852]"
+                          className={`mt-3 grid w-full place-items-center rounded-xl border border-dashed border-[#d5d4ce] text-2xl text-[#9aa49d] transition hover:border-[#75917f] hover:bg-[#f4f7f3] hover:text-[#3f6852] ${
+                            nativeApp ? "h-16" : "h-24"
+                          }`}
                           aria-label={`${copy.add} ${day}, ${meal.label}`}
                         >
                           +
@@ -647,7 +697,11 @@ export function MealPlanner({
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#e1ddd4] bg-white p-4">
+        <div
+          className={`mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#e1ddd4] bg-white ${
+            nativeApp ? "p-3" : "p-4 sm:mt-6"
+          }`}
+        >
           <div>
             <p className="text-sm text-[#68736b]">
               {isLoading
