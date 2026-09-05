@@ -79,13 +79,13 @@ body {
   background: #025026;
 }
 
-html[data-native-boot="true"] .native-boot-screen,
-html[data-native-boot="hiding"] .native-boot-screen {
-  display: grid;
-}
-
-html[data-native-boot="hiding"] .native-boot-screen {
-  animation: native-launch-fade 420ms ease forwards;
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 767px) {
+    .native-boot-screen {
+      display: grid;
+      animation: native-launch-fade 420ms ease 1.35s forwards;
+    }
+  }
 }
 
 .native-boot-logo {
@@ -93,12 +93,6 @@ html[data-native-boot="hiding"] .native-boot-screen {
   aspect-ratio: 1200 / 474;
   border-radius: 2rem;
   background: white url("/logo-full.svg") center / 80% auto no-repeat;
-}
-
-.native-launch-screen {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  animation: native-launch-fade 420ms ease 1.35s forwards;
 }
 
 @keyframes native-launch-fade {

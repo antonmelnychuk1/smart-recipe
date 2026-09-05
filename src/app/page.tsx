@@ -864,7 +864,6 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [nativeMoreOpen, setNativeMoreOpen] = useState(false);
   const [isNativeIosApp] = useState(detectNativeIosApp);
-  const [nativeLaunchVisible, setNativeLaunchVisible] = useState(true);
   const [activeNativeTab, setActiveNativeTab] =
     useState<NativeTab>("generator");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -1220,15 +1219,7 @@ export default function Home() {
   useEffect(() => {
     if (!isNativeIosApp) return;
 
-    let removeNativeBoot: number | undefined;
-
     const finishLaunch = window.setTimeout(() => {
-      document.documentElement.dataset.nativeBoot = "hiding";
-      setNativeLaunchVisible(false);
-      removeNativeBoot = window.setTimeout(() => {
-        document.documentElement.dataset.nativeBoot = "done";
-      }, 430);
-
       void import("@capacitor/status-bar")
         .then((statusBarModule) =>
           Promise.allSettled([
@@ -1263,7 +1254,6 @@ export default function Home() {
 
     return () => {
       window.clearTimeout(finishLaunch);
-      if (removeNativeBoot !== undefined) window.clearTimeout(removeNativeBoot);
     };
   }, [isNativeIosApp]);
 
@@ -2553,24 +2543,6 @@ export default function Home() {
 
   return (
     <main className="app-shell overflow-hidden bg-[#f7f4ed] text-[#25322b]">
-      {isNativeIosApp && nativeLaunchVisible && (
-        <div
-          aria-hidden="true"
-          className="native-launch-screen fixed inset-0 z-[100] grid place-items-center bg-[#025026] px-8"
-        >
-          <div className="rounded-[2rem] bg-white px-7 py-6">
-            <Image
-              src="/logo-full.svg"
-              alt=""
-              width={260}
-              height={102}
-              priority
-              className="h-auto w-56 max-w-[68vw] object-contain"
-            />
-          </div>
-        </div>
-      )}
-
       {!isNativeIosApp && (
       <nav
         className={`${pageContainerClass} app-top-nav relative z-40 flex items-center justify-between`}
