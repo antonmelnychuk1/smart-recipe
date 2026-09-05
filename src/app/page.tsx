@@ -843,6 +843,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [nativeMoreOpen, setNativeMoreOpen] = useState(false);
   const [isNativeIosApp, setIsNativeIosApp] = useState(false);
+  const [nativeLaunchVisible, setNativeLaunchVisible] = useState(true);
   const [activeNativeTab, setActiveNativeTab] =
     useState<NativeTab>("generator");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -1211,6 +1212,23 @@ export default function Home() {
   useEffect(() => {
     if (!isNativeIosApp) return;
 
+    const finishLaunch = window.setTimeout(() => {
+      setNativeLaunchVisible(false);
+
+      void import("@capacitor/status-bar")
+        .then((statusBarModule) =>
+          Promise.allSettled([
+            statusBarModule.StatusBar.setStyle({
+              style: statusBarModule.Style.Light,
+            }),
+            statusBarModule.StatusBar.setBackgroundColor({ color: "#f7f4ed" }),
+          ]),
+        )
+        .catch(() => {
+          // Native plugins are optional in the web build.
+        });
+    }, 1050);
+
     void Promise.all([
       import("@capacitor/status-bar"),
       import("@capacitor/splash-screen"),
@@ -1218,16 +1236,18 @@ export default function Home() {
       .then(([statusBarModule, splashScreenModule]) =>
         Promise.allSettled([
           statusBarModule.StatusBar.setStyle({
-            style: statusBarModule.Style.Light,
+            style: statusBarModule.Style.Dark,
           }),
-          statusBarModule.StatusBar.setBackgroundColor({ color: "#f7f4ed" }),
+          statusBarModule.StatusBar.setBackgroundColor({ color: "#025026" }),
           statusBarModule.StatusBar.setOverlaysWebView({ overlay: false }),
-          splashScreenModule.SplashScreen.hide({ fadeOutDuration: 250 }),
+          splashScreenModule.SplashScreen.hide({ fadeOutDuration: 180 }),
         ]),
       )
       .catch(() => {
         // Native plugins are optional in the web build.
       });
+
+    return () => window.clearTimeout(finishLaunch);
   }, [isNativeIosApp]);
 
   useEffect(() => {
@@ -2516,6 +2536,24 @@ export default function Home() {
 
   return (
     <main className="app-shell overflow-hidden bg-[#f7f4ed] text-[#25322b]">
+      {isNativeIosApp && nativeLaunchVisible && (
+        <div
+          aria-hidden="true"
+          className="native-launch-screen fixed inset-0 z-[100] grid place-items-center bg-[#025026] px-8"
+        >
+          <div className="rounded-[2rem] bg-white px-7 py-6">
+            <Image
+              src="/logo-full.svg"
+              alt=""
+              width={260}
+              height={102}
+              priority
+              className="h-auto w-56 max-w-[68vw] object-contain"
+            />
+          </div>
+        </div>
+      )}
+
       {!isNativeIosApp && (
       <nav
         className={`${pageContainerClass} app-top-nav relative z-40 flex items-center justify-between`}
@@ -4913,7 +4951,7 @@ export default function Home() {
       )}
 
       {isNativeIosApp && (
-        <nav className="native-tab-bar fixed z-[70] rounded-[1.75rem] border border-[#dedbd2] bg-white px-1.5 backdrop-blur">
+        <nav className="native-tab-bar fixed z-[70] rounded-[1.45rem] border border-[#dedbd2] bg-white px-1.5 backdrop-blur">
           <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
             {[
               ["generator", nativeTabLabels.generator],

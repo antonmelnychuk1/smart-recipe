@@ -69,6 +69,19 @@ body {
   height: max(6.2rem, calc(env(safe-area-inset-bottom) + 5.85rem));
 }
 
+.native-launch-screen {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: native-launch-fade 280ms ease 760ms forwards;
+}
+
+@keyframes native-launch-fade {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 .min-h-screen {
   min-height: 100dvh;
 }
