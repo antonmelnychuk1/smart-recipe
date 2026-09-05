@@ -4907,7 +4907,7 @@ export default function Home() {
       )}
 
       {isNativeIosApp && (
-        <nav className="native-tab-bar fixed z-[70] rounded-[1.75rem] border border-[#dedbd2] bg-[#fffdf8]/95 px-2 shadow-[0_14px_38px_rgba(37,50,43,0.20)] backdrop-blur">
+        <nav className="native-tab-bar fixed z-[70] rounded-[1.75rem] border border-[#dedbd2] bg-[#fffdf8]/95 px-2 backdrop-blur">
           <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
             {[
               ["generator", nativeTabLabels.generator],
