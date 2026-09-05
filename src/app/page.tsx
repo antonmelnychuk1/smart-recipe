@@ -206,6 +206,27 @@ const feedbackOptions: {
 
 type NativeTab = "generator" | "recipes" | "planner" | "kitchen";
 
+function detectNativeIosApp() {
+  if (typeof window === "undefined") return false;
+
+  const capacitor = (
+    window as Window & {
+      Capacitor?: {
+        getPlatform?: () => string;
+        isNativePlatform?: () => boolean;
+      };
+    }
+  ).Capacitor;
+  const isNative =
+    capacitor?.isNativePlatform?.() ||
+    window.navigator.userAgent.includes("Capacitor");
+  const isIos =
+    capacitor?.getPlatform?.() === "ios" ||
+    /iPad|iPhone|iPod/.test(window.navigator.userAgent);
+
+  return Boolean(isNative && isIos);
+}
+
 function readStoredValue<T>(key: string, fallback: T): T {
   try {
     const value = window.localStorage.getItem(key);
@@ -842,7 +863,7 @@ export default function Home() {
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [nativeMoreOpen, setNativeMoreOpen] = useState(false);
-  const [isNativeIosApp, setIsNativeIosApp] = useState(false);
+  const [isNativeIosApp] = useState(detectNativeIosApp);
   const [nativeLaunchVisible, setNativeLaunchVisible] = useState(true);
   const [activeNativeTab, setActiveNativeTab] =
     useState<NativeTab>("generator");
@@ -1186,27 +1207,14 @@ export default function Home() {
   }, [currency, language, languageLoaded, priceRegion]);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      const capacitor = (
-        window as Window & {
-          Capacitor?: {
-            getPlatform?: () => string;
-            isNativePlatform?: () => boolean;
-          };
-        }
-      ).Capacitor;
-      const isNative =
-        capacitor?.isNativePlatform?.() ||
-        window.navigator.userAgent.includes("Capacitor");
-      const isIos =
-        capacitor?.getPlatform?.() === "ios" ||
-        /iPad|iPhone|iPod/.test(window.navigator.userAgent);
+    const nativeIos = detectNativeIosApp();
 
-      setIsNativeIosApp(Boolean(isNative && isIos));
-      if (isNative && isIos) setMobileMenuOpen(false);
-    }, 0);
+    document.documentElement.dataset.nativeIos = nativeIos ? "true" : "false";
+    if (!nativeIos) return;
 
-    return () => window.clearTimeout(timeout);
+    const closeMenu = window.setTimeout(() => setMobileMenuOpen(false), 0);
+
+    return () => window.clearTimeout(closeMenu);
   }, []);
 
   useEffect(() => {
