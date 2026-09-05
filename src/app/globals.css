@@ -69,6 +69,32 @@ body {
   height: max(6.2rem, calc(env(safe-area-inset-bottom) + 5.85rem));
 }
 
+.native-boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: none;
+  place-items: center;
+  padding: env(safe-area-inset-top) 2rem env(safe-area-inset-bottom);
+  background: #025026;
+}
+
+html[data-native-boot="true"] .native-boot-screen,
+html[data-native-boot="hiding"] .native-boot-screen {
+  display: grid;
+}
+
+html[data-native-boot="hiding"] .native-boot-screen {
+  animation: native-launch-fade 420ms ease forwards;
+}
+
+.native-boot-logo {
+  width: min(14rem, 68vw);
+  aspect-ratio: 1200 / 474;
+  border-radius: 2rem;
+  background: white url("/logo-full.svg") center / 80% auto no-repeat;
+}
+
 .native-launch-screen {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);

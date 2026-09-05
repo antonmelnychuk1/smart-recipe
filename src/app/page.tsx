@@ -1220,8 +1220,14 @@ export default function Home() {
   useEffect(() => {
     if (!isNativeIosApp) return;
 
+    let removeNativeBoot: number | undefined;
+
     const finishLaunch = window.setTimeout(() => {
+      document.documentElement.dataset.nativeBoot = "hiding";
       setNativeLaunchVisible(false);
+      removeNativeBoot = window.setTimeout(() => {
+        document.documentElement.dataset.nativeBoot = "done";
+      }, 430);
 
       void import("@capacitor/status-bar")
         .then((statusBarModule) =>
@@ -1255,7 +1261,10 @@ export default function Home() {
         // Native plugins are optional in the web build.
       });
 
-    return () => window.clearTimeout(finishLaunch);
+    return () => {
+      window.clearTimeout(finishLaunch);
+      if (removeNativeBoot !== undefined) window.clearTimeout(removeNativeBoot);
+    };
   }, [isNativeIosApp]);
 
   useEffect(() => {

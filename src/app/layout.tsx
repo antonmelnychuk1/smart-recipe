@@ -97,8 +97,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  var ua = navigator.userAgent || "";
+                  var isCapacitor = ua.indexOf("Capacitor") !== -1;
+                  var isIos = /iPad|iPhone|iPod/.test(ua);
+
+                  if (isCapacitor && isIos) {
+                    document.documentElement.dataset.nativeBoot = "true";
+                  }
+                } catch (error) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col">
+        <div aria-hidden="true" className="native-boot-screen">
+          <div className="native-boot-logo" />
+        </div>
+        {children}
+      </body>
     </html>
   );
 }
