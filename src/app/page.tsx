@@ -1235,7 +1235,7 @@ export default function Home() {
         .catch(() => {
           // Native plugins are optional in the web build.
         });
-    }, 1050);
+    }, 1850);
 
     void Promise.all([
       import("@capacitor/status-bar"),
