@@ -863,7 +863,7 @@ export default function Home() {
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [nativeMoreOpen, setNativeMoreOpen] = useState(false);
-  const [isNativeIosApp] = useState(detectNativeIosApp);
+  const [isNativeIosApp, setIsNativeIosApp] = useState(false);
   const [activeNativeTab, setActiveNativeTab] =
     useState<NativeTab>("generator");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -1211,22 +1211,29 @@ export default function Home() {
     document.documentElement.dataset.nativeIos = nativeIos ? "true" : "false";
     if (!nativeIos) return;
 
-    const closeMenu = window.setTimeout(() => setMobileMenuOpen(false), 0);
+    const enableNativeLayout = window.setTimeout(() => {
+      setIsNativeIosApp(true);
+      setMobileMenuOpen(false);
+    }, 0);
 
-    return () => window.clearTimeout(closeMenu);
+    return () => window.clearTimeout(enableNativeLayout);
   }, []);
 
   useEffect(() => {
     if (!isNativeIosApp) return;
 
     const finishLaunch = window.setTimeout(() => {
-      void import("@capacitor/status-bar")
-        .then((statusBarModule) =>
+      void Promise.all([
+        import("@capacitor/status-bar"),
+        import("@capacitor/splash-screen"),
+      ])
+        .then(([statusBarModule, splashScreenModule]) =>
           Promise.allSettled([
             statusBarModule.StatusBar.setStyle({
               style: statusBarModule.Style.Light,
             }),
             statusBarModule.StatusBar.setBackgroundColor({ color: "#f7f4ed" }),
+            splashScreenModule.SplashScreen.hide({ fadeOutDuration: 220 }),
           ]),
         )
         .catch(() => {
@@ -1234,18 +1241,14 @@ export default function Home() {
         });
     }, 1850);
 
-    void Promise.all([
-      import("@capacitor/status-bar"),
-      import("@capacitor/splash-screen"),
-    ])
-      .then(([statusBarModule, splashScreenModule]) =>
+    void import("@capacitor/status-bar")
+      .then((statusBarModule) =>
         Promise.allSettled([
           statusBarModule.StatusBar.setStyle({
             style: statusBarModule.Style.Dark,
           }),
           statusBarModule.StatusBar.setBackgroundColor({ color: "#025026" }),
           statusBarModule.StatusBar.setOverlaysWebView({ overlay: false }),
-          splashScreenModule.SplashScreen.hide({ fadeOutDuration: 180 }),
         ]),
       )
       .catch(() => {
