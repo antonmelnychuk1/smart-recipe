@@ -4913,7 +4913,7 @@ export default function Home() {
       )}
 
       {isNativeIosApp && (
-        <nav className="native-tab-bar fixed z-[70] rounded-[1.75rem] border border-white/80 bg-[#fffdf8]/95 px-1.5 backdrop-blur">
+        <nav className="native-tab-bar fixed z-[70] rounded-[1.75rem] border border-[#ded6c9] bg-[#f4efe4]/96 px-1.5 backdrop-blur">
           <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
             {[
               ["generator", nativeTabLabels.generator],
@@ -4932,7 +4932,7 @@ export default function Home() {
                 className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1 text-center text-[0.64rem] font-bold leading-[1.05] ${
                   active
                     ? "bg-[#e8efe9] text-[#025026]"
-                    : "text-[#5f6c64] active:bg-[#f1eee7]"
+                    : "text-[#5f6c64] active:bg-[#e9e1d4]"
                 }`}
               >
                 <span className="grid size-7 place-items-center">
@@ -4948,7 +4948,7 @@ export default function Home() {
               className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1 text-center text-[0.64rem] font-bold leading-[1.05] ${
                 nativeMoreOpen
                   ? "bg-[#e8efe9] text-[#025026]"
-                  : "text-[#5f6c64]"
+                  : "text-[#5f6c64] active:bg-[#e9e1d4]"
                 }`}
             >
               <span className="grid size-7 place-items-center">
