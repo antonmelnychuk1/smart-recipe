@@ -69,39 +69,6 @@ body {
   height: max(6.2rem, calc(env(safe-area-inset-bottom) + 5.85rem));
 }
 
-.native-boot-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 120;
-  display: none;
-  place-items: center;
-  padding: env(safe-area-inset-top) 2rem env(safe-area-inset-bottom);
-  background: #025026;
-}
-
-@supports (-webkit-touch-callout: none) {
-  @media (max-width: 767px) {
-    .native-boot-screen {
-      display: grid;
-      animation: native-launch-fade 420ms ease 1.35s forwards;
-    }
-  }
-}
-
-.native-boot-logo {
-  width: min(14rem, 68vw);
-  aspect-ratio: 1200 / 474;
-  border-radius: 2rem;
-  background: white url("/logo-full.svg") center / 80% auto no-repeat;
-}
-
-@keyframes native-launch-fade {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
 .min-h-screen {
   min-height: 100dvh;
 }
