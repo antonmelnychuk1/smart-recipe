@@ -599,41 +599,47 @@ function NativeTabIcon({
   const paths: Record<NativeTab | "more", ReactNode> = {
     generator: (
       <>
-        <path d="M12 3.5l1.45 4 4.05 1.45-4.05 1.45L12 14.5l-1.45-4.1L6.5 8.95l4.05-1.45L12 3.5z" />
-        <path d="M18.5 14.5l.75 2 2 .75-2 .75-.75 2-.75-2-2-.75 2-.75.75-2z" />
+        <path d="M14 6a9.3 9.3 0 0 0 1.516-.546c.911-.438 1.494-1.015 1.937-1.932.207-.428.382-.928.547-1.522.165.595.34 1.095.547 1.521.443.918 1.026 1.495 1.937 1.933.426.205.925.38 1.516.546a9.3 9.3 0 0 0-1.516.547c-.911.438-1.494 1.015-1.937 1.932a9 9 0 0 0-.547 1.521c-.165-.594-.34-1.095-.547-1.521-.443-.918-1.026-1.494-1.937-1.932a9 9 0 0 0-1.516-.547" />
+        <path d="M3 14a21 21 0 0 0 1.652-.532c2.542-.953 3.853-2.238 4.816-4.806a20 20 0 0 0 .532-1.662 20 20 0 0 0 .532 1.662c.963 2.567 2.275 3.853 4.816 4.806q.75.28 1.652.532a21 21 0 0 0-1.652.532c-2.542.953-3.854 2.238-4.816 4.806a20 20 0 0 0-.532 1.662 20 20 0 0 0-.532-1.662c-.963-2.568-2.275-3.853-4.816-4.806a21 21 0 0 0-1.652-.532" />
       </>
     ),
     recipes: (
       <>
-        <path d="M7.5 4.5h8.2a2.8 2.8 0 0 1 2.8 2.8v12.2H8a2.5 2.5 0 0 1-2.5-2.5V6.5a2 2 0 0 1 2-2z" />
-        <path d="M8 16.5h10.5" />
-        <path d="M9 8.5h6" />
-        <path d="M9 11.5h4.5" />
+        <path d="M10 19h-6a1 1 0 0 1-1-1v-14a1 1 0 0 1 1-1h6a2 2 0 0 1 2 2 2 2 0 0 1 2-2h6a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-6a2 2 0 0 0-2 2 2 2 0 0 0-2-2" />
+        <path d="M12 5v16" />
+        <path d="M7 7h1" />
+        <path d="M7 11h1" />
+        <path d="M16 7h1" />
+        <path d="M16 11h1" />
+        <path d="M16 15h1" />
       </>
     ),
     planner: (
       <>
-        <path d="M6.5 5.5h11a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-10a2 2 0 0 1 2-2z" />
-        <path d="M8 3.5v4" />
-        <path d="M16 3.5v4" />
-        <path d="M4.5 9.5h15" />
-        <path d="M8 13h.01" />
-        <path d="M12 13h.01" />
-        <path d="M16 13h.01" />
+        <path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12" />
+        <path d="M16 3v4" />
+        <path d="M8 3v4" />
+        <path d="M4 11h16" />
+        <path d="M7 14h.013" />
+        <path d="M10.01 14h.005" />
+        <path d="M13.01 14h.005" />
+        <path d="M16.015 14h.005" />
+        <path d="M13.015 17h.005" />
+        <path d="M7.01 17h.005" />
+        <path d="M10.01 17h.005" />
       </>
     ),
     kitchen: (
       <>
-        <path d="M6.5 10.5h11l-1.1 8.2a2 2 0 0 1-2 1.8H9.6a2 2 0 0 1-2-1.8l-1.1-8.2z" />
-        <path d="M9 10.5V8a3 3 0 0 1 6 0v2.5" />
-        <path d="M8.5 14.5h7" />
+        <path d="M12 3c1.918 0 3.52 1.35 3.91 3.151a4 4 0 0 1 2.09 7.723l0 7.126h-12v-7.126a4 4 0 1 1 2.092-7.723a4 4 0 0 1 3.908-3.151" />
+        <path d="M6.161 17.009l11.839-.009" />
       </>
     ),
     more: (
       <>
-        <path d="M6.5 12h.01" />
-        <path d="M12 12h.01" />
-        <path d="M17.5 12h.01" />
+        <path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0-2 0" />
+        <path d="M11 19a1 1 0 1 0 2 0a1 1 0 1 0-2 0" />
+        <path d="M11 5a1 1 0 1 0 2 0a1 1 0 1 0-2 0" />
       </>
     ),
   };
@@ -645,7 +651,7 @@ function NativeTabIcon({
       className="size-5"
       fill="none"
       stroke="currentColor"
-      strokeWidth={active ? 2.2 : 1.9}
+      strokeWidth={active ? 2.25 : 2}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -4907,7 +4913,7 @@ export default function Home() {
       )}
 
       {isNativeIosApp && (
-        <nav className="native-tab-bar fixed z-[70] rounded-[1.75rem] border border-[#dedbd2] bg-[#fffdf8]/95 px-2 backdrop-blur">
+        <nav className="native-tab-bar fixed z-[70] rounded-[1.75rem] border border-white/80 bg-[#fffdf8]/95 px-2 backdrop-blur">
           <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
             {[
               ["generator", nativeTabLabels.generator],

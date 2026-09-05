@@ -53,12 +53,13 @@ body {
 .native-tab-bar {
   left: 0.75rem;
   right: 0.75rem;
-  bottom: max(0.6rem, calc(env(safe-area-inset-bottom) + 0.35rem));
+  bottom: max(1.05rem, calc(env(safe-area-inset-bottom) + 0.8rem));
   padding-top: 0.85rem;
   padding-bottom: 0.85rem;
   box-shadow:
-    0 -10px 26px rgba(37, 50, 43, 0.08),
-    0 8px 22px rgba(37, 50, 43, 0.08);
+    0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 8px 24px rgba(37, 50, 43, 0.1),
+    0 18px 46px rgba(37, 50, 43, 0.16);
 }
 
 .native-tab-bar::before {
@@ -73,11 +74,11 @@ body {
 }
 
 .native-more-sheet {
-  bottom: max(6.75rem, calc(env(safe-area-inset-bottom) + 6.4rem));
+  bottom: max(7.2rem, calc(env(safe-area-inset-bottom) + 6.85rem));
 }
 
 .native-tab-end-spacer {
-  height: max(6.75rem, calc(env(safe-area-inset-bottom) + 6.25rem));
+  height: max(7.25rem, calc(env(safe-area-inset-bottom) + 6.75rem));
 }
 
 .min-h-screen {
