@@ -83,6 +83,69 @@ const budgetOptions = [
   ["100", "do 100 zł"],
 ];
 
+const cookingGoalOptions = [
+  "balanced",
+  "quick",
+  "cheap",
+  "healthy",
+  "high_protein",
+  "use_pantry",
+] as const;
+
+const cookingGoalLabels: Record<AppLanguage, Record<string, string>> = {
+  pl: {
+    balanced: "Zbalansowanie",
+    quick: "Szybko",
+    cheap: "Tanio",
+    healthy: "Zdrowiej",
+    high_protein: "Wysokobiałkowo",
+    use_pantry: "Z tego co mam",
+  },
+  en: {
+    balanced: "Balanced",
+    quick: "Quick",
+    cheap: "Budget-friendly",
+    healthy: "Healthier",
+    high_protein: "High-protein",
+    use_pantry: "Use what I have",
+  },
+  uk: {
+    balanced: "Збалансовано",
+    quick: "Швидко",
+    cheap: "Бюджетно",
+    healthy: "Здоровіше",
+    high_protein: "Високобілково",
+    use_pantry: "З того, що маю",
+  },
+};
+
+const dislikedPrefix = "nie lubię: ";
+
+function splitPreferenceItems(value: string) {
+  return value
+    .split(",")
+    .map((item) => item.trim().toLocaleLowerCase("pl"))
+    .filter(Boolean);
+}
+
+function splitStoredExcludedIngredients(items: string[] = []) {
+  const allergies: string[] = [];
+  const disliked: string[] = [];
+
+  for (const item of items) {
+    if (item.startsWith(dislikedPrefix)) {
+      disliked.push(item.slice(dislikedPrefix.length));
+    } else {
+      allergies.push(item);
+    }
+  }
+
+  return {
+    allergies: allergies.join(", "),
+    disliked: disliked.join(", "),
+  };
+}
+
 const shoppingCategoryMatchers = [
   {
     name: "Warzywa i owoce",
@@ -824,6 +887,17 @@ export default function Home() {
   const [cookingGoal, setCookingGoal] = useState("balanced");
   const [excludedIngredients, setExcludedIngredients] = useState<string[]>([]);
   const [preferencesCompleted, setPreferencesCompleted] = useState(true);
+  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const [preferencesSaving, setPreferencesSaving] = useState(false);
+  const [preferencesMessage, setPreferencesMessage] = useState("");
+  const [preferenceDiet, setPreferenceDiet] = useState("Bez ograniczeń");
+  const [preferenceMaxTime, setPreferenceMaxTime] = useState("0");
+  const [preferenceBudget, setPreferenceBudget] = useState("0");
+  const [preferenceGoal, setPreferenceGoal] = useState("balanced");
+  const [preferenceCalories, setPreferenceCalories] = useState("");
+  const [preferenceProtein, setPreferenceProtein] = useState("");
+  const [preferenceAllergies, setPreferenceAllergies] = useState("");
+  const [preferenceDisliked, setPreferenceDisliked] = useState("");
   const [desiredDishLoading, setDesiredDishLoading] = useState(false);
   const [desiredDishError, setDesiredDishError] = useState("");
   const [sharePending, setSharePending] = useState(false);
@@ -896,7 +970,8 @@ export default function Home() {
   const expiredPantryItems = pantryItems.filter(
     (item) => item.expiresAt !== null && daysUntilExpiry(item.expiresAt) < 0,
   );
-  const modalOpen = Boolean(selectedRecipe) || cookingMode || authOpen;
+  const modalOpen =
+    Boolean(selectedRecipe) || cookingMode || authOpen || preferencesOpen;
   const copy = homeCopy[language];
   const nativeMoreLabel =
     language === "pl" ? "Więcej" : language === "uk" ? "Більше" : "More";
@@ -1125,6 +1200,70 @@ export default function Home() {
           from: "of",
           limitStarts: "The limit will start counting after your first generation.",
         };
+
+  const preferencesCopy =
+    language === "pl"
+      ? {
+          title: "Ustaw preferencje gotowania",
+          text: "Dzięki temu SmartRecipe od razu dopasuje przepisy do Twojego stylu gotowania.",
+          diet: "Dieta",
+          goal: "Cel gotowania",
+          budget: "Budżet na 2 porcje",
+          time: "Maksymalny czas",
+          calories: "Kalorie dziennie",
+          protein: "Białko dziennie (g)",
+          allergies: "Alergie i składniki zakazane",
+          allergiesPlaceholder: "np. orzechy, krewetki, seler",
+          allergiesHint: "Wpisz po przecinku. Generator będzie ich unikać.",
+          disliked: "Produkty, których nie lubisz",
+          dislikedPlaceholder: "np. kolendra, oliwki, pieczarki",
+          cancel: "Później",
+          save: "Zapisz i zacznij gotować",
+          saving: "Zapisuję...",
+          saved: "Preferencje zapisane.",
+          saveError: "Nie udało się zapisać preferencji.",
+        }
+      : language === "uk"
+        ? {
+            title: "Налаштуй кулінарні вподобання",
+            text: "Так SmartRecipe одразу підлаштує рецепти під твій стиль готування.",
+            diet: "Дієта",
+            goal: "Ціль готування",
+            budget: "Бюджет на 2 порції",
+            time: "Максимальний час",
+            calories: "Калорії на день",
+            protein: "Білки на день (г)",
+            allergies: "Алергії та заборонені інгредієнти",
+            allergiesPlaceholder: "наприклад, горіхи, креветки, селера",
+            allergiesHint: "Вводь через кому. Генератор уникатиме їх.",
+            disliked: "Продукти, які ти не любиш",
+            dislikedPlaceholder: "наприклад, кінза, оливки, печериці",
+            cancel: "Пізніше",
+            save: "Зберегти й почати готувати",
+            saving: "Зберігаю...",
+            saved: "Вподобання збережено.",
+            saveError: "Не вдалося зберегти вподобання.",
+          }
+        : {
+            title: "Set cooking preferences",
+            text: "This helps SmartRecipe tailor recipes to the way you cook.",
+            diet: "Diet",
+            goal: "Cooking goal",
+            budget: "Budget for 2 servings",
+            time: "Maximum time",
+            calories: "Daily calories",
+            protein: "Daily protein (g)",
+            allergies: "Allergies and forbidden ingredients",
+            allergiesPlaceholder: "e.g. nuts, shrimp, celery",
+            allergiesHint: "Separate items with commas. The generator will avoid them.",
+            disliked: "Products you dislike",
+            dislikedPlaceholder: "e.g. cilantro, olives, mushrooms",
+            cancel: "Later",
+            save: "Save and start cooking",
+            saving: "Saving...",
+            saved: "Preferences saved.",
+            saveError: "Could not save preferences.",
+          };
 
   function changeLanguage(nextLanguage: AppLanguage) {
     setLanguage(nextLanguage);
@@ -1555,19 +1694,37 @@ export default function Home() {
         excludedIngredients?: string[];
         preferencesCompleted?: boolean;
       }) => {
+        const nextDiet = data.defaultDiet ?? "Bez ograniczeń";
+        const nextMaxTime = String(data.defaultMaxTime ?? 0);
+        const nextBudget = String(data.defaultBudget ?? 0);
+        const nextGoal = data.cookingGoal ?? "balanced";
+        const nextExcludedIngredients = data.excludedIngredients ?? [];
+        const storedPreferences = splitStoredExcludedIngredients(
+          nextExcludedIngredients,
+        );
+
         setCalorieTarget(data.calorieTarget ?? null);
         setProteinTarget(data.proteinTarget ?? null);
-        setCookingGoal(data.cookingGoal ?? "balanced");
-        setExcludedIngredients(data.excludedIngredients ?? []);
+        setCookingGoal(nextGoal);
+        setExcludedIngredients(nextExcludedIngredients);
         setPreferencesCompleted(data.preferencesCompleted ?? true);
+        setPreferenceDiet(nextDiet);
+        setPreferenceMaxTime(nextMaxTime);
+        setPreferenceBudget(nextBudget);
+        setPreferenceGoal(nextGoal);
+        setPreferenceCalories(data.calorieTarget?.toString() ?? "");
+        setPreferenceProtein(data.proteinTarget?.toString() ?? "");
+        setPreferenceAllergies(storedPreferences.allergies);
+        setPreferenceDisliked(storedPreferences.disliked);
+        if (data.preferencesCompleted === false) setPreferencesOpen(true);
         if (data.defaultDiet) {
-          setDiet(data.defaultDiet);
-          setDesiredDishDiet(data.defaultDiet);
+          setDiet(nextDiet);
+          setDesiredDishDiet(nextDiet);
         }
-        setMaxTime(String(data.defaultMaxTime ?? 0));
-        setDesiredDishMaxTime(String(data.defaultMaxTime ?? 0));
-        setMaxBudget(String(data.defaultBudget ?? 0));
-        setDesiredDishBudget(String(data.defaultBudget ?? 0));
+        setMaxTime(nextMaxTime);
+        setDesiredDishMaxTime(nextMaxTime);
+        setMaxBudget(nextBudget);
+        setDesiredDishBudget(nextBudget);
       });
   }, [session?.user]);
 
@@ -2271,6 +2428,57 @@ export default function Home() {
     });
   }
 
+  async function saveCookingPreferences(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPreferencesSaving(true);
+    setPreferencesMessage("");
+
+    const nextExcludedIngredients = [
+      ...splitPreferenceItems(preferenceAllergies),
+      ...splitPreferenceItems(preferenceDisliked).map(
+        (item) => `${dislikedPrefix}${item}`,
+      ),
+    ];
+
+    const response = await fetch("/api/preferences", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        calorieTarget: preferenceCalories ? Number(preferenceCalories) : null,
+        proteinTarget: preferenceProtein ? Number(preferenceProtein) : null,
+        defaultDiet: preferenceDiet,
+        defaultMaxTime: Number(preferenceMaxTime),
+        defaultBudget: Number(preferenceBudget),
+        cookingGoal: preferenceGoal,
+        excludedIngredients: nextExcludedIngredients,
+      }),
+    });
+
+    setPreferencesSaving(false);
+
+    if (!response.ok) {
+      const data = (await response.json().catch(() => null)) as {
+        error?: string;
+      } | null;
+      setPreferencesMessage(data?.error ?? preferencesCopy.saveError);
+      return;
+    }
+
+    setCalorieTarget(preferenceCalories ? Number(preferenceCalories) : null);
+    setProteinTarget(preferenceProtein ? Number(preferenceProtein) : null);
+    setCookingGoal(preferenceGoal);
+    setExcludedIngredients(nextExcludedIngredients);
+    setDiet(preferenceDiet);
+    setDesiredDishDiet(preferenceDiet);
+    setMaxTime(preferenceMaxTime);
+    setDesiredDishMaxTime(preferenceMaxTime);
+    setMaxBudget(preferenceBudget);
+    setDesiredDishBudget(preferenceBudget);
+    setPreferencesCompleted(true);
+    setPreferencesOpen(false);
+    setToast(preferencesCopy.saved);
+  }
+
   function restoreHistory(entry: SearchHistoryEntry) {
     if (entry.mode === "dish" && entry.query) {
       setDesiredDish(entry.query);
@@ -2833,13 +3041,14 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  <Link
-                    href="/settings"
+                  <button
+                    type="button"
+                    onClick={() => setPreferencesOpen(true)}
                     tabIndex={preferencesCompleted ? -1 : undefined}
                     className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#013d1d]"
                   >
                     {pageCopy.completeNow}
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -4871,6 +5080,183 @@ export default function Home() {
           language={language}
           onClose={() => setAuthOpen(false)}
         />
+      )}
+
+      {preferencesOpen && (
+        <div
+          className="modal-safe-area fixed inset-0 z-[65] grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={preferencesCopy.title}
+          onClick={() => {
+            if (!preferencesSaving) setPreferencesOpen(false);
+          }}
+        >
+          <form
+            onSubmit={saveCookingPreferences}
+            className="modal-panel-safe w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-7"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#fc5726]">
+                  SmartRecipe
+                </p>
+                <h2 className="mt-1 font-serif text-3xl font-semibold tracking-tight">
+                  {preferencesCopy.title}
+                </h2>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-[#68736b]">
+                  {preferencesCopy.text}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreferencesOpen(false)}
+                disabled={preferencesSaving}
+                className="grid size-10 shrink-0 place-items-center rounded-full bg-[#f1eee7] text-xl text-[#68736b] transition hover:bg-[#e5ded3] disabled:opacity-50"
+                aria-label={preferencesCopy.cancel}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <label className="text-sm font-semibold text-[#25322b]">
+                {preferencesCopy.diet}
+                <select
+                  value={preferenceDiet}
+                  onChange={(event) => setPreferenceDiet(event.target.value)}
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                >
+                  {dietOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {copy.options.diets[
+                        option as keyof typeof copy.options.diets
+                      ] ?? option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="text-sm font-semibold text-[#25322b]">
+                {preferencesCopy.goal}
+                <select
+                  value={preferenceGoal}
+                  onChange={(event) => setPreferenceGoal(event.target.value)}
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                >
+                  {cookingGoalOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {cookingGoalLabels[language][option]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="text-sm font-semibold text-[#25322b]">
+                {preferencesCopy.budget}
+                <select
+                  value={preferenceBudget}
+                  onChange={(event) => setPreferenceBudget(event.target.value)}
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                >
+                  {budgetOptions.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {formatOptionLabel(language, "budget", value, label, currency)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="text-sm font-semibold text-[#25322b]">
+                {preferencesCopy.time}
+                <select
+                  value={preferenceMaxTime}
+                  onChange={(event) => setPreferenceMaxTime(event.target.value)}
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                >
+                  {timeOptions.map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {formatOptionLabel(language, "time", value, label)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="text-sm font-semibold text-[#25322b]">
+                {preferencesCopy.calories}
+                <input
+                  type="number"
+                  min="800"
+                  max="6000"
+                  value={preferenceCalories}
+                  onChange={(event) => setPreferenceCalories(event.target.value)}
+                  placeholder="2200"
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                />
+              </label>
+
+              <label className="text-sm font-semibold text-[#25322b]">
+                {preferencesCopy.protein}
+                <input
+                  type="number"
+                  min="20"
+                  max="400"
+                  value={preferenceProtein}
+                  onChange={(event) => setPreferenceProtein(event.target.value)}
+                  placeholder="120"
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                />
+              </label>
+
+              <label className="text-sm font-semibold text-[#25322b] sm:col-span-2">
+                {preferencesCopy.allergies}
+                <input
+                  value={preferenceAllergies}
+                  onChange={(event) => setPreferenceAllergies(event.target.value)}
+                  placeholder={preferencesCopy.allergiesPlaceholder}
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                />
+                <span className="mt-1 block text-xs font-normal leading-5 text-[#748078]">
+                  {preferencesCopy.allergiesHint}
+                </span>
+              </label>
+
+              <label className="text-sm font-semibold text-[#25322b] sm:col-span-2">
+                {preferencesCopy.disliked}
+                <input
+                  value={preferenceDisliked}
+                  onChange={(event) => setPreferenceDisliked(event.target.value)}
+                  placeholder={preferencesCopy.dislikedPlaceholder}
+                  className="mt-2 block h-12 w-full rounded-xl border border-[#dedfd9] bg-white px-4 font-normal outline-none focus:border-[#71927e]"
+                />
+              </label>
+            </div>
+
+            {preferencesMessage && (
+              <p className="mt-4 rounded-xl bg-[#fff0e8] px-4 py-3 text-sm font-semibold text-[#9a3d24]">
+                {preferencesMessage}
+              </p>
+            )}
+
+            <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setPreferencesOpen(false)}
+                disabled={preferencesSaving}
+                className="h-11 rounded-xl border border-[#dedbd2] bg-white px-5 text-sm font-semibold text-[#68736b] disabled:opacity-50"
+              >
+                {preferencesCopy.cancel}
+              </button>
+              <button
+                disabled={preferencesSaving}
+                className="h-11 rounded-xl bg-[#025026] px-5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#013d1d] disabled:opacity-50"
+              >
+                {preferencesSaving ? preferencesCopy.saving : preferencesCopy.save}
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
       {toast && (
