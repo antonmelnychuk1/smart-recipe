@@ -2802,35 +2802,45 @@ export default function Home() {
         </div>
       )}
 
-      {session?.user && !preferencesCompleted && (
-        <section className={`${nativeTabClass("generator")} pt-4 sm:pt-6`}>
-          <div className={pageContainerClass}>
-            <div className="overflow-hidden rounded-[1.5rem] border border-[#d6e2d8] bg-[#eef6ef] p-4 shadow-sm sm:p-5">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#365a46]">
-                    {pageCopy.setPreferences}
-                  </p>
-                  <p className="mt-1 max-w-3xl text-xs leading-5 text-[#68736b] sm:text-sm">
-                    {pageCopy.preferencesText}
-                  </p>
-                  <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
-                    {pageCopy.onboardingSteps.map((step, index) => (
-                      <span
-                        key={step}
-                        className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#365a46] shadow-sm"
-                      >
-                        {index + 1}. {step}
-                      </span>
-                    ))}
+      {session?.user && (
+        <section
+          className={`${nativeTabClass("generator")} grid transition-[grid-template-rows,opacity,padding] duration-500 ease-out ${
+            preferencesCompleted
+              ? "grid-rows-[0fr] pt-0 opacity-0"
+              : "grid-rows-[1fr] pt-4 opacity-100 sm:pt-6"
+          }`}
+          aria-hidden={preferencesCompleted}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className={pageContainerClass}>
+              <div className="overflow-hidden rounded-[1.5rem] border border-[#d6e2d8] bg-[#eef6ef] p-4 shadow-sm sm:p-5">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-[#365a46]">
+                      {pageCopy.setPreferences}
+                    </p>
+                    <p className="mt-1 max-w-3xl text-xs leading-5 text-[#68736b] sm:text-sm">
+                      {pageCopy.preferencesText}
+                    </p>
+                    <div className="mt-3 flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+                      {pageCopy.onboardingSteps.map((step, index) => (
+                        <span
+                          key={step}
+                          className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#365a46] shadow-sm"
+                        >
+                          {index + 1}. {step}
+                        </span>
+                      ))}
+                    </div>
                   </div>
+                  <Link
+                    href="/settings"
+                    tabIndex={preferencesCompleted ? -1 : undefined}
+                    className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#013d1d]"
+                  >
+                    {pageCopy.completeNow}
+                  </Link>
                 </div>
-                <Link
-                  href="/settings"
-                  className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-[#025026] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#013d1d]"
-                >
-                  {pageCopy.completeNow}
-                </Link>
               </div>
             </div>
           </div>
