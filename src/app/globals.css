@@ -164,6 +164,10 @@ select:focus-visible {
   overscroll-behavior: contain;
 }
 
+.modal-panel-native-safe {
+  padding-bottom: max(1rem, calc(env(safe-area-inset-bottom) + 1rem));
+}
+
 .modal-panel-safe-tall {
   max-height: calc(
     100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 1.5rem
