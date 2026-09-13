@@ -76,7 +76,7 @@ If a reviewer needs to test account features, create a test account using email 
 Suggested demo test account:
 
 - Email: `reviewer@smartrecipeapp.com`
-- Password: `ChangeBeforeSubmission123!`
+- Password: create a temporary password directly in App Store Connect notes before submission. Do not commit the password to the repository.
 
 Before submission, create this account manually and verify that it can:
 
