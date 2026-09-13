@@ -125,7 +125,7 @@ export default async function AboutPage() {
   const copy = aboutCopy[language];
 
   return (
-    <main className="app-shell bg-[#f7f4ed] px-4 py-6 text-[#25322b] sm:px-8 sm:py-10">
+    <main className="app-shell subpage-shell bg-[#f7f4ed] px-4 py-6 text-[#25322b] sm:px-8 sm:py-10">
       <article className="mx-auto max-w-3xl rounded-[2rem] border border-[#e2dfd6] bg-[#fffdf8] p-5 shadow-sm sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
           {siteName}

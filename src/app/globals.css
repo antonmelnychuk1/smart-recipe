@@ -40,6 +40,11 @@ body {
     var(--background);
 }
 
+.subpage-shell {
+  padding-top: max(1.25rem, calc(env(safe-area-inset-top) + 1.25rem));
+  padding-bottom: max(2rem, calc(env(safe-area-inset-bottom) + 2rem));
+}
+
 .app-top-nav {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
@@ -181,6 +186,11 @@ select:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .subpage-shell {
+    padding-top: max(1rem, calc(env(safe-area-inset-top) + 1rem));
+    padding-bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+  }
+
   .app-top-nav {
     padding-top: 0.55rem;
     padding-bottom: 0.55rem;
