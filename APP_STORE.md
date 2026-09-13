@@ -117,6 +117,31 @@ Suggested captions:
 - Plan your meals for the week
 - Keep your pantry organized
 
+See `SCREENSHOTS.md` for the detailed screenshot plan and suggested file names.
+
+## App Store Connect fields
+
+Suggested values for the first release:
+
+- App name: `SmartRecipe`
+- Subtitle: `AI recipes from your pantry`
+- Category: `Food & Drink`
+- Secondary category: `Lifestyle`
+- Content rights: you own or have rights to included app content; recipe photos are loaded through Pexels API where available.
+- Sign-in required: not required for basic preview/generation, but account features use sign-in.
+- Uses encryption: standard HTTPS only; use the existing `ITSAppUsesNonExemptEncryption=false` setting.
+- Advertising identifier: not used.
+- Tracking: not used.
+- In-app purchases: not used in the current version.
+- Push notifications: not used in the current version.
+- Device permissions: none in the current version.
+
+## First release notes
+
+```text
+SmartRecipe helps you turn pantry ingredients into practical recipe ideas. Generate recipes, save favorites, plan meals, manage your kitchen and build shopping lists.
+```
+
 ## Pre-submission checklist
 
 - [ ] Confirm production domain works: `https://smartrecipeapp.com`

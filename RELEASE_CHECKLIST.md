@@ -6,6 +6,12 @@ Use this checklist before deploying SmartRecipe to production or preparing a mob
 
 - [ ] Review recent changes locally.
 - [ ] Make sure no secrets are committed.
+- [ ] Run local iOS release audit:
+
+  ```bash
+  npm run ios:audit
+  ```
+
 - [ ] Run lint:
 
   ```bash
@@ -152,6 +158,8 @@ Before uploading a new iOS build:
 ## 7. App Store Connect
 
 - [ ] Update listing from `APP_STORE.md`.
+- [ ] Copy review notes from `APP_REVIEW_NOTES.md`.
+- [ ] Prepare screenshots using `SCREENSHOTS.md`.
 - [ ] Confirm support URL.
 - [ ] Confirm privacy policy URL.
 - [ ] Confirm app category.

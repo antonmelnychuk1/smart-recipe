@@ -10,6 +10,7 @@
     "mobile:sync": "cap sync",
     "mobile:open:ios": "cap open ios",
     "mobile:open:android": "cap open android",
+    "ios:audit": "node scripts/audit-ios-release.mjs",
     "ios:bump-build": "node scripts/bump-ios-build.mjs",
     "ios:prepare-release": "node scripts/prepare-ios-release.mjs",
     "ios:set-version": "node scripts/set-ios-version.mjs",

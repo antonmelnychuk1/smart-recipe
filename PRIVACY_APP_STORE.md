@@ -268,6 +268,24 @@ Likely selected categories:
 - Usage Data
   - Product Interaction
 
+Suggested purpose mapping:
+
+- Name
+  - App Functionality
+- Email Address
+  - App Functionality
+- Other User Content
+  - App Functionality
+- User ID
+  - App Functionality
+- Product Interaction
+  - App Functionality
+
+For each selected data type:
+
+- Linked to user: **Yes**
+- Used for tracking: **No**
+
 Likely not selected:
 
 - Location
