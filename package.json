@@ -11,6 +11,7 @@
     "mobile:open:ios": "cap open ios",
     "mobile:open:android": "cap open android",
     "ios:bump-build": "node scripts/bump-ios-build.mjs",
+    "ios:set-version": "node scripts/set-ios-version.mjs",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
