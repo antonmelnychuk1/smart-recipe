@@ -251,6 +251,7 @@ const storageKeys = {
   language: "smart-recipe:language",
   currency: "smart-recipe:currency",
   priceRegion: "smart-recipe:price-region",
+  preferencesDismissed: "smart-recipe:preferences-dismissed",
 };
 
 const pageContainerClass = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
@@ -1702,12 +1703,18 @@ export default function Home() {
         const storedPreferences = splitStoredExcludedIngredients(
           nextExcludedIngredients,
         );
+        const preferencesDismissed =
+          window.localStorage.getItem(
+            `${storageKeys.preferencesDismissed}:${session.user.id}`,
+          ) === "true";
+        const nextPreferencesCompleted =
+          (data.preferencesCompleted ?? true) || preferencesDismissed;
 
         setCalorieTarget(data.calorieTarget ?? null);
         setProteinTarget(data.proteinTarget ?? null);
         setCookingGoal(nextGoal);
         setExcludedIngredients(nextExcludedIngredients);
-        setPreferencesCompleted(data.preferencesCompleted ?? true);
+        setPreferencesCompleted(nextPreferencesCompleted);
         setPreferenceDiet(nextDiet);
         setPreferenceMaxTime(nextMaxTime);
         setPreferenceBudget(nextBudget);
@@ -1716,7 +1723,7 @@ export default function Home() {
         setPreferenceProtein(data.proteinTarget?.toString() ?? "");
         setPreferenceAllergies(storedPreferences.allergies);
         setPreferenceDisliked(storedPreferences.disliked);
-        if (data.preferencesCompleted === false) setPreferencesOpen(true);
+        if (!nextPreferencesCompleted) setPreferencesOpen(true);
         if (data.defaultDiet) {
           setDiet(nextDiet);
           setDesiredDishDiet(nextDiet);
@@ -2476,7 +2483,24 @@ export default function Home() {
     setDesiredDishBudget(preferenceBudget);
     setPreferencesCompleted(true);
     setPreferencesOpen(false);
+    if (session?.user.id) {
+      window.localStorage.removeItem(
+        `${storageKeys.preferencesDismissed}:${session.user.id}`,
+      );
+    }
     setToast(preferencesCopy.saved);
+  }
+
+  function dismissCookingPreferences() {
+    if (preferencesSaving) return;
+    if (session?.user.id) {
+      window.localStorage.setItem(
+        `${storageKeys.preferencesDismissed}:${session.user.id}`,
+        "true",
+      );
+    }
+    setPreferencesCompleted(true);
+    setPreferencesOpen(false);
   }
 
   function restoreHistory(entry: SearchHistoryEntry) {
@@ -5250,7 +5274,7 @@ export default function Home() {
             <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
               <button
                 type="button"
-                onClick={() => setPreferencesOpen(false)}
+                onClick={dismissCookingPreferences}
                 disabled={preferencesSaving}
                 className="h-11 rounded-xl border border-[#dedbd2] bg-white px-5 text-sm font-semibold text-[#68736b] disabled:opacity-50"
               >
