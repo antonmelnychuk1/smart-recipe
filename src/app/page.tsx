@@ -2792,7 +2792,7 @@ export default function Home() {
             className="h-auto w-32 object-contain sm:w-40"
           />
         </a>
-        <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] 2xl:flex 2xl:gap-5 2xl:text-sm">
+        <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] xl:flex xl:gap-4">
           <a className="transition hover:text-[#25322b]" href="#how">
             {copy.nav.how}
           </a>
@@ -2808,19 +2808,6 @@ export default function Home() {
           <Link className="transition hover:text-[#25322b]" href="/support">
             {copy.nav.support}
           </Link>
-          {session?.user && (
-            <>
-              <Link className="transition hover:text-[#25322b]" href="/recipes">
-                {copy.nav.saved}
-              </Link>
-              <Link
-                className="transition hover:text-[#25322b]"
-                href="/recipes/history"
-              >
-                {copy.nav.history}
-              </Link>
-            </>
-          )}
           <LocaleSettings
             language={language}
             currency={currency}
@@ -2832,31 +2819,60 @@ export default function Home() {
           {sessionPending ? (
             <span className="h-9 w-24 animate-pulse rounded-full bg-[#e5e2da]" />
           ) : session?.user ? (
-            <div className="flex items-center gap-2 lg:gap-3">
-              {isAdmin && (
-                <a
-                  href="/admin"
-                  className="rounded-full bg-[#253d31] px-4 py-2 text-white"
+            <details className="group relative">
+              <summary className="flex h-10 max-w-40 cursor-pointer list-none items-center gap-2 rounded-full border border-[#d9d7cd] bg-white px-3 text-[#33433a] shadow-sm transition hover:border-[#cbd6cf] hover:bg-[#f8faf7] [&::-webkit-details-marker]:hidden">
+                <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[#eef6ef] text-[11px] font-bold text-[#025026]">
+                  {session.user.name?.charAt(0)?.toUpperCase() ?? "U"}
+                </span>
+                <span className="truncate font-semibold">{session.user.name}</span>
+                <span className="text-[10px] text-[#7a857e] transition group-open:rotate-180">
+                  ▾
+                </span>
+              </summary>
+              <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-[#dedbd2] bg-white p-2 text-sm font-semibold text-[#536159] shadow-xl">
+                <div className="border-b border-[#ebe8e0] px-3 py-2">
+                  <p className="truncate text-[#25322b]">{session.user.name}</p>
+                  <p className="mt-0.5 truncate text-xs font-normal text-[#7a857e]">
+                    {session.user.email}
+                  </p>
+                </div>
+                <Link
+                  href="/recipes"
+                  className="mt-2 block rounded-xl px-3 py-2.5 transition hover:bg-[#f3f6f2] hover:text-[#025026]"
                 >
-                  {copy.nav.admin}
-                </a>
-              )}
-              <a
-                href="/settings"
-                className="rounded-full border border-[#d9d7cd] bg-white px-4 py-2 text-[#33433a] shadow-sm"
-              >
-                {session.user.name}
-              </a>
-              <button
-                onClick={() => {
-                  setIsAdmin(false);
-                  void authClient.signOut();
-                }}
-                className="text-xs text-[#7a857e] hover:text-[#025026]"
-              >
-                {copy.nav.logout}
-              </button>
-            </div>
+                  {copy.nav.savedRecipes}
+                </Link>
+                <Link
+                  href="/recipes/history"
+                  className="block rounded-xl px-3 py-2.5 transition hover:bg-[#f3f6f2] hover:text-[#025026]"
+                >
+                  {copy.nav.recipeHistory}
+                </Link>
+                <Link
+                  href="/settings"
+                  className="block rounded-xl px-3 py-2.5 transition hover:bg-[#f3f6f2] hover:text-[#025026]"
+                >
+                  {copy.nav.accountSettings}
+                </Link>
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="block rounded-xl bg-[#253d31] px-3 py-2.5 text-white transition hover:bg-[#025026]"
+                  >
+                    {copy.nav.adminPanel}
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    setIsAdmin(false);
+                    void authClient.signOut();
+                  }}
+                  className="mt-1 w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-[#a45c45] hover:bg-[#fff4ef]"
+                >
+                  {copy.nav.logoutFull}
+                </button>
+              </div>
+            </details>
           ) : (
             <button
               onClick={() => setAuthOpen(true)}
@@ -2872,7 +2888,7 @@ export default function Home() {
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-navigation"
           onClick={() => setMobileMenuOpen((current) => !current)}
-          className="grid size-10 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm sm:size-11 2xl:hidden"
+          className="grid size-10 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm sm:size-11 xl:hidden"
         >
           <span className="relative block h-4 w-5">
             <span
@@ -2898,7 +2914,7 @@ export default function Home() {
       {!isNativeIosApp && mobileMenuOpen && (
         <div
           id="mobile-navigation"
-          className="app-mobile-menu relative z-30 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl 2xl:hidden"
+          className="app-mobile-menu relative z-30 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl xl:hidden"
         >
           <div className="grid gap-1 text-sm font-semibold text-[#536159]">
             {[
