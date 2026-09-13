@@ -2778,6 +2778,9 @@ export default function Home() {
           <a className="transition hover:text-[#25322b]" href="#meal-planner">
             {copy.nav.planner}
           </a>
+          <Link className="transition hover:text-[#25322b]" href="/about">
+            {copy.nav.about}
+          </Link>
           <Link className="transition hover:text-[#25322b]" href="/support">
             {copy.nav.support}
           </Link>
@@ -2885,6 +2888,7 @@ export default function Home() {
                     [copy.nav.recipeHistory, "/recipes/history"],
                   ]
                 : []),
+              [copy.nav.about, "/about"],
               [copy.nav.support, "/support"],
             ].map(([label, href]) => (
               <Link
@@ -5309,6 +5313,12 @@ export default function Home() {
                   {copy.nav.accountSettings}
                 </Link>
                 <Link
+                  href="/about"
+                  className="rounded-xl bg-[#f8f5ee] px-4 py-3 text-[#35483e]"
+                >
+                  {copy.nav.about}
+                </Link>
+                <Link
                   href="/support"
                   className="rounded-xl bg-[#f8f5ee] px-4 py-3 text-[#35483e]"
                 >
@@ -5412,6 +5422,12 @@ export default function Home() {
             {copy.footer.pexels}
           </a>
           <span className="hidden text-white/25 sm:inline">·</span>
+          <Link
+            href="/about"
+            className="underline decoration-white/30 underline-offset-4 hover:text-white"
+          >
+            {copy.nav.about}
+          </Link>
           <Link
             href="/privacy"
             className="underline decoration-white/30 underline-offset-4 hover:text-white"
