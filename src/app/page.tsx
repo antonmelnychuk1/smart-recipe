@@ -2792,7 +2792,7 @@ export default function Home() {
             className="h-auto w-32 object-contain sm:w-40"
           />
         </a>
-        <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] xl:flex xl:gap-5 xl:text-sm">
+        <div className="hidden items-center gap-3 text-xs font-medium text-[#667168] 2xl:flex 2xl:gap-5 2xl:text-sm">
           <a className="transition hover:text-[#25322b]" href="#how">
             {copy.nav.how}
           </a>
@@ -2872,7 +2872,7 @@ export default function Home() {
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-navigation"
           onClick={() => setMobileMenuOpen((current) => !current)}
-          className="grid size-10 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm sm:size-11 xl:hidden"
+          className="grid size-10 place-items-center rounded-xl border border-[#d9d7cd] bg-white text-[#33433a] shadow-sm sm:size-11 2xl:hidden"
         >
           <span className="relative block h-4 w-5">
             <span
@@ -2898,7 +2898,7 @@ export default function Home() {
       {!isNativeIosApp && mobileMenuOpen && (
         <div
           id="mobile-navigation"
-          className="app-mobile-menu relative z-30 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl xl:hidden"
+          className="app-mobile-menu relative z-30 rounded-2xl border border-[#dedbd2] bg-white p-3 shadow-xl 2xl:hidden"
         >
           <div className="grid gap-1 text-sm font-semibold text-[#536159]">
             {[
