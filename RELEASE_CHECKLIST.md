@@ -136,6 +136,12 @@ Test in iOS Simulator:
 
 Before uploading a new iOS build:
 
+- [ ] Prepare the iOS release locally:
+
+  ```bash
+  npm run ios:prepare-release -- 1.0.1
+  ```
+
 - [ ] Increase build number: `CURRENT_PROJECT_VERSION`.
 - [ ] Increase app version only for user-visible releases: `MARKETING_VERSION`.
 - [ ] Confirm Bundle ID: `com.smartrecipeapp.app`.
