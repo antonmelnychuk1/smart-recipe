@@ -971,8 +971,13 @@ export default function Home() {
   const expiredPantryItems = pantryItems.filter(
     (item) => item.expiresAt !== null && daysUntilExpiry(item.expiresAt) < 0,
   );
+  const generationInProgress = isLoading || desiredDishLoading;
   const modalOpen =
-    Boolean(selectedRecipe) || cookingMode || authOpen || preferencesOpen;
+    Boolean(selectedRecipe) ||
+    cookingMode ||
+    authOpen ||
+    preferencesOpen ||
+    generationInProgress;
   const copy = homeCopy[language];
   const nativeMoreLabel =
     language === "pl" ? "Więcej" : language === "uk" ? "Більше" : "More";
@@ -1742,7 +1747,6 @@ export default function Home() {
       ),
     [generated, generatedRecipes, maxTime, sampleRecipes],
   );
-  const generationInProgress = isLoading || desiredDishLoading;
   const groupedShoppingList = useMemo(
     () =>
       groupShoppingItems(
@@ -2778,6 +2782,10 @@ export default function Home() {
 
   return (
     <main className="app-shell overflow-hidden bg-[#f7f4ed] text-[#25322b]">
+      {isNativeIosApp && (
+        <div className="native-status-glass pointer-events-none fixed inset-x-0 top-0 z-[60]" />
+      )}
+
       {!isNativeIosApp && (
       <nav
         className={`${pageContainerClass} app-top-nav relative z-40 flex items-center justify-between`}
@@ -3388,10 +3396,12 @@ export default function Home() {
             <button
               disabled={ingredients.length === 0 || isLoading}
               className={`mt-auto flex items-center justify-center gap-2 rounded-xl bg-[#025026] font-semibold text-white shadow-lg shadow-[#025026]/20 transition hover:-translate-y-0.5 hover:bg-[#013d1d] disabled:cursor-not-allowed disabled:opacity-40 ${
+                isLoading ? "generating-button" : ""
+              } ${
                 isNativeIosApp ? "col-span-2 h-11 px-4" : "h-12 px-6"
               }`}
             >
-              <Icon name="spark" />{" "}
+              {isLoading ? <span className="button-spinner" /> : <Icon name="spark" />}{" "}
               {isLoading ? copy.generator.generating : copy.generator.generate}
             </button>
           </div>
@@ -3640,10 +3650,16 @@ export default function Home() {
               <button
                 disabled={desiredDish.trim().length < 2 || desiredDishLoading}
                 className={`mt-auto flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#fc5726] font-semibold text-white shadow-lg shadow-[#fc5726]/20 transition hover:-translate-y-0.5 hover:bg-[#d94318] disabled:cursor-not-allowed disabled:opacity-40 ${
+                  desiredDishLoading ? "generating-button" : ""
+                } ${
                   isNativeIosApp ? "col-span-2 h-11 px-4" : "h-12 px-5"
                 }`}
               >
-                <Icon name="spark" />
+                {desiredDishLoading ? (
+                  <span className="button-spinner" />
+                ) : (
+                  <Icon name="spark" />
+                )}
                 {desiredDishLoading ? copy.dish.creating : copy.dish.create}
               </button>
             </div>
@@ -4535,14 +4551,16 @@ export default function Home() {
 
       {selectedRecipe && (
         <div
-          className="modal-safe-area fixed inset-0 z-50 grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
+          className="modal-safe-area app-fade-in fixed inset-0 z-50 grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label={selectedRecipe.title}
           onClick={() => setSelectedRecipe(null)}
         >
           <article
-            className="modal-panel-safe w-full max-w-3xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-9"
+            className={`modal-panel-safe modal-panel-native-safe app-slide-up w-full max-w-3xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:rounded-[2rem] sm:p-9 ${
+              isNativeIosApp ? "modal-panel-tab-safe" : ""
+            }`}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="relative flex items-start justify-between gap-4">
@@ -4816,12 +4834,16 @@ export default function Home() {
 
       {selectedRecipe && cookingMode && (
         <div
-          className="modal-safe-area fixed inset-0 z-[70] grid place-items-center bg-[#18241e]/85 backdrop-blur-md"
+          className="modal-safe-area app-fade-in fixed inset-0 z-[70] grid place-items-center bg-[#18241e]/85 backdrop-blur-md"
           role="dialog"
           aria-modal="true"
           aria-label={`${copy.cookingMode.label} ${selectedRecipe.title}`}
         >
-          <div className="modal-panel-safe-tall w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-8">
+          <div
+            className={`modal-panel-safe-tall modal-panel-native-safe app-slide-up w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-8 ${
+              isNativeIosApp ? "modal-panel-tab-safe" : ""
+            }`}
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#fc5726]">
@@ -5130,9 +5152,37 @@ export default function Home() {
         />
       )}
 
+      {generationInProgress && (
+        <div
+          className="generation-overlay fixed inset-0 z-[80] grid place-items-center bg-[#f7f4ed]/55 px-5 backdrop-blur-xl"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <div className="generation-card w-full max-w-sm rounded-[2rem] border border-white/70 bg-white/72 p-6 text-center text-[#25322b] shadow-2xl shadow-[#25322b]/15">
+            <div className="relative mx-auto grid size-20 place-items-center">
+              <span className="generation-orb absolute size-20 rounded-full bg-[#025026]/15" />
+              <span className="generation-orb absolute size-14 rounded-full bg-[#fc5726]/18 [animation-delay:160ms]" />
+              <span className="relative grid size-12 place-items-center rounded-2xl bg-[#025026] text-white shadow-lg shadow-[#025026]/25">
+                <Icon name="spark" />
+              </span>
+            </div>
+            <p className="mt-5 font-serif text-2xl font-semibold tracking-tight">
+              {isLoading ? copy.generator.loadingTitle : copy.dish.loadingTitle}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-[#617068]">
+              {isLoading ? copy.generator.loadingText : copy.dish.loadingText}
+            </p>
+            <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#e8e2d8]">
+              <div className="h-full w-1/2 rounded-full bg-[#025026] shadow-[0_0_18px_rgba(2,80,38,0.35)] [animation:button-shine_1.3s_ease-in-out_infinite]" />
+            </div>
+          </div>
+        </div>
+      )}
+
       {preferencesOpen && (
         <div
-          className="modal-safe-area fixed inset-0 z-[90] grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
+          className="modal-safe-area app-fade-in fixed inset-0 z-[90] grid place-items-center bg-[#18241e]/60 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label={preferencesCopy.title}
@@ -5142,7 +5192,9 @@ export default function Home() {
         >
           <form
             onSubmit={saveCookingPreferences}
-            className="modal-panel-safe modal-panel-native-safe w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-7"
+            className={`modal-panel-safe modal-panel-native-safe app-slide-up w-full max-w-2xl overflow-y-auto rounded-3xl bg-[#fffdf8] p-4 shadow-2xl sm:p-7 ${
+              isNativeIosApp ? "modal-panel-tab-safe" : ""
+            }`}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
@@ -5399,7 +5451,7 @@ export default function Home() {
       )}
 
       {isNativeIosApp && (
-        <nav className="native-tab-bar fixed z-[70] rounded-[1.45rem] border border-[#dedbd2] bg-white px-1.5 backdrop-blur">
+        <nav className="native-tab-bar fixed z-[70] rounded-[1.45rem] border border-[#dedbd2] bg-white/95 px-1.5 backdrop-blur-xl transition-[bottom,transform,opacity] duration-300">
           <div className="mx-auto grid max-w-md grid-cols-5 gap-0.5">
             {[
               ["generator", nativeTabLabels.generator],
@@ -5415,10 +5467,10 @@ export default function Home() {
                 key={nativeTab}
                 type="button"
                 onClick={() => openNativeTab(nativeTab)}
-                className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1 text-center text-[0.64rem] font-bold leading-[1.05] ${
+                className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1 text-center text-[0.64rem] font-bold leading-[1.05] transition-all duration-200 ${
                   active
                     ? "bg-[#025026] text-white"
-                    : "text-[#5f6c64] active:bg-[#f1eee7]"
+                    : "text-[#5f6c64] active:bg-[#f1eee7] active:scale-95"
                 }`}
               >
                 <span className="grid size-7 place-items-center">
@@ -5431,11 +5483,11 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setNativeMoreOpen((current) => !current)}
-              className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1 text-center text-[0.64rem] font-bold leading-[1.05] ${
+              className={`flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-0.5 py-1 text-center text-[0.64rem] font-bold leading-[1.05] transition-all duration-200 ${
                 nativeMoreOpen
                   ? "bg-[#025026] text-white"
-                  : "text-[#5f6c64] active:bg-[#f1eee7]"
-                }`}
+                  : "text-[#5f6c64] active:bg-[#f1eee7] active:scale-95"
+              }`}
             >
               <span className="grid size-7 place-items-center">
                 <NativeTabIcon name="more" active={nativeMoreOpen} />
